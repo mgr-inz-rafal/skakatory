@@ -8,10 +8,14 @@
 
             icl 'src\atari.inc'
 
-FRAME_COUNT     equ 4
-SCR_MEM_1	    equ	$4000
-SCR_MEM_2	    equ	$6000
+FRAME_COUNT     equ 6
+SCR_MEM_1	    equ	$4150
+SCR_MEM_1_P2    equ $5000
+SCR_MEM_2	    equ	$6150
+SCR_MEM_2_P2    equ $7000
 @TAB_MEM_BANKS  equ $0600
+
+.zpvar          CURRENT_FRAME .byte
 
 //------------------------------------------------
 // Memory detection
@@ -104,6 +108,81 @@ dBANK   DTA B($E3),B($C3),B($A3),B($83),B($63),B($43),B($23),B($03)
 
 dSAFE	.ds MAX_BANKS
 
+//------------------------------------------------
+// Main program start
+//------------------------------------------------
+PROGRAM_START_FIRST_PART
+            jsr GAME_STATE_INIT
+
+		    ldx <DLIST_GAME
+		    ldy >DLIST_GAME
+		    stx SDLSTL
+		    sty SDLSTL+1
+
+AGAIN       
+            ldx #0
+            jsr SHOW_FRAME
+
+            ldx #60
+            jsr WAIT_FRAMES
+
+            ldx #1
+            jsr SHOW_FRAME
+
+            ldx #60
+            jsr WAIT_FRAMES
+
+            jmp AGAIN
+        
+CHUJ        jmp CHUJ
+
+; Number of frames in X
+WAIT_FRAMES
+            cpx #0
+            beq @+
+            jsr SYNCHRO
+            dex
+            jmp WAIT_FRAMES
+@           rts
+
+SYNCHRO
+            lda PAL
+            beq SYN_0
+            lda #120	; NTSC
+            jmp SYN_1
+SYN_0       lda #145	; PAL
+SYN_1       cmp VCOUNT
+            bne SYN_1
+            rts
+
+GAME_STATE_INIT
+            lda #0
+            sta CURRENT_FRAME
+            tay
+            lda @TAB_MEM_BANKS,y
+            sta PORTB
+            rts           
+
+; Frame number in X
+SHOW_FRAME
+            txa
+            and %00000001
+            beq SF_FIRST
+		    mwa #SCR_MEM_1      DLIST_ADDR_TOP
+		    mwa #SCR_MEM_1_P2   DLIST_ADDR_BOTTOM
+            jmp SF_X
+SF_FIRST
+		    mwa #SCR_MEM_2      DLIST_ADDR_TOP
+		    mwa #SCR_MEM_2_P2   DLIST_ADDR_BOTTOM
+SF_X
+            rts             
+
+PROGRAM_END_FIRST_PART      ; Can't cross $4000
+
+
+//------------------------------------------------
+// Loading data into extram
+//------------------------------------------------
             ini INIT_00
 
 ; Frames 3, 4 into BANK #1
@@ -134,8 +213,21 @@ INIT_02
             org SCR_MEM_2
             ins "frames/6.bin"
 
-            run PROGRAM_START
+            run PROGRAM_START_FIRST_PART
 
-PROGRAM_START
+.align		$400
+DLIST_GAME
+:3			dta b($70)
+DLIST_MEM_TOP
+			dta b($4e)
+DLIST_ADDR_TOP
+			dta a($0000)
+:93			dta b($0e)
+DLIST_MEM_BOTTOM
+			dta b($4e)
+DLIST_ADDR_BOTTOM
+			dta a($0000)
+:97			dta b($0e)
+			dta b($41),a(DLIST_GAME)
 
-CHUJ        jmp CHUJ
+           
