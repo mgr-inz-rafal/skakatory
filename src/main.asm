@@ -119,23 +119,24 @@ PROGRAM_START_FIRST_PART
 		    stx SDLSTL
 		    sty SDLSTL+1
 
-AGAIN       
-            ldx #0
+GAME_LOOP
+            ldx CURRENT_FRAME
             jsr SHOW_FRAME
-
-            ldx #60
+            ldx #120
             jsr WAIT_FRAMES
 
-            ldx #1
-            jsr SHOW_FRAME
+            inc CURRENT_FRAME
+            lda CURRENT_FRAME
+            cmp #FRAME_COUNT
+            beq ANIM_AGAIN
+            jmp GAME_LOOP
 
-            ldx #60
-            jsr WAIT_FRAMES
+ANIM_AGAIN
+            lda #0
+            sta CURRENT_FRAME            
 
-            jmp AGAIN
+            jmp GAME_LOOP
         
-CHUJ        jmp CHUJ
-
 ; Number of frames in X
 WAIT_FRAMES
             cpx #0
@@ -165,9 +166,19 @@ GAME_STATE_INIT
 
 ; Frame number in X
 SHOW_FRAME
+; Pick correct ext ram bank
+            txa
+            pha
+            lsr
+            tay
+            lda @TAB_MEM_BANKS,y
+            sta PORTB
+            pla
+
+; Pick correct frame from ext ram bank
             txa
             and %00000001
-            beq SF_FIRST
+            bne SF_FIRST
 		    mwa #SCR_MEM_1      DLIST_ADDR_TOP
 		    mwa #SCR_MEM_1_P2   DLIST_ADDR_BOTTOM
             jmp SF_X
