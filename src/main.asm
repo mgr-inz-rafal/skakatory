@@ -1,17 +1,17 @@
 ; First two frames in main memory
             org SCR_MEM_1		
-            ins "frames/1.bin"
+            ins "frames/f0.bin"
             org SCR_MEM_2
-            ins "frames/2.bin"
+            ins "frames/f1.bin"
 
             org $2000
 
             icl 'src\atari.inc'
 
-FRAME_COUNT     equ 6
-SCR_MEM_1	    equ	$4150
+FRAME_COUNT     equ 60
+SCR_MEM_1       equ $4150
 SCR_MEM_1_P2    equ $5000
-SCR_MEM_2	    equ	$6150
+SCR_MEM_2       equ $6150
 SCR_MEM_2_P2    equ $7000
 @TAB_MEM_BANKS  equ $0600
 
@@ -122,7 +122,7 @@ PROGRAM_START_FIRST_PART
 GAME_LOOP
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
-            ldx #120
+            ldx #20
             jsr WAIT_FRAMES
 
             inc CURRENT_FRAME
@@ -190,55 +190,44 @@ SF_X
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
+; Call mem detect proc
+            ini INIT_00
 
 //------------------------------------------------
 // Loading data into extram
 //------------------------------------------------
-            ini INIT_00
+.rept FRAME_COUNT/2-1, #+1, #*2+2, #*2+3
 
-; Frames 3, 4 into BANK #1
+; Frames 3.. into ext ram banks
             org $6A0
-INIT_01 
-            ldy #1
+INIT_:1
+            ldy #:1
             lda @TAB_MEM_BANKS,y
             sta PORTB
             rts
 
-            ini INIT_01
+            ini INIT_:1
             org SCR_MEM_1		
-            ins "frames/3.bin"
+            ins "frames/f:2.bin"
             org SCR_MEM_2
-            ins "frames/4.bin"
-
-; Frames 5, 6 into BANK #2
-            org $6A0
-INIT_02
-            ldy #2
-            lda @TAB_MEM_BANKS,y
-            sta PORTB
-            rts
-
-            ini INIT_02
-            org SCR_MEM_1		
-            ins "frames/5.bin"
-            org SCR_MEM_2
-            ins "frames/6.bin"
+            ins "frames/f:3.bin"
+.endr
 
             run PROGRAM_START_FIRST_PART
 
 .align		$400
 DLIST_GAME
-:3			dta b($70)
+:3          dta b($70)
 DLIST_MEM_TOP
-			dta b($4e)
+            dta b($4e)
 DLIST_ADDR_TOP
-			dta a($0000)
-:93			dta b($0e)
+            dta a($0000)
+:93         dta b($0e)
 DLIST_MEM_BOTTOM
-			dta b($4e)
+            dta b($4e)
 DLIST_ADDR_BOTTOM
-			dta a($0000)
-:97			dta b($0e)
-			dta b($41),a(DLIST_GAME)
+            dta a($0000)
+:97         dta b($0e)
+            dta b($41),a(DLIST_GAME)
 
            
