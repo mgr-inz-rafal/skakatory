@@ -114,10 +114,10 @@ dSAFE	.ds MAX_BANKS
 PROGRAM_START_FIRST_PART
             jsr GAME_STATE_INIT
 
-		    ldx <DLIST_GAME
-		    ldy >DLIST_GAME
-		    stx SDLSTL
-		    sty SDLSTL+1
+            ldx <DLIST_GAME
+            ldy >DLIST_GAME
+            stx SDLSTL
+            sty SDLSTL+1
 
 GAME_LOOP
             ldx CURRENT_FRAME
