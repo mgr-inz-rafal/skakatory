@@ -4,8 +4,6 @@
             org SCR_MEM_2
             ins "frames/f1.bin"
 
-            org $2000
-
             icl 'src\atari.inc'
 
 FRAME_COUNT     equ 60
@@ -20,6 +18,7 @@ SCR_MEM_2_P2    equ $7000
 //------------------------------------------------
 // Memory detection
 //------------------------------------------------
+            org $600
 INIT_00
 MAX_BANKS = 64		; maksymalna liczba banków pamięci
 	LDA $7FFF	; bajt z pamięci podstawowej
@@ -108,10 +107,64 @@ dBANK   DTA B($E3),B($C3),B($A3),B($83),B($63),B($43),B($23),B($03)
 
 dSAFE	.ds MAX_BANKS
 
+            org $2000
+
+; --------- DLI & PMG data --------------------------
+.align $1000
+PMG_BASE
+SCENE_DISPLAY_LIST
+DLIST_GAME
+:3          dta b($70)
+DLIST_MEM_TOP
+            dta b($4e)
+DLIST_ADDR_TOP
+            dta a($0000)
+:93         dta b($0e)
+DLIST_MEM_BOTTOM
+            dta b($4e)
+DLIST_ADDR_BOTTOM
+            dta a($0000)
+:97         dta b($0e)
+            dta b($41),a(DLIST_GAME)
+DL_MAIN_AREA
+            dta b('J')
+            dta b('E')
+            dta b('B')
+            dta b('A')
+            dta b('C')
+            dta b(' ')
+            dta b('P')
+            dta b('I')
+            dta b('S')
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b($40)
+            dta b(%00000010)
+            dta b(%00000010)
+            dta b(%00000010)
+            dta b(%00000010)
+            dta b($41), a(SCENE_DISPLAY_LIST)
+
+:$800       dta b(0)
+PMG_M0      equ PMG_BASE+$300
+PMG_P0      equ PMG_BASE+$400
+PMG_P1      equ PMG_BASE+$500
+PMG_P2      equ PMG_BASE+$600
+PMG_P3      equ PMG_BASE+$700
+PMG_END     equ PMG_BASE+$800
+
 //------------------------------------------------
 // Main program start
 //------------------------------------------------
 PROGRAM_START_FIRST_PART
+            jsr GAME_ENGINE_INIT
             jsr GAME_STATE_INIT
 
             ldx <DLIST_GAME
@@ -136,6 +189,26 @@ ANIM_AGAIN
             sta CURRENT_FRAME            
 
             jmp GAME_LOOP
+
+GAME_ENGINE_INIT
+; --------- Enable sprites                   
+            lda #>PMG_BASE
+            sta PMBASE
+            lda #%00100001
+            sta GPRIOR
+            lda #%00000011
+            sta GRACTL
+            lda SDMCTL
+            ora #%00011100
+            sta SDMCTL
+
+            lda #$7a
+            sta HPOSP0
+            sta PCOLR0
+            lda #$aa
+            sta PMG_P0+70
+
+            rts
         
 ; Number of frames in X
 WAIT_FRAMES
@@ -198,7 +271,7 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
 //------------------------------------------------
 .rept FRAME_COUNT/2-1, #+1, #*2+2, #*2+3
 
-; Frames 3.. into ext ram banks
+; Frames 3..FRAME_COUNT into ext ram banks
             org $6A0
 INIT_:1
             ldy #:1
@@ -214,20 +287,4 @@ INIT_:1
 .endr
 
             run PROGRAM_START_FIRST_PART
-
-.align		$400
-DLIST_GAME
-:3          dta b($70)
-DLIST_MEM_TOP
-            dta b($4e)
-DLIST_ADDR_TOP
-            dta a($0000)
-:93         dta b($0e)
-DLIST_MEM_BOTTOM
-            dta b($4e)
-DLIST_ADDR_BOTTOM
-            dta a($0000)
-:97         dta b($0e)
-            dta b($41),a(DLIST_GAME)
-
            
