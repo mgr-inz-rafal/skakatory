@@ -26,6 +26,7 @@ LIFT_LEN_MAX    equ 30
 ; Counts cooldown between updates within a jump phase
 .zpvar          JUMP_TICKER   .byte
 THRUST_TICK     equ 30
+LIFT_TICK       equ 100
 
 .zpvar          P1_STATE      .byte
 PS_IDLE         equ 0
@@ -225,7 +226,10 @@ PLAYER_TICK
             cmp #PS_THRUST
             bne @+
             jsr DO_THRUST
-@
+            rts
+@           cmp #PS_LIFT
+            bne @+
+            jsr DO_LIFT
 PT_X        rts
 
 INIT_THRUST
@@ -249,9 +253,26 @@ DT_2        lda JUMP_COUNTER
             rts
 DT_1        lda #0
             sta JUMP_COUNTER
+            lda #LIFT_TICK
             sta JUMP_TICKER
             lda #PS_LIFT
             sta P1_STATE
+            rts
+
+DO_LIFT
+            dec JUMP_TICKER
+            beq DL_2
+            rts
+DL_2        lda JUMP_COUNTER
+            cmp #LIFT_LEN_MIN
+            beq DL_1
+            jsr MOVE_PLAYER_UP
+            inc JUMP_COUNTER
+            lda #LIFT_TICK
+            sta JUMP_TICKER
+            rts
+DL_1        
+CHUJ        jmp CHUJ
             rts
 
 MOVE_PLAYER_UP
