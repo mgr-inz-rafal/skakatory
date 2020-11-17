@@ -17,10 +17,15 @@ SCR_MEM_2_P2    equ $7000
 .zpvar          P1_X          .byte 
 .zpvar          P1_Y          .byte
 
+; Counts the len of a jump phase
 .zpvar          JUMP_COUNTER  .byte
 THRUST_LEN      equ 10
 LIFT_LEN_MIN    equ 10
 LIFT_LEN_MAX    equ 30
+
+; Counts cooldown between updates within a jump phase
+.zpvar          JUMP_TICKER   .byte
+THRUST_TICK     equ 30
 
 .zpvar          P1_STATE      .byte
 PS_IDLE         equ 0
@@ -208,8 +213,7 @@ START_JUMP
             lda P1_STATE
             cmp #PS_IDLE
             bne DJ_X
-            lda #0
-            sta JUMP_COUNTER
+            jsr INIT_THRUST
             lda #PS_THRUST
             sta P1_STATE
 DJ_X        rts
@@ -224,15 +228,28 @@ PLAYER_TICK
 @
 PT_X        rts
 
+INIT_THRUST
+            lda #0
+            sta JUMP_COUNTER
+            lda #THRUST_TICK
+            sta JUMP_TICKER
+            rts
+
 DO_THRUST
-            lda JUMP_COUNTER
+            dec JUMP_TICKER
+            beq DT_2
+            rts
+DT_2        lda JUMP_COUNTER
             cmp #THRUST_LEN
             beq DT_1
             jsr MOVE_PLAYER_UP
             inc JUMP_COUNTER
+            lda #THRUST_TICK
+            sta JUMP_TICKER
             rts
 DT_1        lda #0
             sta JUMP_COUNTER
+            sta JUMP_TICKER
             lda #PS_LIFT
             sta P1_STATE
             rts
