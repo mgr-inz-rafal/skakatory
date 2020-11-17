@@ -17,6 +17,17 @@ SCR_MEM_2_P2    equ $7000
 .zpvar          P1_X          .byte 
 .zpvar          P1_Y          .byte
 
+.zpvar          JUMP_COUNTER  .byte
+THRUST_LEN      equ 10
+LIFT_LEN_MIN    equ 10
+LIFT_LEN_MAX    equ 30
+
+.zpvar          P1_STATE      .byte
+PS_IDLE         equ 0
+PS_THRUST       equ 1
+PS_LIFT         equ 2
+PS_FALL         equ 3
+
 //------------------------------------------------
 // Memory detection
 //------------------------------------------------
@@ -25,7 +36,6 @@ INIT_00
 MAX_BANKS = 64		; maksymalna liczba banków pamięci
 	LDA $7FFF	; bajt z pamięci podstawowej
 	STA TEMP
-
 
         LDX #MAX_BANKS-1
 
@@ -177,16 +187,60 @@ PROGRAM_START_FIRST_PART
             jsr PAINT_PLAYERS
 
 GAME_LOOP
+            jsr PLAYER_TICK
+
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
-            ldx #20
-            jsr WAIT_FRAMES
+            // ldx #20
+            // jsr WAIT_FRAMES
 
             inc CURRENT_FRAME
             lda CURRENT_FRAME
             cmp #FRAME_COUNT
             beq ANIM_AGAIN
-            jmp GAME_LOOP
+
+            lda STRIG0
+            bne @+
+            jsr START_JUMP
+@           jmp GAME_LOOP
+
+START_JUMP
+            lda P1_STATE
+            cmp #PS_IDLE
+            bne DJ_X
+            lda #0
+            sta JUMP_COUNTER
+            lda #PS_THRUST
+            sta P1_STATE
+DJ_X        rts
+
+PLAYER_TICK
+            lda P1_STATE
+            cmp #PS_IDLE
+            beq PT_X
+            cmp #PS_THRUST
+            bne @+
+            jsr DO_THRUST
+@
+PT_X        rts
+
+DO_THRUST
+            lda JUMP_COUNTER
+            cmp #THRUST_LEN
+            beq DT_1
+            jsr MOVE_PLAYER_UP
+            inc JUMP_COUNTER
+            rts
+DT_1        lda #0
+            sta JUMP_COUNTER
+            lda #PS_LIFT
+            sta P1_STATE
+            rts
+
+MOVE_PLAYER_UP
+            dec P1_Y
+            jsr PAINT_PLAYERS
+            rts
 
 ANIM_AGAIN
             lda #0
@@ -251,6 +305,8 @@ INIT_PLAYERS
             sta P1_Y
             lda #$1f
             sta PCOLR0
+            lda #PS_IDLE
+            sta P1_STATE
             rts
 
 ; Number of frames in X
