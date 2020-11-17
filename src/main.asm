@@ -18,6 +18,8 @@ SCR_MEM_2_P2    equ $7000
 .zpvar          P1_Y                  .byte
 .zpvar          OPTIONAL_LIFT_ALLOWED .byte
 
+BASE_Y_POS      equ 156
+
 ; Counts the len of a jump phase
 .zpvar          JUMP_COUNTER  .byte
 THRUST_LEN      equ 10
@@ -28,6 +30,7 @@ LIFT_LEN_MAX    equ 30
 .zpvar          JUMP_TICKER   .byte
 THRUST_TICK     equ 30
 LIFT_TICK       equ 100
+FALL_TICK       equ 200
 
 .zpvar          P1_STATE      .byte
 PS_IDLE          equ 0
@@ -241,7 +244,8 @@ PLAYER_TICK
             rts
 @           cmp #PS_FALL
             bne @+
-CHUJ        jmp CHUJ
+            jsr DO_FALL
+            rts
 @
 PT_X        rts
 
@@ -270,6 +274,22 @@ DT_1        lda #0
             sta JUMP_TICKER
             lda #PS_LIFT
             sta P1_STATE
+            rts
+
+DO_FALL
+            dec JUMP_TICKER
+            beq DF_2
+            rts
+DF_2        lda P1_Y
+            cmp #BASE_Y_POS
+            beq DF_1
+            jsr MOVE_PLAYER_DOWN
+            inc JUMP_COUNTER
+            lda #FALL_TICK
+            sta JUMP_TICKER
+            rts
+DF_1        
+CHUJ        jmp CHUJ
             rts
 
 DO_LIFT
@@ -328,6 +348,11 @@ DLO_1       lda #0
 
 MOVE_PLAYER_UP
             dec P1_Y
+            jsr PAINT_PLAYERS
+            rts
+
+MOVE_PLAYER_DOWN
+            inc P1_Y
             jsr PAINT_PLAYERS
             rts
 
@@ -390,7 +415,7 @@ GAME_ENGINE_INIT
 INIT_PLAYERS
             lda #$50
             sta P1_X
-            lda #156
+            lda #BASE_Y_POS
             sta P1_Y
             lda #$1f
             sta PCOLR0
