@@ -29,10 +29,11 @@ THRUST_TICK     equ 30
 LIFT_TICK       equ 100
 
 .zpvar          P1_STATE      .byte
-PS_IDLE         equ 0
-PS_THRUST       equ 1
-PS_LIFT         equ 2
-PS_FALL         equ 3
+PS_IDLE          equ 0
+PS_THRUST        equ 1
+PS_LIFT          equ 2
+PS_LIFT_OPTIONAL equ 4
+PS_FALL          equ 3
 
 //------------------------------------------------
 // Memory detection
@@ -203,7 +204,7 @@ GAME_LOOP
             inc CURRENT_FRAME
             lda CURRENT_FRAME
             cmp #FRAME_COUNT
-            beq ANIM_AGAIN
+            jeq ANIM_AGAIN
 
             lda STRIG0
             bne @+
@@ -230,6 +231,12 @@ PLAYER_TICK
 @           cmp #PS_LIFT
             bne @+
             jsr DO_LIFT
+            rts
+@           cmp #PS_LIFT_OPTIONAL
+            bne @+
+            jsr DO_LIFT_OPTIONAL
+            rts
+@            
 PT_X        rts
 
 INIT_THRUST
@@ -271,8 +278,40 @@ DL_2        lda JUMP_COUNTER
             lda #LIFT_TICK
             sta JUMP_TICKER
             rts
-DL_1        
-CHUJ        jmp CHUJ
+DL_1        lda #0
+            sta JUMP_COUNTER
+            lda #LIFT_TICK
+            sta JUMP_TICKER
+            lda STRIG0
+            beq DL_3
+            lda #PS_IDLE    ; TODO: Fall here
+            sta P1_STATE
+            rts
+DL_3        lda #PS_LIFT_OPTIONAL
+            sta P1_STATE
+            rts
+
+DO_LIFT_OPTIONAL
+            lda #55
+            sta PCOLR0
+
+            dec JUMP_TICKER
+            beq DLO_2
+            rts
+DLO_2       lda JUMP_COUNTER
+            cmp #LIFT_LEN_MAX
+            beq DLO_1
+            jsr MOVE_PLAYER_UP
+            inc JUMP_COUNTER
+            lda #LIFT_TICK
+            sta JUMP_TICKER
+            rts
+DLO_1       lda #0
+            sta JUMP_COUNTER
+            lda #LIFT_TICK
+            sta JUMP_TICKER
+            lda #PS_IDLE
+            sta P1_STATE
             rts
 
 MOVE_PLAYER_UP
