@@ -13,9 +13,10 @@ SCR_MEM_2       equ $6150
 SCR_MEM_2_P2    equ $7000
 @TAB_MEM_BANKS  equ $0600
 
-.zpvar          CURRENT_FRAME .byte
-.zpvar          P1_X          .byte 
-.zpvar          P1_Y          .byte
+.zpvar          CURRENT_FRAME         .byte
+.zpvar          P1_X                  .byte 
+.zpvar          P1_Y                  .byte
+.zpvar          OPTIONAL_LIFT_ALLOWED .byte
 
 ; Counts the len of a jump phase
 .zpvar          JUMP_COUNTER  .byte
@@ -212,6 +213,8 @@ GAME_LOOP
 @           jmp GAME_LOOP
 
 START_JUMP
+            lda #1
+            sta OPTIONAL_LIFT_ALLOWED
             lda P1_STATE
             cmp #PS_IDLE
             bne DJ_X
@@ -236,7 +239,10 @@ PLAYER_TICK
             bne @+
             jsr DO_LIFT_OPTIONAL
             rts
-@            
+@           cmp #PS_FALL
+            bne @+
+CHUJ        jmp CHUJ
+@
 PT_X        rts
 
 INIT_THRUST
@@ -284,10 +290,16 @@ DL_1        lda #0
             sta JUMP_TICKER
             lda STRIG0
             beq DL_3
-            lda #PS_IDLE    ; TODO: Fall here
+            lda #PS_FALL
             sta P1_STATE
             rts
-DL_3        lda #PS_LIFT_OPTIONAL
+DL_3        lda OPTIONAL_LIFT_ALLOWED
+            bne DL_4
+            lda #PS_FALL
+            sta P1_STATE
+            rts
+DL_4        dec OPTIONAL_LIFT_ALLOWED
+            lda #PS_LIFT_OPTIONAL
             sta P1_STATE
             rts
 
@@ -310,7 +322,7 @@ DLO_1       lda #0
             sta JUMP_COUNTER
             lda #LIFT_TICK
             sta JUMP_TICKER
-            lda #PS_IDLE
+            lda #PS_FALL
             sta P1_STATE
             rts
 
