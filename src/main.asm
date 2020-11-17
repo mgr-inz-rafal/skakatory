@@ -14,6 +14,8 @@ SCR_MEM_2_P2    equ $7000
 @TAB_MEM_BANKS  equ $0600
 
 .zpvar          CURRENT_FRAME .byte
+.zpvar          P1_X          .byte 
+.zpvar          P1_Y          .byte
 
 //------------------------------------------------
 // Memory detection
@@ -172,6 +174,8 @@ PROGRAM_START_FIRST_PART
             stx SDLSTL
             sty SDLSTL+1
 
+            jsr PAINT_PLAYERS
+
 GAME_LOOP
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
@@ -190,6 +194,41 @@ ANIM_AGAIN
 
             jmp GAME_LOOP
 
+PAINT_PLAYERS
+            ldy P1_Y
+            ldx #0
+@           lda PLAYER_DATA,x
+            sta PMG_P0,y
+            iny
+            inx
+            cpx #20
+            bne @-
+            lda P1_X
+            sta HPOSP0
+            rts
+
+PLAYER_DATA
+            dta b($aa)
+            dta b($ab)
+            dta b($ac)
+            dta b($ad)
+            dta b($ae)
+            dta b($af)
+            dta b($ba)
+            dta b($bb)
+            dta b($bc)
+            dta b($bd)
+            dta b($aa)
+            dta b($ab)
+            dta b($ac)
+            dta b($ad)
+            dta b($ae)
+            dta b($af)
+            dta b($ba)
+            dta b($bb)
+            dta b($bc)
+            dta b($bd)
+
 GAME_ENGINE_INIT
 ; --------- Enable sprites                   
             lda #>PMG_BASE
@@ -202,14 +241,18 @@ GAME_ENGINE_INIT
             ora #%00011100
             sta SDMCTL
 
-            lda #$7a
-            sta HPOSP0
-            sta PCOLR0
-            lda #$aa
-            sta PMG_P0+70
-
+            jsr INIT_PLAYERS
             rts
         
+INIT_PLAYERS
+            lda #$50
+            sta P1_X
+            lda #156
+            sta P1_Y
+            lda #$1f
+            sta PCOLR0
+            rts
+
 ; Number of frames in X
 WAIT_FRAMES
             cpx #0
