@@ -337,7 +337,12 @@ DLO_2       lda JUMP_COUNTER
             inc JUMP_COUNTER
             lda #LIFT_TICK
             sta JUMP_TICKER
-            rts
+            ; Cancel optional phase when fire is released
+            lda STRIG0
+            beq @+
+            lda #PS_FALL
+            sta P1_STATE
+@           rts
 DLO_1       lda #0
             sta JUMP_COUNTER
             lda #LIFT_TICK
