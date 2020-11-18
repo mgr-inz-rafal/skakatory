@@ -24,7 +24,6 @@ BASE_Y_POS      equ 156
 .zpvar          CURRENT_ROTATION_COOLDOWN   .byte
 INITIAL_ROTATION_COOLDOWN   equ 250
 
-
 ; Counts the len of a jump phase
 .zpvar          JUMP_COUNTER  .byte
 THRUST_LEN          equ 10
@@ -35,11 +34,12 @@ LIFT_LEN_MAX        equ 30
 .zpvar          JUMP_TICKER   .byte
 THRUST_TICK         equ 30
 LIFT_TICK           equ 60
-FALL_TICK           equ 200
+FALL_TICK           equ 255
 
 ; Counter for the optional lift phase is increased gradually,
-; so the ancension slows down
-.zpvar          CURRENT_OPTIONAL_LIFT_TICK .byte
+; so the ancension slows down. For the fall phase, it is
+; decreased, so the decline speeds up.
+.zpvar          VARIABLE_SPEED_JUMP_PHASE_TICK .byte
 
 .zpvar          P1_STATE      .byte
 PS_IDLE             equ 0
@@ -223,7 +223,7 @@ START_JUMP
             cmp #PS_IDLE
             bne DJ_X
             lda #LIFT_TICK
-            sta CURRENT_OPTIONAL_LIFT_TICK
+            sta VARIABLE_SPEED_JUMP_PHASE_TICK
             lda #1
             sta OPTIONAL_LIFT_ALLOWED
             jsr INIT_THRUST
@@ -305,11 +305,19 @@ DF_2        lda P1_Y
             beq DF_1
             jsr MOVE_PLAYER_DOWN
             inc JUMP_COUNTER
-            lda #FALL_TICK
+            lda VARIABLE_SPEED_JUMP_PHASE_TICK
+            sec
+            sbc #25
+            bcc DF_3
+            sta VARIABLE_SPEED_JUMP_PHASE_TICK
             sta JUMP_TICKER
             rts
 DF_1        lda #PS_IDLE
             sta P1_STATE
+            rts
+DF_3        lda #20
+            sta VARIABLE_SPEED_JUMP_PHASE_TICK
+            sta JUMP_TICKER
             rts
 
 DO_LIFT
@@ -332,11 +340,15 @@ DL_1        lda #0
             beq DL_3
             lda #PS_FALL
             sta P1_STATE
+            lda #FALL_TICK
+            sta VARIABLE_SPEED_JUMP_PHASE_TICK
             rts
 DL_3        lda OPTIONAL_LIFT_ALLOWED
             bne DL_4
             lda #PS_FALL
             sta P1_STATE
+            lda #FALL_TICK
+            sta VARIABLE_SPEED_JUMP_PHASE_TICK
             rts
 DL_4        dec OPTIONAL_LIFT_ALLOWED
             lda #PS_LIFT_OPTIONAL
@@ -355,16 +367,18 @@ DLO_2       lda JUMP_COUNTER
             beq DLO_1
             jsr MOVE_PLAYER_UP
             inc JUMP_COUNTER
-            lda CURRENT_OPTIONAL_LIFT_TICK
+            lda VARIABLE_SPEED_JUMP_PHASE_TICK
             clc
             adc #7
-            sta CURRENT_OPTIONAL_LIFT_TICK
+            sta VARIABLE_SPEED_JUMP_PHASE_TICK
             sta JUMP_TICKER
             ; Cancel optional phase when fire is released
             lda STRIG0
             beq @+
             lda #PS_FALL
             sta P1_STATE
+            lda #FALL_TICK
+            sta VARIABLE_SPEED_JUMP_PHASE_TICK
 @           rts
 DLO_1       lda #0
             sta JUMP_COUNTER
@@ -372,6 +386,8 @@ DLO_1       lda #0
             sta JUMP_TICKER
             lda #PS_FALL
             sta P1_STATE
+            lda #FALL_TICK
+            sta VARIABLE_SPEED_JUMP_PHASE_TICK
             rts
 
 MOVE_PLAYER_UP
