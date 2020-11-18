@@ -288,8 +288,8 @@ DF_2        lda P1_Y
             lda #FALL_TICK
             sta JUMP_TICKER
             rts
-DF_1        
-CHUJ        jmp CHUJ
+DF_1        lda #PS_IDLE
+            sta P1_STATE
             rts
 
 DO_LIFT
