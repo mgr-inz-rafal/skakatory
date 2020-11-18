@@ -34,8 +34,12 @@ LIFT_LEN_MAX        equ 30
 ; Counts cooldown between updates within a jump phase
 .zpvar          JUMP_TICKER   .byte
 THRUST_TICK         equ 30
-LIFT_TICK           equ 100
+LIFT_TICK           equ 60
 FALL_TICK           equ 200
+
+; Counter for the optional lift phase is increased gradually,
+; so the ancension slows down
+.zpvar          CURRENT_OPTIONAL_LIFT_TICK .byte
 
 .zpvar          P1_STATE      .byte
 PS_IDLE             equ 0
@@ -215,11 +219,13 @@ GAME_LOOP
 @           jmp GAME_LOOP
 
 START_JUMP
-            lda #1
-            sta OPTIONAL_LIFT_ALLOWED
             lda P1_STATE
             cmp #PS_IDLE
             bne DJ_X
+            lda #LIFT_TICK
+            sta CURRENT_OPTIONAL_LIFT_TICK
+            lda #1
+            sta OPTIONAL_LIFT_ALLOWED
             jsr INIT_THRUST
             lda #PS_THRUST
             sta P1_STATE
@@ -349,7 +355,10 @@ DLO_2       lda JUMP_COUNTER
             beq DLO_1
             jsr MOVE_PLAYER_UP
             inc JUMP_COUNTER
-            lda #LIFT_TICK
+            lda CURRENT_OPTIONAL_LIFT_TICK
+            clc
+            adc #7
+            sta CURRENT_OPTIONAL_LIFT_TICK
             sta JUMP_TICKER
             ; Cancel optional phase when fire is released
             lda STRIG0
