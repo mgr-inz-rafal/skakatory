@@ -6,12 +6,12 @@
 
             icl 'src\atari.inc'
 
-FRAME_COUNT     equ 60
-SCR_MEM_1       equ $4150
-SCR_MEM_1_P2    equ $5000
-SCR_MEM_2       equ $6150
-SCR_MEM_2_P2    equ $7000
-@TAB_MEM_BANKS  equ $0600
+FRAME_COUNT         equ 60
+SCR_MEM_1           equ $4150
+SCR_MEM_1_P2        equ $5000
+SCR_MEM_2           equ $6150
+SCR_MEM_2_P2        equ $7000
+@TAB_MEM_BANKS      equ $0600
 
 .zpvar          CURRENT_FRAME         .byte
 .zpvar          P1_X                  .byte 
@@ -20,24 +20,29 @@ SCR_MEM_2_P2    equ $7000
 
 BASE_Y_POS      equ 156
 
+.zpvar          ROTATION_COUNTER            .byte
+.zpvar          CURRENT_ROTATION_COOLDOWN   .byte
+INITIAL_ROTATION_COOLDOWN   equ 250
+
+
 ; Counts the len of a jump phase
 .zpvar          JUMP_COUNTER  .byte
-THRUST_LEN      equ 10
-LIFT_LEN_MIN    equ 10
-LIFT_LEN_MAX    equ 30
+THRUST_LEN          equ 10
+LIFT_LEN_MIN        equ 10
+LIFT_LEN_MAX        equ 30
 
 ; Counts cooldown between updates within a jump phase
 .zpvar          JUMP_TICKER   .byte
-THRUST_TICK     equ 30
-LIFT_TICK       equ 100
-FALL_TICK       equ 200
+THRUST_TICK         equ 30
+LIFT_TICK           equ 100
+FALL_TICK           equ 200
 
 .zpvar          P1_STATE      .byte
-PS_IDLE          equ 0
-PS_THRUST        equ 1
-PS_LIFT          equ 2
-PS_LIFT_OPTIONAL equ 4
-PS_FALL          equ 3
+PS_IDLE             equ 0
+PS_THRUST           equ 1
+PS_LIFT             equ 2
+PS_LIFT_OPTIONAL    equ 3
+PS_FALL             equ 4
 
 //------------------------------------------------
 // Memory detection
@@ -199,16 +204,10 @@ PROGRAM_START_FIRST_PART
 
 GAME_LOOP
             jsr PLAYER_TICK
+            JSR BACKGROUND_TICK
 
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
-            // ldx #20
-            // jsr WAIT_FRAMES
-
-            inc CURRENT_FRAME
-            lda CURRENT_FRAME
-            cmp #FRAME_COUNT
-            jeq ANIM_AGAIN
 
             lda STRIG0
             bne @+
@@ -225,6 +224,21 @@ START_JUMP
             lda #PS_THRUST
             sta P1_STATE
 DJ_X        rts
+
+BACKGROUND_TICK
+            dec ROTATION_COUNTER
+            bne BT_2
+            lda CURRENT_ROTATION_COOLDOWN
+            sta ROTATION_COUNTER
+            inc CURRENT_FRAME
+            lda CURRENT_FRAME
+            cmp #FRAME_COUNT
+            beq BT_1
+BT_2        rts
+BT_1        lda #0
+            sta CURRENT_FRAME            
+            dec CURRENT_ROTATION_COOLDOWN
+            rts
 
 PLAYER_TICK
             lda P1_STATE
@@ -361,12 +375,6 @@ MOVE_PLAYER_DOWN
             jsr PAINT_PLAYERS
             rts
 
-ANIM_AGAIN
-            lda #0
-            sta CURRENT_FRAME            
-
-            jmp GAME_LOOP
-
 PAINT_PLAYERS
             ldy P1_Y
             ldx #0
@@ -448,6 +456,9 @@ SYN_1       cmp VCOUNT
             rts
 
 GAME_STATE_INIT
+            lda #INITIAL_ROTATION_COOLDOWN
+            sta ROTATION_COUNTER
+            sta CURRENT_ROTATION_COOLDOWN
             lda #0
             sta CURRENT_FRAME
             tay
