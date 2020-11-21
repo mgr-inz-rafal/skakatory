@@ -18,35 +18,17 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_Y                  .byte
 .zpvar          OPTIONAL_LIFT_ALLOWED .byte
 
-BASE_Y_POS      equ 156
-
 .zpvar          ROTATION_COUNTER            .byte
 .zpvar          CURRENT_ROTATION_COOLDOWN   .byte
 INITIAL_ROTATION_COOLDOWN   equ 250
 
-; Counts the len of a jump phase
-.zpvar          JUMP_COUNTER  .byte
-THRUST_LEN          equ 10
-LIFT_LEN_MIN        equ 10
-LIFT_LEN_MAX        equ 30
-
-; Counts cooldown between updates within a jump phase
-.zpvar          JUMP_TICKER   .byte
-THRUST_TICK         equ 30
-LIFT_TICK           equ 60
-FALL_TICK           equ 255
-
-; Counter for the optional lift phase is increased gradually,
-; so the ancension slows down. For the fall phase, it is
-; decreased, so the decline speeds up.
-.zpvar          VARIABLE_SPEED_JUMP_PHASE_TICK .byte
+.zpvar          JUMP_COUNTER                .byte
+JUMP_FRAME_COUNT            equ 60
+JUMP_FRAME_ADVANCE          equ 100
 
 .zpvar          P1_STATE      .byte
 PS_IDLE             equ 0
-PS_THRUST           equ 1
-PS_LIFT             equ 2
-PS_LIFT_OPTIONAL    equ 3
-PS_FALL             equ 4
+PS_JUMP             equ 1
 
 //------------------------------------------------
 // Memory detection
@@ -207,6 +189,7 @@ PROGRAM_START_FIRST_PART
             jsr PAINT_PLAYERS
 
 GAME_LOOP
+            ;jsr SYNCHRO
             jsr PLAYER_TICK
             JSR BACKGROUND_TICK
 
@@ -221,15 +204,12 @@ GAME_LOOP
 START_JUMP
             lda P1_STATE
             cmp #PS_IDLE
-            bne DJ_X
-            lda #LIFT_TICK
-            sta VARIABLE_SPEED_JUMP_PHASE_TICK
-            lda #1
-            sta OPTIONAL_LIFT_ALLOWED
-            jsr INIT_THRUST
-            lda #PS_THRUST
+            bne SJ_X    ; Only idle can jump
+            lda #JUMP_FRAME_ADVANCE
+            sta JUMP_COUNTER
+            lda #PS_JUMP
             sta P1_STATE
-DJ_X        rts
+SJ_X        rts
 
 BACKGROUND_TICK
             dec ROTATION_COUNTER
@@ -250,158 +230,49 @@ PLAYER_TICK
             lda P1_STATE
             cmp #PS_IDLE
             beq PT_X
-            cmp #PS_THRUST
+            cmp #PS_JUMP
             bne @+
-            jsr DO_THRUST
-            rts
-@           cmp #PS_LIFT
-            bne @+
-            jsr DO_LIFT
-            rts
-@           cmp #PS_LIFT_OPTIONAL
-            bne @+
-            jsr DO_LIFT_OPTIONAL
-            rts
-@           cmp #PS_FALL
-            bne @+
-            jsr DO_FALL
-            rts
+            jsr JUMP_TICK
 @
 PT_X        rts
 
-INIT_THRUST
-            lda #0
+JUMP_TICK
+            dec JUMP_COUNTER
+            bne JT_X    ; Do not advance yet
+            lda #JUMP_FRAME_ADVANCE
             sta JUMP_COUNTER
-            lda #THRUST_TICK
-            sta JUMP_TICKER
-            rts
-
-DO_THRUST
-            dec JUMP_TICKER
-            beq DT_2
-            rts
-DT_2        lda JUMP_COUNTER
-            cmp #THRUST_LEN
-            beq DT_1
-            jsr MOVE_PLAYER_UP
-            inc JUMP_COUNTER
-            lda #THRUST_TICK
-            sta JUMP_TICKER
-            rts
-DT_1        lda #0
-            sta JUMP_COUNTER
-            lda #LIFT_TICK
-            sta JUMP_TICKER
-            lda #PS_LIFT
-            sta P1_STATE
-            rts
-
-DO_FALL
-            dec JUMP_TICKER
-            beq DF_2
-            rts
-DF_2        lda P1_Y
-            cmp #BASE_Y_POS
-            beq DF_1
-            jsr MOVE_PLAYER_DOWN
-            inc JUMP_COUNTER
-            lda VARIABLE_SPEED_JUMP_PHASE_TICK
-            sec
-            sbc #25
-            bcc DF_3
-            sta VARIABLE_SPEED_JUMP_PHASE_TICK
-            sta JUMP_TICKER
-            rts
-DF_1        lda #PS_IDLE
-            sta P1_STATE
-            rts
-DF_3        lda #20
-            sta VARIABLE_SPEED_JUMP_PHASE_TICK
-            sta JUMP_TICKER
-            rts
-
-DO_LIFT
-            dec JUMP_TICKER
-            beq DL_2
-            rts
-DL_2        lda JUMP_COUNTER
-            cmp #LIFT_LEN_MIN
-            beq DL_1
-            jsr MOVE_PLAYER_UP
-            inc JUMP_COUNTER
-            lda #LIFT_TICK
-            sta JUMP_TICKER
-            rts
-DL_1        lda #0
-            sta JUMP_COUNTER
-            lda #LIFT_TICK
-            sta JUMP_TICKER
-            lda STRIG0
-            beq DL_3
-            lda #PS_FALL
-            sta P1_STATE
-            lda #FALL_TICK
-            sta VARIABLE_SPEED_JUMP_PHASE_TICK
-            rts
-DL_3        lda OPTIONAL_LIFT_ALLOWED
-            bne DL_4
-            lda #PS_FALL
-            sta P1_STATE
-            lda #FALL_TICK
-            sta VARIABLE_SPEED_JUMP_PHASE_TICK
-            rts
-DL_4        dec OPTIONAL_LIFT_ALLOWED
-            lda #PS_LIFT_OPTIONAL
-            sta P1_STATE
-            rts
-
-DO_LIFT_OPTIONAL
-            lda #55
-            sta PCOLR0
-
-            dec JUMP_TICKER
-            beq DLO_2
-            rts
-DLO_2       lda JUMP_COUNTER
-            cmp #LIFT_LEN_MAX
-            beq DLO_1
-            jsr MOVE_PLAYER_UP
-            inc JUMP_COUNTER
-            lda VARIABLE_SPEED_JUMP_PHASE_TICK
-            clc
-            adc #7
-            sta VARIABLE_SPEED_JUMP_PHASE_TICK
-            sta JUMP_TICKER
-            ; Cancel optional phase when fire is released
-            lda STRIG0
-            beq @+
-            lda #PS_FALL
-            sta P1_STATE
-            lda #FALL_TICK
-            sta VARIABLE_SPEED_JUMP_PHASE_TICK
-@           rts
-DLO_1       lda #0
-            sta JUMP_COUNTER
-            lda #LIFT_TICK
-            sta JUMP_TICKER
-            lda #PS_FALL
-            sta P1_STATE
-            lda #FALL_TICK
-            sta VARIABLE_SPEED_JUMP_PHASE_TICK
-            rts
-
-MOVE_PLAYER_UP
-            dec P1_Y
-            jsr PAINT_PLAYERS
-            rts
-
-MOVE_PLAYER_DOWN
+            jsr CLEAR_PLAYERS
             inc P1_Y
             jsr PAINT_PLAYERS
+            lda P1_Y
+            cmp #JUMP_FRAME_COUNT-1
+            bne JT_X
+            ; Finish the jump
+            lda #PS_IDLE
+            sta P1_STATE
+            lda #0
+            sta P1_Y
+JT_X        rts
+
+CLEAR_PLAYERS
+            ldy P1_Y
+            lda JUMP_HEIGHT_TABLE,y
+            tay
+            ldx #0
+@           lda #0
+            sta PMG_P0,y
+            iny
+            inx
+            cpx #20
+            bne @-
+            lda P1_X
+            sta HPOSP0
             rts
 
 PAINT_PLAYERS
             ldy P1_Y
+            lda JUMP_HEIGHT_TABLE,y
+            tay
             ldx #0
 @           lda PLAYER_DATA,x
             sta PMG_P0,y
@@ -453,7 +324,7 @@ GAME_ENGINE_INIT
 INIT_PLAYERS
             lda #$50
             sta P1_X
-            lda #BASE_Y_POS
+            lda #0
             sta P1_Y
             lda #$1f
             sta PCOLR0
@@ -514,6 +385,68 @@ SF_FIRST
 		    mwa #SCR_MEM_2_P2   DLIST_ADDR_BOTTOM
 SF_X
             rts             
+
+JUMP_HEIGHT_TABLE
+            dta b(156)
+            dta b(153)
+            dta b(150)
+            dta b(147)
+            dta b(144)
+            dta b(141)
+            dta b(138)
+            dta b(135)
+            dta b(133)
+            dta b(131)
+            dta b(128)
+            dta b(126)
+            dta b(124)
+            dta b(122)
+            dta b(120)
+            dta b(119)
+            dta b(117)
+            dta b(115)
+            dta b(114)
+            dta b(113)
+            dta b(112)
+            dta b(111)
+            dta b(110)
+            dta b(109)
+            dta b(108)
+            dta b(107)
+            dta b(107)
+            dta b(107)
+            dta b(106)
+            dta b(106)
+            dta b(106)
+            dta b(106)
+            dta b(106)
+            dta b(106)
+            dta b(107)
+            dta b(107)
+            dta b(108)
+            dta b(109)
+            dta b(110)
+            dta b(110)
+            dta b(112)
+            dta b(113)
+            dta b(114)
+            dta b(115)
+            dta b(117)
+            dta b(118)
+            dta b(120)
+            dta b(122)
+            dta b(124)
+            dta b(126)
+            dta b(128)
+            dta b(130)
+            dta b(133)
+            dta b(135)
+            dta b(138)
+            dta b(141)
+            dta b(144)
+            dta b(146)
+            dta b(150)
+            dta b(153)
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
