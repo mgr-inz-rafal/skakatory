@@ -23,6 +23,7 @@ SCR_MEM_2_P2        equ $7000
 INITIAL_ROTATION_COOLDOWN   equ 250
 
 .zpvar          JUMP_COUNTER                .byte
+.zpvar          JUMP_INTERRUPTED            .byte
 JUMP_FRAME_COUNT            equ 60
 JUMP_FRAME_ADVANCE          equ 100
 
@@ -205,6 +206,8 @@ START_JUMP
             lda P1_STATE
             cmp #PS_IDLE
             bne SJ_X    ; Only idle can jump
+            lda #0
+            sta JUMP_INTERRUPTED
             lda #JUMP_FRAME_ADVANCE
             sta JUMP_COUNTER
             lda #PS_JUMP
@@ -236,6 +239,19 @@ PLAYER_TICK
 @
 PT_X        rts
 
+INTERRUPT_JUMP
+            lda STRIG0
+            beq IJ_X ; Button still pressed, do not interrupt
+            lda JUMP_INTERRUPTED
+            bne IJ_X ; This jump has already been interrupted
+            lda #JUMP_FRAME_COUNT-1
+            sec
+            sbc P1_Y
+            sta P1_Y
+            lda #1
+            sta JUMP_INTERRUPTED
+IJ_X        rts
+
 JUMP_TICK
             dec JUMP_COUNTER
             bne JT_X    ; Do not advance yet
@@ -245,6 +261,17 @@ JUMP_TICK
             inc P1_Y
             jsr PAINT_PLAYERS
             lda P1_Y
+            cmp #JUMP_FRAME_COUNT/2
+            bne JT_2
+            ; We're just started to go down, it's too late to interrupt the jump
+            lda #1
+            sta JUMP_INTERRUPTED
+JT_2        lda P1_Y
+            sec
+            sbc #JUMP_FRAME_COUNT/4
+            bcc JT_1    ; Do not allow to interrupt the jump yet
+            jsr INTERRUPT_JUMP
+JT_1        lda P1_Y
             cmp #JUMP_FRAME_COUNT-1
             bne JT_X
             ; Finish the jump
