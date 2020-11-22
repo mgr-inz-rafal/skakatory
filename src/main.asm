@@ -18,19 +18,15 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_Y                  .byte
 .zpvar          OPTIONAL_LIFT_ALLOWED .byte
 
-.zpvar          ROTATION_COUNTER            .byte
-.zpvar          CURRENT_ROTATION_COOLDOWN   .byte
-.zpvar          CURRENT_ROTATION_ROUNDS     .byte
-
-; Each game level has 5 phases, 1st being the slowest one and
-; 5th being the fastest one. This is tracke
-.zpvar          CURRENT_ROTATION_PHASE      .byte 
-TOTAL_ROTATION_PHASES       equ 5
-
-; There are two levels in the game. In the second one
-; all rotations are twice as fast
+; Each level maps to two parameters that control
+; the speed of background rotation
+; 1) Number of frames to skip before advancing to next rotator position
+; 2) How many frames are advanced (1, 2, 4, ...)
 .zpvar          CURRENT_GAME_LEVEL          .byte
-INITIAL_ROTATION_COOLDOWN   equ 5
+
+.zpvar          CURRENT_ROTATION_COOLDOWN   .byte
+.zpvar          CURRENT_ADVANCE_COUNT       .byte
+.zpvar          CURRENT_ROTATIONS           .byte
 
 .zpvar          JUMP_COUNTER                .byte
 .zpvar          JUMP_INTERRUPTED            .byte
@@ -201,23 +197,27 @@ PROGRAM_START_FIRST_PART
             jsr PAINT_PLAYERS
 
 GAME_LOOP
-            lda CURRENT_ROTATION_ROUNDS
+            lda CURRENT_GAME_LEVEL
             clc
             adc #16
-            sta STATUS_BAR_BUFFER
+            sta STATUS_BAR_BUFFER+0
 
             lda CURRENT_ROTATION_COOLDOWN
             clc
             adc #16
-            sta STATUS_BAR_BUFFER+5
+            sta STATUS_BAR_BUFFER+3
 
-            lda CURRENT_GAME_LEVEL
+            lda CURRENT_ROTATIONS
             clc
             adc #16
-            sta STATUS_BAR_BUFFER+10
+            sta STATUS_BAR_BUFFER+5
+
+            lda CURRENT_ADVANCE_COUNT
+            clc
+            adc #16
+            sta STATUS_BAR_BUFFER+7
 
             jsr SYNCHRO
-            ;jsr BACKGROUND_TICK
             jsr PLAYER_TICK
 
             ldx CURRENT_FRAME
@@ -241,37 +241,26 @@ START_JUMP
 SJ_X        rts
 
 BACKGROUND_TICK
-            dec ROTATION_COUNTER
-            bne BT_2
-            lda CURRENT_ROTATION_COOLDOWN
-            sta ROTATION_COUNTER
-            inc CURRENT_FRAME
-            lda CURRENT_GAME_LEVEL
-            beq BT_5
-            inc CURRENT_FRAME
-BT_5        lda CURRENT_FRAME
-            cmp #FRAME_COUNT
-            beq BT_1
-BT_2        rts
-BT_1        lda #0
-            sta CURRENT_FRAME
-            ; Check whether to increase rotation speed
-            dec CURRENT_ROTATION_ROUNDS
-            bne BT_3
-            inc CURRENT_ROTATION_PHASE
-            ldy CURRENT_ROTATION_PHASE
-            ; Check if switch to faster game level
-            cpy #TOTAL_ROTATION_PHASES
-            bne BT_4
-            inc CURRENT_GAME_LEVEL
-            jsr GAME_PER_LEVEL_INIT
-BT_4        lda ROTATIONS_PER_PHASE,y
-            sta CURRENT_ROTATION_ROUNDS
             dec CURRENT_ROTATION_COOLDOWN
-            bne BT_3
-            lda #1
-            sta CURRENT_ROTATION_COOLDOWN
-BT_3        rts
+            bne BT_X ; Still not a good time to advance the rotation
+@           inc CURRENT_FRAME
+            dec CURRENT_ADVANCE_COUNT
+            bne @-
+            jsr INIT_LEVEL_PARAMS
+            lda CURRENT_FRAME
+            cmp #FRAME_COUNT
+            bne BT_X
+            lda #0
+            sta CURRENT_FRAME
+            dec CURRENT_ROTATIONS
+            bne BT_X
+            ; Advance to next level
+            inc CURRENT_GAME_LEVEL
+            jsr INIT_LEVEL_PARAMS
+            ldy CURRENT_GAME_LEVEL
+            lda ROTATIONS_PER_LEVEL,y
+            sta CURRENT_ROTATIONS
+BT_X        rts
 
 PLAYER_TICK
             lda P1_STATE
@@ -428,21 +417,21 @@ SYN_1       cmp VCOUNT
             bne SYN_1
             rts
 
-GAME_PER_LEVEL_INIT
-            lda #0
-            sta CURRENT_ROTATION_PHASE
-            ldy CURRENT_ROTATION_PHASE
-            lda ROTATIONS_PER_PHASE,y
-            sta CURRENT_ROTATION_ROUNDS
-            lda #INITIAL_ROTATION_COOLDOWN
-            sta ROTATION_COUNTER
+INIT_LEVEL_PARAMS
+            ldy CURRENT_GAME_LEVEL
+            lda ROTATION_COOLDOWN_TAB,y
             sta CURRENT_ROTATION_COOLDOWN
+            lda ROTATION_ADVANCE_COUNT,y
+            sta CURRENT_ADVANCE_COUNT
             rts
 
 GAME_STATE_INIT
             lda #0
             sta CURRENT_GAME_LEVEL
-            jsr GAME_PER_LEVEL_INIT
+            jsr INIT_LEVEL_PARAMS
+            ldy CURRENT_GAME_LEVEL
+            lda ROTATIONS_PER_LEVEL,y
+            sta CURRENT_ROTATIONS
             lda #0
             sta CURRENT_FRAME
             tay
@@ -543,15 +532,32 @@ VBI_ROUTINE
 STATUS_BAR_BUFFER
 :20         dta b('A')
 
-; This table describes how many full rotations
-; should be made until the speed increases
-ROTATIONS_PER_PHASE
-            dta b(6)
-            dta b(9)
-            dta b(15)
-            dta b(20)
-            dta b(30)
+ROTATIONS_PER_LEVEL
+    dta b(9)
+    dta b(9)
+    dta b(9)
+    dta b(9)
+    dta b(9)
+    dta b(9)
+    dta b(200)
 
+ROTATION_COOLDOWN_TAB
+    dta b(5)
+    dta b(4)
+    dta b(3)
+    dta b(2)
+    dta b(1)
+    dta b(2)
+    dta b(1)
+
+ROTATION_ADVANCE_COUNT
+    dta b(1)
+    dta b(1)
+    dta b(1)
+    dta b(1)
+    dta b(1)
+    dta b(2)
+    dta b(2)
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
