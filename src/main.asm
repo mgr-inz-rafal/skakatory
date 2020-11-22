@@ -30,7 +30,7 @@ SCR_MEM_2_P2        equ $7000
 
 .zpvar          JUMP_COUNTER                .byte
 .zpvar          JUMP_INTERRUPTED            .byte
-JUMP_FRAME_COUNT            equ 60
+JUMP_FRAME_COUNT            equ 46
 JUMP_FRAME_ADVANCE          equ 1
 
 .zpvar          P1_STATE      .byte
@@ -465,35 +465,26 @@ SF_X
 
 JUMP_HEIGHT_TABLE
             dta b(156)
-            dta b(153)
-            dta b(150)
-            dta b(147)
+            dta b(152)
+            dta b(148)
             dta b(144)
-            dta b(141)
-            dta b(138)
-            dta b(135)
+            dta b(140)
+            dta b(136)
             dta b(133)
-            dta b(131)
-            dta b(128)
-            dta b(126)
+            dta b(130)
+            dta b(127)
             dta b(124)
-            dta b(122)
-            dta b(120)
+            dta b(121)
             dta b(119)
             dta b(117)
             dta b(115)
-            dta b(114)
             dta b(113)
             dta b(112)
-            dta b(111)
             dta b(110)
             dta b(109)
             dta b(108)
             dta b(107)
             dta b(107)
-            dta b(107)
-            dta b(106)
-            dta b(106)
             dta b(106)
             dta b(106)
             dta b(106)
@@ -503,27 +494,22 @@ JUMP_HEIGHT_TABLE
             dta b(108)
             dta b(109)
             dta b(110)
-            dta b(110)
             dta b(112)
             dta b(113)
-            dta b(114)
             dta b(115)
             dta b(117)
-            dta b(118)
-            dta b(120)
-            dta b(122)
+            dta b(119)
+            dta b(121)
             dta b(124)
-            dta b(126)
-            dta b(128)
+            dta b(127)
             dta b(130)
             dta b(133)
-            dta b(135)
-            dta b(138)
-            dta b(141)
+            dta b(136)
+            dta b(140)
             dta b(144)
-            dta b(146)
-            dta b(150)
-            dta b(153)
+            dta b(148)
+            dta b(152)
+            dta b(156)
 
 VBI_ROUTINE
             jsr BACKGROUND_TICK
@@ -533,18 +519,18 @@ STATUS_BAR_BUFFER
 :20         dta b('A')
 
 ROTATIONS_PER_LEVEL
-    dta b(9)
-    dta b(9)
-    dta b(9)
+    dta b(10)
+    dta b(20)
+    dta b(200)
     dta b(9)
     dta b(9)
     dta b(9)
     dta b(200)
 
 ROTATION_COOLDOWN_TAB
-    dta b(5)
-    dta b(4)
-    dta b(3)
+    dta b(1)
+    dta b(1)
+    dta b(1)
     dta b(2)
     dta b(1)
     dta b(2)
@@ -552,8 +538,8 @@ ROTATION_COOLDOWN_TAB
 
 ROTATION_ADVANCE_COUNT
     dta b(1)
-    dta b(1)
-    dta b(1)
+    dta b(2)
+    dta b(3)
     dta b(1)
     dta b(1)
     dta b(2)
