@@ -20,12 +20,22 @@ SCR_MEM_2_P2        equ $7000
 
 .zpvar          ROTATION_COUNTER            .byte
 .zpvar          CURRENT_ROTATION_COOLDOWN   .byte
-INITIAL_ROTATION_COOLDOWN   equ 250
+.zpvar          CURRENT_ROTATION_ROUNDS     .byte
+
+; Each game level has 5 phases, 1st being the slowest one and
+; 5th being the fastest one. This is tracke
+.zpvar          CURRENT_ROTATION_PHASE      .byte 
+TOTAL_ROTATION_PHASES       equ 5
+
+; There are two levels in the game. In the second one
+; all rotations are twice as fast
+.zpvar          CURRENT_GAME_LEVEL          .byte
+INITIAL_ROTATION_COOLDOWN   equ 5
 
 .zpvar          JUMP_COUNTER                .byte
 .zpvar          JUMP_INTERRUPTED            .byte
 JUMP_FRAME_COUNT            equ 60
-JUMP_FRAME_ADVANCE          equ 100
+JUMP_FRAME_ADVANCE          equ 1
 
 .zpvar          P1_STATE      .byte
 PS_IDLE             equ 0
@@ -140,6 +150,7 @@ DLIST_MEM_BOTTOM
 DLIST_ADDR_BOTTOM
             dta a($0000)
 :97         dta b($0e)
+            dta b($42),a(STATUS_BAR_BUFFER)
             dta b($41),a(DLIST_GAME)
 DL_MAIN_AREA
             dta b('J')
@@ -190,9 +201,24 @@ PROGRAM_START_FIRST_PART
             jsr PAINT_PLAYERS
 
 GAME_LOOP
-            ;jsr SYNCHRO
+            lda CURRENT_ROTATION_ROUNDS
+            clc
+            adc #16
+            sta STATUS_BAR_BUFFER
+
+            lda CURRENT_ROTATION_COOLDOWN
+            clc
+            adc #16
+            sta STATUS_BAR_BUFFER+5
+
+            lda CURRENT_GAME_LEVEL
+            clc
+            adc #16
+            sta STATUS_BAR_BUFFER+10
+
+            jsr SYNCHRO
+            ;jsr BACKGROUND_TICK
             jsr PLAYER_TICK
-            JSR BACKGROUND_TICK
 
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
@@ -220,14 +246,32 @@ BACKGROUND_TICK
             lda CURRENT_ROTATION_COOLDOWN
             sta ROTATION_COUNTER
             inc CURRENT_FRAME
-            lda CURRENT_FRAME
+            lda CURRENT_GAME_LEVEL
+            beq BT_5
+            inc CURRENT_FRAME
+BT_5        lda CURRENT_FRAME
             cmp #FRAME_COUNT
             beq BT_1
 BT_2        rts
 BT_1        lda #0
-            sta CURRENT_FRAME            
+            sta CURRENT_FRAME
+            ; Check whether to increase rotation speed
+            dec CURRENT_ROTATION_ROUNDS
+            bne BT_3
+            inc CURRENT_ROTATION_PHASE
+            ldy CURRENT_ROTATION_PHASE
+            ; Check if switch to faster game level
+            cpy #TOTAL_ROTATION_PHASES
+            bne BT_4
+            inc CURRENT_GAME_LEVEL
+            jsr GAME_PER_LEVEL_INIT
+BT_4        lda ROTATIONS_PER_PHASE,y
+            sta CURRENT_ROTATION_ROUNDS
             dec CURRENT_ROTATION_COOLDOWN
-            rts
+            bne BT_3
+            lda #1
+            sta CURRENT_ROTATION_COOLDOWN
+BT_3        rts
 
 PLAYER_TICK
             lda P1_STATE
@@ -334,7 +378,7 @@ PLAYER_DATA
             dta b($bd)
 
 GAME_ENGINE_INIT
-; --------- Enable sprites                   
+            ; Enable sprites
             lda #>PMG_BASE
             sta PMBASE
             lda #%00100001
@@ -344,6 +388,12 @@ GAME_ENGINE_INIT
             lda SDMCTL
             ora #%00011100
             sta SDMCTL
+
+            ; Init VBI
+            ldy <VBI_ROUTINE
+            ldx >VBI_ROUTINE
+            lda #7
+            jsr SETVBV
 
             jsr INIT_PLAYERS
             rts
@@ -378,10 +428,21 @@ SYN_1       cmp VCOUNT
             bne SYN_1
             rts
 
-GAME_STATE_INIT
+GAME_PER_LEVEL_INIT
+            lda #0
+            sta CURRENT_ROTATION_PHASE
+            ldy CURRENT_ROTATION_PHASE
+            lda ROTATIONS_PER_PHASE,y
+            sta CURRENT_ROTATION_ROUNDS
             lda #INITIAL_ROTATION_COOLDOWN
             sta ROTATION_COUNTER
             sta CURRENT_ROTATION_COOLDOWN
+            rts
+
+GAME_STATE_INIT
+            lda #0
+            sta CURRENT_GAME_LEVEL
+            jsr GAME_PER_LEVEL_INIT
             lda #0
             sta CURRENT_FRAME
             tay
@@ -474,6 +535,23 @@ JUMP_HEIGHT_TABLE
             dta b(146)
             dta b(150)
             dta b(153)
+
+VBI_ROUTINE
+            jsr BACKGROUND_TICK
+            jmp XITVBV
+
+STATUS_BAR_BUFFER
+:20         dta b('A')
+
+; This table describes how many full rotations
+; should be made until the speed increases
+ROTATIONS_PER_PHASE
+            dta b(6)
+            dta b(9)
+            dta b(15)
+            dta b(20)
+            dta b(30)
+
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
