@@ -6,7 +6,7 @@
 
             icl 'src\atari.inc'
 
-FRAME_COUNT         equ 40
+FRAME_COUNT         equ 52
 SCR_MEM_1           equ $4150
 SCR_MEM_1_P2        equ $5000
 SCR_MEM_2           equ $6150
@@ -539,7 +539,7 @@ ROTATION_COOLDOWN_TAB
 ROTATION_ADVANCE_COUNT
     dta b(1)
     dta b(2)
-    dta b(3)
+    dta b(4)
     dta b(1)
     dta b(1)
     dta b(2)
