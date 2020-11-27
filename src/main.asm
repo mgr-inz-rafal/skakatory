@@ -6,7 +6,7 @@
 
             icl 'src\atari.inc'
 
-FRAME_COUNT         equ 60
+FRAME_COUNT         equ 40
 SCR_MEM_1           equ $4150
 SCR_MEM_1_P2        equ $5000
 SCR_MEM_2           equ $6150
@@ -519,8 +519,8 @@ STATUS_BAR_BUFFER
 :20         dta b('A')
 
 ROTATIONS_PER_LEVEL
-    dta b(10)
     dta b(20)
+    dta b(100)
     dta b(200)
     dta b(9)
     dta b(9)
@@ -528,7 +528,7 @@ ROTATIONS_PER_LEVEL
     dta b(200)
 
 ROTATION_COOLDOWN_TAB
-    dta b(1)
+    dta b(2)
     dta b(1)
     dta b(1)
     dta b(2)
