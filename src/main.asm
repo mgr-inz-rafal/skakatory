@@ -6,17 +6,23 @@
 
             icl 'src\atari.inc'
 
-FRAME_COUNT         equ 52
+FRAME_COUNT         equ 104
 SCR_MEM_1           equ $4150
 SCR_MEM_1_P2        equ $5000
 SCR_MEM_2           equ $6150
 SCR_MEM_2_P2        equ $7000
 @TAB_MEM_BANKS      equ $0600
 
+//  0 -  51   - slower rotation (52 frames)
+// 52 -  85   - faster rotation (34 frames)
+// 86 - 103   - fastest rotation (18 frames)
 .zpvar          CURRENT_FRAME         .byte
 .zpvar          P1_X                  .byte 
 .zpvar          P1_Y                  .byte
 .zpvar          OPTIONAL_LIFT_ALLOWED .byte
+.zpvar          FIRST_FRAME           .byte
+.zpvar          LAST_FRAME            .byte
+
 
 ; Each level maps to two parameters that control
 ; the speed of background rotation
@@ -248,9 +254,9 @@ BACKGROUND_TICK
             bne @-
             jsr INIT_LEVEL_PARAMS
             lda CURRENT_FRAME
-            cmp #FRAME_COUNT
+            cmp LAST_FRAME
             bne BT_X
-            lda #0
+            lda FIRST_FRAME
             sta CURRENT_FRAME
             dec CURRENT_ROTATIONS
             bne BT_X
@@ -426,13 +432,17 @@ INIT_LEVEL_PARAMS
             rts
 
 GAME_STATE_INIT
+            lda #86
+            sta FIRST_FRAME
+            lda #104
+            sta LAST_FRAME
             lda #0
             sta CURRENT_GAME_LEVEL
             jsr INIT_LEVEL_PARAMS
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
             sta CURRENT_ROTATIONS
-            lda #0
+            lda FIRST_FRAME
             sta CURRENT_FRAME
             tay
             lda @TAB_MEM_BANKS,y
@@ -519,7 +529,7 @@ STATUS_BAR_BUFFER
 :20         dta b('A')
 
 ROTATIONS_PER_LEVEL
-    dta b(20)
+    dta b(100)
     dta b(100)
     dta b(200)
     dta b(9)
@@ -528,22 +538,22 @@ ROTATIONS_PER_LEVEL
     dta b(200)
 
 ROTATION_COOLDOWN_TAB
-    dta b(2)
     dta b(1)
     dta b(1)
-    dta b(2)
     dta b(1)
-    dta b(2)
+    dta b(1)
+    dta b(1)
+    dta b(1)
     dta b(1)
 
 ROTATION_ADVANCE_COUNT
     dta b(1)
-    dta b(2)
-    dta b(4)
     dta b(1)
     dta b(1)
-    dta b(2)
-    dta b(2)
+    dta b(1)
+    dta b(1)
+    dta b(1)
+    dta b(1)
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
