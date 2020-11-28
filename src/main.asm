@@ -16,17 +16,22 @@ SCR_MEM_2_P2        equ $7000
 //  0 -  51   - slower rotation (52 frames)
 // 52 -  85   - faster rotation (34 frames)
 // 86 - 103   - fastest rotation (18 frames)
-.zpvar          CURRENT_FRAME         .byte
-.zpvar          P1_X                  .byte 
-.zpvar          P1_Y                  .byte
-.zpvar          OPTIONAL_LIFT_ALLOWED .byte
+.zpvar          CURRENT_FRAME          .byte
+.zpvar          P1_X                   .byte 
+.zpvar          P1_Y                   .byte
+.zpvar          P2_X                   .byte 
+.zpvar          P2_Y                   .byte
+.zpvar          OPTIONAL_LIFT_ALLOWED  .byte
 
-.zpvar          JUMP_COUNTER          .byte
-.zpvar          JUMP_INTERRUPTED      .byte
+.zpvar          JUMP_COUNTER           .byte
+.zpvar          JUMP_COUNTER_RIGHT     .byte
+.zpvar          JUMP_INTERRUPTED       .byte
+.zpvar          JUMP_INTERRUPTED_RIGHT .byte
 JUMP_FRAME_COUNT    equ 46
 JUMP_FRAME_ADVANCE  equ 1
 
-.zpvar          P1_STATE              .byte
+.zpvar          P1_STATE               .byte
+.zpvar          P2_STATE               .byte
 PS_IDLE             equ 0
 PS_JUMP             equ 1
 
@@ -221,6 +226,7 @@ GAME_LOOP
 
             jsr SYNCHRO
             jsr PLAYER_TICK
+            jsr PLAYER_TICK_RIGHT
 
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
@@ -228,6 +234,9 @@ GAME_LOOP
             lda STRIG0
             bne @+
             jsr START_JUMP
+@           lda STRIG1
+            bne @+
+            jsr START_JUMP_RIGHT
 @           jmp GAME_LOOP
 
 START_JUMP
@@ -241,6 +250,18 @@ START_JUMP
             lda #PS_JUMP
             sta P1_STATE
 SJ_X        rts
+
+START_JUMP_RIGHT
+            lda P2_STATE
+            cmp #PS_IDLE
+            bne SJR_X    ; Only idle can jump
+            lda #0
+            sta JUMP_INTERRUPTED_RIGHT
+            lda #JUMP_FRAME_ADVANCE
+            sta JUMP_COUNTER_RIGHT
+            lda #PS_JUMP
+            sta P2_STATE
+SJR_X       rts
 
 BACKGROUND_TICK
             dec CURRENT_ROTATION_COOLDOWN
@@ -274,6 +295,16 @@ PLAYER_TICK
 @
 PT_X        rts
 
+PLAYER_TICK_RIGHT
+            lda P2_STATE
+            cmp #PS_IDLE
+            beq PTR_X
+            cmp #PS_JUMP
+            bne @+
+            jsr JUMP_TICK_RIGHT
+@
+PTR_X       rts
+
 INTERRUPT_JUMP
             lda STRIG0
             beq IJ_X ; Button still pressed, do not interrupt
@@ -286,6 +317,19 @@ INTERRUPT_JUMP
             lda #1
             sta JUMP_INTERRUPTED
 IJ_X        rts
+
+INTERRUPT_JUMP_RIGHT
+            lda STRIG1
+            beq IJR_X ; Button still pressed, do not interrupt
+            lda JUMP_INTERRUPTED_RIGHT
+            bne IJR_X ; This jump has already been interrupted
+            lda #JUMP_FRAME_COUNT-1
+            sec
+            sbc P2_Y
+            sta P2_Y
+            lda #1
+            sta JUMP_INTERRUPTED_RIGHT
+IJR_X       rts
 
 JUMP_TICK
             dec JUMP_COUNTER
@@ -316,6 +360,35 @@ JT_1        lda P1_Y
             sta P1_Y
 JT_X        rts
 
+JUMP_TICK_RIGHT
+            dec JUMP_COUNTER_RIGHT
+            bne JTR_X    ; Do not advance yet
+            lda #JUMP_FRAME_ADVANCE
+            sta JUMP_COUNTER_RIGHT
+            jsr CLEAR_PLAYERS
+            inc P2_Y
+            jsr PAINT_PLAYERS
+            lda P2_Y
+            cmp #JUMP_FRAME_COUNT/2
+            bne JTR_2
+            ; We're just started to go down, it's too late to interrupt the jump
+            lda #1
+            sta JUMP_INTERRUPTED_RIGHT
+JTR_2       lda P2_Y
+            sec
+            sbc #JUMP_FRAME_COUNT/4
+            bcc JTR_1    ; Do not allow to interrupt the jump yet
+            jsr INTERRUPT_JUMP_RIGHT
+JTR_1       lda P2_Y
+            cmp #JUMP_FRAME_COUNT-1
+            bne JTR_X
+            ; Finish the jump
+            lda #PS_IDLE
+            sta P2_STATE
+            lda #0
+            sta P2_Y
+JTR_X       rts
+
 CLEAR_PLAYERS
             ldy P1_Y
             lda JUMP_HEIGHT_TABLE,y
@@ -328,9 +401,21 @@ CLEAR_PLAYERS
             inx
             cpx #20
             bne @-
+            ldy P2_Y
+            lda JUMP_HEIGHT_TABLE,y
+            tay
+            ldx #0
+@           lda #0
+            sta PMG_P2,y
+            sta PMG_P3,y
+            iny
+            inx
+            cpx #20
+            bne @-
             rts
 
 PAINT_PLAYERS
+; Paint left player
             ldy P1_Y
             lda JUMP_HEIGHT_TABLE,y
             tay
@@ -343,15 +428,31 @@ PAINT_PLAYERS
             inx
             cpx #20
             bne @-
-            lda P1_X
-            sta HPOSP0
-            sta HPOSP1
+; Paint right player
+            ldy P2_Y
+            lda JUMP_HEIGHT_TABLE,y
+            tay
+            ldx #0
+@           lda PLAYER_DATA_02,x
+            sta PMG_P2,y
+            lda PLAYER_DATA_03,x
+            sta PMG_P3,y
+            iny
+            inx
+            cpx #20
+            bne @-
             rts
 
+; Left player sprites
 PLAYER_DATA_00
             dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
 PLAYER_DATA_01
             dta $C3,$81,$00,$00,$00,$00,$00,$00,$00,$18,$3C,$3C,$18,$18,$00,$00,$00,$00,$42,$E7
+; Right player sprites
+PLAYER_DATA_02
+            dta $00,$00,$00,$00,$00,$00,$18,$7E,$5A,$9A,$19,$18,$18,$3C,$7C,$7E,$7E,$24,$24,$66
+PLAYER_DATA_03
+            dta $3C,$2C,$3C,$34,$3C,$3C,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$24,$24,$66
 
 GAME_ENGINE_INIT
             ; Enable sprites
@@ -377,14 +478,28 @@ GAME_ENGINE_INIT
 INIT_PLAYERS
             lda #$50
             sta P1_X
+            lda #$aa
+            sta P2_X
             lda #0
             sta P1_Y
+            sta P2_Y
             lda #$1f
             sta PCOLR0
             lda #$af
             sta PCOLR1
+            lda #$3f
+            sta PCOLR2
+            lda #$a6
+            sta PCOLR3
             lda #PS_IDLE
             sta P1_STATE
+            sta P2_STATE
+            lda P1_X
+            sta HPOSP0
+            sta HPOSP1
+            lda P2_X
+            sta HPOSP2
+            sta HPOSP3
             rts
 
 ; Number of frames in X
