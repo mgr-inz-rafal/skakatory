@@ -323,12 +323,11 @@ CLEAR_PLAYERS
             ldx #0
 @           lda #0
             sta PMG_P0,y
+            sta PMG_P1,y
             iny
             inx
             cpx #20
             bne @-
-            lda P1_X
-            sta HPOSP0
             rts
 
 PAINT_PLAYERS
@@ -336,37 +335,23 @@ PAINT_PLAYERS
             lda JUMP_HEIGHT_TABLE,y
             tay
             ldx #0
-@           lda PLAYER_DATA,x
+@           lda PLAYER_DATA_00,x
             sta PMG_P0,y
+            lda PLAYER_DATA_01,x
+            sta PMG_P1,y
             iny
             inx
             cpx #20
             bne @-
             lda P1_X
             sta HPOSP0
+            sta HPOSP1
             rts
 
-PLAYER_DATA
-            dta b($aa)
-            dta b($ab)
-            dta b($ac)
-            dta b($ad)
-            dta b($ae)
-            dta b($af)
-            dta b($ba)
-            dta b($bb)
-            dta b($bc)
-            dta b($bd)
-            dta b($aa)
-            dta b($ab)
-            dta b($ac)
-            dta b($ad)
-            dta b($ae)
-            dta b($af)
-            dta b($ba)
-            dta b($bb)
-            dta b($bc)
-            dta b($bd)
+PLAYER_DATA_00
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
+PLAYER_DATA_01
+            dta $C3,$81,$00,$00,$00,$00,$00,$00,$00,$18,$3C,$3C,$18,$18,$00,$00,$00,$00,$42,$E7
 
 GAME_ENGINE_INIT
             ; Enable sprites
@@ -396,6 +381,8 @@ INIT_PLAYERS
             sta P1_Y
             lda #$1f
             sta PCOLR0
+            lda #$af
+            sta PCOLR1
             lda #PS_IDLE
             sta P1_STATE
             rts
