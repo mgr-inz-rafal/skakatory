@@ -20,28 +20,29 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_X                  .byte 
 .zpvar          P1_Y                  .byte
 .zpvar          OPTIONAL_LIFT_ALLOWED .byte
-.zpvar          FIRST_FRAME           .byte
-.zpvar          LAST_FRAME            .byte
+
+.zpvar          JUMP_COUNTER          .byte
+.zpvar          JUMP_INTERRUPTED      .byte
+JUMP_FRAME_COUNT    equ 46
+JUMP_FRAME_ADVANCE  equ 1
+
+.zpvar          P1_STATE              .byte
+PS_IDLE             equ 0
+PS_JUMP             equ 1
 
 
-; Each level maps to two parameters that control
+; Each level maps to these parameters that control
 ; the speed of background rotation
 ; 1) Number of frames to skip before advancing to next rotator position
-; 2) How many frames are advanced (1, 2, 4, ...)
+; 2) First animation frame
+; 3) Last animation frame
 .zpvar          CURRENT_GAME_LEVEL          .byte
 
 .zpvar          CURRENT_ROTATION_COOLDOWN   .byte
-.zpvar          CURRENT_ADVANCE_COUNT       .byte
 .zpvar          CURRENT_ROTATIONS           .byte
+.zpvar          FIRST_FRAME                 .byte
+.zpvar          LAST_FRAME                  .byte
 
-.zpvar          JUMP_COUNTER                .byte
-.zpvar          JUMP_INTERRUPTED            .byte
-JUMP_FRAME_COUNT            equ 46
-JUMP_FRAME_ADVANCE          equ 1
-
-.zpvar          P1_STATE      .byte
-PS_IDLE             equ 0
-PS_JUMP             equ 1
 
 //------------------------------------------------
 // Memory detection
@@ -218,11 +219,6 @@ GAME_LOOP
             adc #16
             sta STATUS_BAR_BUFFER+5
 
-            lda CURRENT_ADVANCE_COUNT
-            clc
-            adc #16
-            sta STATUS_BAR_BUFFER+7
-
             jsr SYNCHRO
             jsr PLAYER_TICK
 
@@ -249,14 +245,14 @@ SJ_X        rts
 BACKGROUND_TICK
             dec CURRENT_ROTATION_COOLDOWN
             bne BT_X ; Still not a good time to advance the rotation
-@           inc CURRENT_FRAME
-            dec CURRENT_ADVANCE_COUNT
-            bne @-
+            inc CURRENT_FRAME
             jsr INIT_LEVEL_PARAMS
             lda CURRENT_FRAME
-            cmp LAST_FRAME
+            ldy CURRENT_GAME_LEVEL
+            cmp LAST_FRAME_PER_LEVEL,y
             bne BT_X
-            lda FIRST_FRAME
+            ldy CURRENT_GAME_LEVEL
+            lda FIRST_FRAME_PER_LEVEL,y
             sta CURRENT_FRAME
             dec CURRENT_ROTATIONS
             bne BT_X
@@ -427,17 +423,16 @@ INIT_LEVEL_PARAMS
             ldy CURRENT_GAME_LEVEL
             lda ROTATION_COOLDOWN_TAB,y
             sta CURRENT_ROTATION_COOLDOWN
-            lda ROTATION_ADVANCE_COUNT,y
-            sta CURRENT_ADVANCE_COUNT
             rts
 
 GAME_STATE_INIT
-            lda #86
-            sta FIRST_FRAME
-            lda #104
-            sta LAST_FRAME
             lda #0
             sta CURRENT_GAME_LEVEL
+            tay
+            lda FIRST_FRAME_PER_LEVEL,y
+            sta FIRST_FRAME
+            lda LAST_FRAME_PER_LEVEL,y
+            sta LAST_FRAME
             jsr INIT_LEVEL_PARAMS
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
@@ -528,32 +523,62 @@ VBI_ROUTINE
 STATUS_BAR_BUFFER
 :20         dta b('A')
 
+; Level difficulty parameters
 ROTATIONS_PER_LEVEL
-    dta b(100)
-    dta b(100)
-    dta b(200)
-    dta b(9)
-    dta b(9)
-    dta b(9)
-    dta b(200)
+    dta b(10)
+    dta b(10)
+    dta b(10)
+    dta b(10)
+    dta b(10)
+    dta b(10)
+    dta b(10)
+    dta b(10)
+    dta b(10)
+    dta b(10)
+    dta b(10)
+    dta b(10)
 
 ROTATION_COOLDOWN_TAB
+    dta b(4)
+    dta b(3)
+    dta b(2)
     dta b(1)
+    dta b(4)
+    dta b(3)
+    dta b(2)
     dta b(1)
-    dta b(1)
-    dta b(1)
-    dta b(1)
-    dta b(1)
+    dta b(4)
+    dta b(3)
+    dta b(2)
     dta b(1)
 
-ROTATION_ADVANCE_COUNT
-    dta b(1)
-    dta b(1)
-    dta b(1)
-    dta b(1)
-    dta b(1)
-    dta b(1)
-    dta b(1)
+FIRST_FRAME_PER_LEVEL
+    dta b(0)
+    dta b(0)
+    dta b(0)
+    dta b(0)
+    dta b(52)
+    dta b(52)
+    dta b(52)
+    dta b(52)
+    dta b(86)
+    dta b(86)
+    dta b(86)
+    dta b(86)
+
+LAST_FRAME_PER_LEVEL
+    dta b(52)
+    dta b(52)
+    dta b(52)
+    dta b(52)
+    dta b(86)
+    dta b(86)
+    dta b(86)
+    dta b(86)
+    dta b(104)
+    dta b(104)
+    dta b(104)
+    dta b(104)
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
