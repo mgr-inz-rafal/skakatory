@@ -232,6 +232,7 @@ GAME_LOOP
             jsr SHOW_FRAME
 
             jsr CHECK_COLLISIONS
+            jsr CHECK_COLLISIONS_RIGHT
 
             lda STRIG0
             bne @+
@@ -266,6 +267,9 @@ START_JUMP_RIGHT
 SJR_X       rts
 
 CHECK_COLLISIONS
+            #if .byte P1_Y > #6
+                rts
+            #end
             ldy CURRENT_GAME_LEVEL
             lda HIT_FRAMES_0,y
             cmp CURRENT_FRAME
@@ -278,7 +282,29 @@ CHECK_COLLISIONS
             beq CC_KILLED
             rts
 CC_KILLED
-CHUJ        jmp CHUJ
+            lda #$ff
+            sta COLBK
+            rts
+
+CHECK_COLLISIONS_RIGHT
+            #if .byte P2_Y > #6
+                rts
+            #end
+            ldy CURRENT_GAME_LEVEL
+            lda HIT_FRAMES_0,y
+            cmp CURRENT_FRAME
+            beq CCR_KILLED
+            lda HIT_FRAMES_1,y
+            cmp CURRENT_FRAME
+            beq CCR_KILLED
+            lda HIT_FRAMES_2,y
+            cmp CURRENT_FRAME
+            beq CCR_KILLED
+            rts
+CCR_KILLED
+            lda #$af
+            sta COLBK
+            rts
 
 BACKGROUND_TICK
             dec CURRENT_ROTATION_COOLDOWN
