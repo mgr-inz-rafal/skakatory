@@ -231,6 +231,8 @@ GAME_LOOP
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
 
+            jsr CHECK_COLLISIONS
+
             lda STRIG0
             bne @+
             jsr START_JUMP
@@ -262,6 +264,21 @@ START_JUMP_RIGHT
             lda #PS_JUMP
             sta P2_STATE
 SJR_X       rts
+
+CHECK_COLLISIONS
+            ldy CURRENT_GAME_LEVEL
+            lda HIT_FRAMES_0,y
+            cmp CURRENT_FRAME
+            beq CC_KILLED
+            lda HIT_FRAMES_1,y
+            cmp CURRENT_FRAME
+            beq CC_KILLED
+            lda HIT_FRAMES_2,y
+            cmp CURRENT_FRAME
+            beq CC_KILLED
+            rts
+CC_KILLED
+CHUJ        jmp CHUJ
 
 BACKGROUND_TICK
             dec CURRENT_ROTATION_COOLDOWN
@@ -539,9 +556,13 @@ GAME_STATE_INIT
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
             sta CURRENT_ROTATIONS
-            lda FIRST_FRAME
-            sta CURRENT_FRAME
-            tay
+            ldy FIRST_FRAME
+            iny
+            iny
+            iny
+            iny
+            sty CURRENT_FRAME
+            ldy #0
             lda @TAB_MEM_BANKS,y
             sta PORTB
             rts           
@@ -681,6 +702,48 @@ LAST_FRAME_PER_LEVEL
     dta b(104)
     dta b(104)
     dta b(104)
+
+HIT_FRAMES_0
+    dta b(51)
+    dta b(51)
+    dta b(51)
+    dta b(51)
+    dta b(85)
+    dta b(85)
+    dta b(85)
+    dta b(85)
+    dta b(86)
+    dta b(86)
+    dta b(86)
+    dta b(86)
+
+HIT_FRAMES_1
+    dta b(00)
+    dta b(00)
+    dta b(00)
+    dta b(00)
+    dta b(52)
+    dta b(52)
+    dta b(52)
+    dta b(52)
+    dta b(86)
+    dta b(86)
+    dta b(86)
+    dta b(86)
+
+HIT_FRAMES_2
+    dta b(01)
+    dta b(01)
+    dta b(01)
+    dta b(01)
+    dta b(53)
+    dta b(53)
+    dta b(53)
+    dta b(53)
+    dta b(86)
+    dta b(86)
+    dta b(86)
+    dta b(86)
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
