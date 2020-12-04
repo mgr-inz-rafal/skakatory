@@ -342,9 +342,11 @@ PLAYER_TICK
             cmp #PS_JUMP
             bne @+
             jsr JUMP_TICK
+            rts
 @           cmp #PS_DYING
             bne @+
             jsr DYING_TICK
+            rts
 @            
 PT_X        rts
 
@@ -832,6 +834,7 @@ LEFT_KILL_X_SPEED_1
             dta b(115)
             dta b(116)
             dta b(117)
+            dta b($ff)
  
 LEFT_KILL_Y_SPEED_1
             dta b(156)
@@ -871,6 +874,7 @@ LEFT_KILL_Y_SPEED_1
             dta b(222)
             dta b(228)
             dta b(234)
+            dta b($ff)
             
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
