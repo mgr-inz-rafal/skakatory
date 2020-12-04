@@ -13,6 +13,8 @@ SCR_MEM_2           equ $6150
 SCR_MEM_2_P2        equ $7000
 @TAB_MEM_BANKS      equ $0600
 
+.zpvar          P1_Y_TABLE             .word
+
 //  0 -  51   - slower rotation (52 frames)
 // 52 -  85   - faster rotation (34 frames)
 // 86 - 103   - fastest rotation (18 frames)
@@ -30,11 +32,13 @@ SCR_MEM_2_P2        equ $7000
 JUMP_FRAME_COUNT    equ 46
 JUMP_FRAME_ADVANCE  equ 1
 
+.zpvar          DYING_POS_X_P1         .byte
+
 .zpvar          P1_STATE               .byte
 .zpvar          P2_STATE               .byte
 PS_IDLE             equ 0
 PS_JUMP             equ 1
-
+PS_DYING            equ 2
 
 ; Each level maps to these parameters that control
 ; the speed of background rotation
@@ -47,7 +51,6 @@ PS_JUMP             equ 1
 .zpvar          CURRENT_ROTATIONS           .byte
 .zpvar          FIRST_FRAME                 .byte
 .zpvar          LAST_FRAME                  .byte
-
 
 //------------------------------------------------
 // Memory detection
@@ -282,8 +285,12 @@ CHECK_COLLISIONS
             beq CC_KILLED
             rts
 CC_KILLED
-            lda #$ff
-            sta COLBK
+            lda #PS_DYING
+            sta P1_STATE
+            lda #0
+            sta DYING_POS_X_P1
+            sta P1_Y
+            mwa #LEFT_KILL_Y_SPEED_1 P1_Y_TABLE
             rts
 
 CHECK_COLLISIONS_RIGHT
@@ -335,7 +342,10 @@ PLAYER_TICK
             cmp #PS_JUMP
             bne @+
             jsr JUMP_TICK
-@
+@           cmp #PS_DYING
+            bne @+
+            jsr DYING_TICK
+@            
 PT_X        rts
 
 PLAYER_TICK_RIGHT
@@ -373,6 +383,18 @@ INTERRUPT_JUMP_RIGHT
             lda #1
             sta JUMP_INTERRUPTED_RIGHT
 IJR_X       rts
+
+DYING_TICK
+            jsr CLEAR_PLAYERS
+            inc P1_Y
+            ldy DYING_POS_X_P1
+            lda LEFT_KILL_X_SPEED_1,y
+            inc DYING_POS_X_P1
+            sta HPOSP0
+            sta HPOSP1
+            jsr PAINT_PLAYERS
+
+            rts
 
 JUMP_TICK
             dec JUMP_COUNTER
@@ -434,7 +456,7 @@ JTR_X       rts
 
 CLEAR_PLAYERS
             ldy P1_Y
-            lda JUMP_HEIGHT_TABLE,y
+            lda (P1_Y_TABLE),y
             tay
             ldx #0
 @           lda #0
@@ -460,7 +482,7 @@ CLEAR_PLAYERS
 PAINT_PLAYERS
 ; Paint left player
             ldy P1_Y
-            lda JUMP_HEIGHT_TABLE,y
+            lda (P1_Y_TABLE),y
             tay
             ldx #0
 @           lda PLAYER_DATA_00,x
@@ -591,6 +613,7 @@ GAME_STATE_INIT
             ldy #0
             lda @TAB_MEM_BANKS,y
             sta PORTB
+            mwa #JUMP_HEIGHT_TABLE P1_Y_TABLE
             rts           
 
 ; Frame number in X
@@ -771,6 +794,84 @@ HIT_FRAMES_2
     dta b(86)
     dta b(86)
 
+LEFT_KILL_X_SPEED_1
+            dta b(081)
+            dta b(082)
+            dta b(083)
+            dta b(084)
+            dta b(085)
+            dta b(086)
+            dta b(087)
+            dta b(088)
+            dta b(089)
+            dta b(090)
+            dta b(091)
+            dta b(092)
+            dta b(093)
+            dta b(094)
+            dta b(095)
+            dta b(096)
+            dta b(097)
+            dta b(098)
+            dta b(099)
+            dta b(100)
+            dta b(101)
+            dta b(102)
+            dta b(103)
+            dta b(104)
+            dta b(105)
+            dta b(106)
+            dta b(107)
+            dta b(108)
+            dta b(109)
+            dta b(110)
+            dta b(111)
+            dta b(112)
+            dta b(113)
+            dta b(114)
+            dta b(115)
+            dta b(116)
+            dta b(117)
+ 
+LEFT_KILL_Y_SPEED_1
+            dta b(156)
+            dta b(154)
+            dta b(153)
+            dta b(152)
+            dta b(151)
+            dta b(150)
+            dta b(150)
+            dta b(149)
+            dta b(149)
+            dta b(150)
+            dta b(150)
+            dta b(151)
+            dta b(151)
+            dta b(152)
+            dta b(154)
+            dta b(155)
+            dta b(157)
+            dta b(159)
+            dta b(161)
+            dta b(163)
+            dta b(165)
+            dta b(168)
+            dta b(171)
+            dta b(174)
+            dta b(177)
+            dta b(181)
+            dta b(185)
+            dta b(189)
+            dta b(193)
+            dta b(197)
+            dta b(202)
+            dta b(207)
+            dta b(212)
+            dta b(217)
+            dta b(222)
+            dta b(228)
+            dta b(234)
+            
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
 ; Call mem detect proc
