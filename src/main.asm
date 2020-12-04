@@ -387,6 +387,10 @@ INTERRUPT_JUMP_RIGHT
 IJR_X       rts
 
 DYING_TICK
+            ldy DYING_POS_X_P1
+            lda LEFT_KILL_X_SPEED_1,y
+            cmp #$ff
+            beq DT_0
             jsr CLEAR_PLAYERS
             inc P1_Y
             ldy DYING_POS_X_P1
@@ -395,7 +399,11 @@ DYING_TICK
             sta HPOSP0
             sta HPOSP1
             jsr PAINT_PLAYERS
-
+            rts
+DT_0        lda #0
+            sta HPOSP0
+            sta HPOSP1
+CHUJ        jmp CHUJ
             rts
 
 JUMP_TICK
@@ -830,10 +838,6 @@ LEFT_KILL_X_SPEED_1
             dta b(111)
             dta b(112)
             dta b(113)
-            dta b(114)
-            dta b(115)
-            dta b(116)
-            dta b(117)
             dta b($ff)
  
 LEFT_KILL_Y_SPEED_1
@@ -870,10 +874,6 @@ LEFT_KILL_Y_SPEED_1
             dta b(202)
             dta b(207)
             dta b(212)
-            dta b(217)
-            dta b(222)
-            dta b(228)
-            dta b(234)
             dta b($ff)
             
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
