@@ -27,7 +27,8 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          OPTIONAL_LIFT_ALLOWED  .byte
 
 .zpvar          DYING_JUMP_COUNTER     .byte
-DYING_JUMP_COOLDOWN    equ 2
+DYING_JUMP_COOLDOWN         equ 2
+DYING_JUMP_COOLDOWN_FAST    equ 1
 
 .zpvar          JUMP_COUNTER           .byte
 .zpvar          JUMP_COUNTER_RIGHT     .byte
@@ -425,11 +426,20 @@ INTERRUPT_JUMP_RIGHT
             sta JUMP_INTERRUPTED_RIGHT
 IJR_X       rts
 
+INIT_DYING_COOLDOWN
+            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
+                lda #DYING_JUMP_COOLDOWN
+                sta DYING_JUMP_COUNTER
+                rts
+            #end
+            lda #DYING_JUMP_COOLDOWN_FAST
+            sta DYING_JUMP_COUNTER
+            rts
+
 DYING_TICK
             dec DYING_JUMP_COUNTER
             bne DT_X
-            lda #DYING_JUMP_COOLDOWN
-            sta DYING_JUMP_COUNTER
+            jsr INIT_DYING_COOLDOWN
             ldy DYING_POS_X_P1
             lda (P1_X_TABLE),y
             cmp #$ff
@@ -646,7 +656,7 @@ INIT_LEVEL_PARAMS
             rts
 
 GAME_STATE_INIT
-            lda #7
+            lda #2
             sta CURRENT_GAME_LEVEL
             tay
             lda FIRST_FRAME_PER_LEVEL,y
