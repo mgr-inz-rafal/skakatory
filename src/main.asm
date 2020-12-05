@@ -25,6 +25,9 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P2_Y                   .byte
 .zpvar          OPTIONAL_LIFT_ALLOWED  .byte
 
+.zpvar          DYING_JUMP_COUNTER     .byte
+DYING_JUMP_COOLDOWN    equ 2
+
 .zpvar          JUMP_COUNTER           .byte
 .zpvar          JUMP_COUNTER_RIGHT     .byte
 .zpvar          JUMP_INTERRUPTED       .byte
@@ -270,7 +273,7 @@ START_JUMP_RIGHT
 SJR_X       rts
 
 CHECK_COLLISIONS
-            #if .byte P1_Y > #6
+            #if .byte P1_STATE <> #PS_DYING .and .byte P1_Y > #6
                 rts
             #end
             ldy CURRENT_GAME_LEVEL
@@ -290,6 +293,8 @@ CC_KILLED
             lda #0
             sta DYING_POS_X_P1
             sta P1_Y
+            lda #1
+            sta DYING_JUMP_COUNTER
             mwa #LEFT_KILL_Y_SPEED_1 P1_Y_TABLE
             rts
 
@@ -387,6 +392,10 @@ INTERRUPT_JUMP_RIGHT
 IJR_X       rts
 
 DYING_TICK
+            dec DYING_JUMP_COUNTER
+            bne DT_X
+            lda #DYING_JUMP_COOLDOWN
+            sta DYING_JUMP_COUNTER
             ldy DYING_POS_X_P1
             lda LEFT_KILL_X_SPEED_1,y
             cmp #$ff
@@ -399,7 +408,7 @@ DYING_TICK
             sta HPOSP0
             sta HPOSP1
             jsr PAINT_PLAYERS
-            rts
+DT_X        rts
 DT_0        lda #0
             sta HPOSP0
             sta HPOSP1
