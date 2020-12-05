@@ -846,7 +846,6 @@ LEFT_KILL_X_SPEED_1
             dta b(110)
             dta b(111)
             dta b(112)
-            dta b(113)
             dta b($ff)
  
 LEFT_KILL_Y_SPEED_1
@@ -883,7 +882,6 @@ LEFT_KILL_Y_SPEED_1
             dta b(202)
             dta b(207)
             dta b(212)
-            dta b($ff)
             
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
