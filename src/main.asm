@@ -295,7 +295,7 @@ CC_KILLED
             sta P1_Y
             lda #1
             sta DYING_JUMP_COUNTER
-            mwa #LEFT_KILL_Y_SPEED_2 P1_Y_TABLE
+            mwa #LEFT_KILL_Y_SPEED_3 P1_Y_TABLE
             rts
 
 CHECK_COLLISIONS_RIGHT
@@ -397,13 +397,13 @@ DYING_TICK
             lda #DYING_JUMP_COOLDOWN
             sta DYING_JUMP_COUNTER
             ldy DYING_POS_X_P1
-            lda LEFT_KILL_X_SPEED_2,y
+            lda LEFT_KILL_X_SPEED_3,y
             cmp #$ff
             beq DT_0
             jsr CLEAR_PLAYERS
             inc P1_Y
             ldy DYING_POS_X_P1
-            lda LEFT_KILL_X_SPEED_2,y
+            lda LEFT_KILL_X_SPEED_3,y
             inc DYING_POS_X_P1
             sta HPOSP0
             sta HPOSP1
@@ -999,6 +999,91 @@ LEFT_KILL_Y_SPEED_2
             dta b(228)
             dta b(232)
             dta b(236)
+            
+LEFT_KILL_X_SPEED_3
+            DTA B(083)
+            DTA B(086)
+            DTA B(090)
+            DTA B(093)
+            DTA B(097)
+            DTA B(100)
+            DTA B(103)
+            DTA B(107)
+            DTA B(110)
+            DTA B(114)
+            DTA B(117)
+            DTA B(121)
+            DTA B(124)
+            DTA B(127)
+            DTA B(131)
+            DTA B(134)
+            DTA B(138)
+            DTA B(141)
+            DTA B(144)
+            DTA B(148)
+            DTA B(151)
+            DTA B(155)
+            DTA B(158)
+            DTA B(162)
+            DTA B(165)
+            DTA B(168)
+            DTA B(172)
+            DTA B(175)
+            DTA B(179)
+            DTA B(182)
+            DTA B(186)
+            DTA B(189)
+            DTA B(192)
+            DTA B(196)
+            DTA B(199)
+            DTA B(203)
+            DTA B(206)
+            DTA B(209)
+            DTA B(213)
+            DTA B(216)
+            DTA B($FF)
+ 
+LEFT_KILL_Y_SPEED_3
+            DTA B(156)
+            DTA B(153)
+            DTA B(150)
+            DTA B(148)
+            DTA B(145)
+            DTA B(143)
+            DTA B(141)
+            DTA B(139)
+            DTA B(137)
+            DTA B(135)
+            DTA B(133)
+            DTA B(132)
+            DTA B(130)
+            DTA B(129)
+            DTA B(128)
+            DTA B(127)
+            DTA B(126)
+            DTA B(125)
+            DTA B(124)
+            DTA B(123)
+            DTA B(122)
+            DTA B(122)
+            DTA B(122)
+            DTA B(121)
+            DTA B(121)
+            DTA B(121)
+            DTA B(121)
+            DTA B(121)
+            DTA B(121)
+            DTA B(122)
+            DTA B(122)
+            DTA B(123)
+            DTA B(124)
+            DTA B(124)
+            DTA B(125)
+            DTA B(126)
+            DTA B(128)
+            DTA B(129)
+            DTA B(130)
+            DTA B(132)
             
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
