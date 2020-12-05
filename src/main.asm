@@ -295,7 +295,7 @@ CC_KILLED
             sta P1_Y
             lda #1
             sta DYING_JUMP_COUNTER
-            mwa #LEFT_KILL_Y_SPEED_1 P1_Y_TABLE
+            mwa #LEFT_KILL_Y_SPEED_2 P1_Y_TABLE
             rts
 
 CHECK_COLLISIONS_RIGHT
@@ -397,13 +397,13 @@ DYING_TICK
             lda #DYING_JUMP_COOLDOWN
             sta DYING_JUMP_COUNTER
             ldy DYING_POS_X_P1
-            lda LEFT_KILL_X_SPEED_1,y
+            lda LEFT_KILL_X_SPEED_2,y
             cmp #$ff
             beq DT_0
             jsr CLEAR_PLAYERS
             inc P1_Y
             ldy DYING_POS_X_P1
-            lda LEFT_KILL_X_SPEED_1,y
+            lda LEFT_KILL_X_SPEED_2,y
             inc DYING_POS_X_P1
             sta HPOSP0
             sta HPOSP1
@@ -882,6 +882,123 @@ LEFT_KILL_Y_SPEED_1
             dta b(202)
             dta b(207)
             dta b(212)
+            
+LEFT_KILL_X_SPEED_2
+            dta b(081)
+            dta b(083)
+            dta b(085)
+            dta b(086)
+            dta b(088)
+            dta b(090)
+            dta b(091)
+            dta b(093)
+            dta b(095)
+            dta b(097)
+            dta b(098)
+            dta b(100)
+            dta b(102)
+            dta b(103)
+            dta b(105)
+            dta b(107)
+            dta b(108)
+            dta b(110)
+            dta b(112)
+            dta b(114)
+            dta b(115)
+            dta b(117)
+            dta b(119)
+            dta b(120)
+            dta b(122)
+            dta b(124)
+            dta b(125)
+            dta b(127)
+            dta b(129)
+            dta b(131)
+            dta b(132)
+            dta b(134)
+            dta b(136)
+            dta b(137)
+            dta b(139)
+            dta b(141)
+            dta b(142)
+            dta b(144)
+            dta b(146)
+            dta b(148)
+            dta b(149)
+            dta b(151)
+            dta b(153)
+            dta b(154)
+            dta b(156)
+            dta b(158)
+            dta b(159)
+            dta b(161)
+            dta b(163)
+            dta b(165)
+            dta b(166)
+            dta b(168)
+            dta b(170)
+            dta b(171)
+            dta b(173)
+            dta b(175)
+            dta b($ff)
+ 
+LEFT_KILL_Y_SPEED_2
+            dta b(156)
+            dta b(154)
+            dta b(153)
+            dta b(151)
+            dta b(150)
+            dta b(149)
+            dta b(148)
+            dta b(147)
+            dta b(147)
+            dta b(146)
+            dta b(145)
+            dta b(145)
+            dta b(145)
+            dta b(145)
+            dta b(145)
+            dta b(145)
+            dta b(145)
+            dta b(145)
+            dta b(145)
+            dta b(146)
+            dta b(146)
+            dta b(147)
+            dta b(148)
+            dta b(149)
+            dta b(150)
+            dta b(151)
+            dta b(152)
+            dta b(154)
+            dta b(155)
+            dta b(157)
+            dta b(158)
+            dta b(160)
+            dta b(162)
+            dta b(164)
+            dta b(166)
+            dta b(168)
+            dta b(171)
+            dta b(173)
+            dta b(176)
+            dta b(179)
+            dta b(181)
+            dta b(184)
+            dta b(187)
+            dta b(190)
+            dta b(194)
+            dta b(197)
+            dta b(200)
+            dta b(204)
+            dta b(208)
+            dta b(211)
+            dta b(215)
+            dta b(219)
+            dta b(223)
+            dta b(228)
+            dta b(232)
+            dta b(236)
             
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
