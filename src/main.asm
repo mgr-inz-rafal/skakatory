@@ -14,6 +14,7 @@ SCR_MEM_2_P2        equ $7000
 @TAB_MEM_BANKS      equ $0600
 
 .zpvar          P1_Y_TABLE             .word
+.zpvar          P1_X_TABLE             .word
 
 //  0 -  51   - slower rotation (52 frames)
 // 52 -  85   - faster rotation (34 frames)
@@ -26,7 +27,8 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          OPTIONAL_LIFT_ALLOWED  .byte
 
 .zpvar          DYING_JUMP_COUNTER     .byte
-DYING_JUMP_COOLDOWN    equ 2
+DYING_JUMP_COOLDOWN         equ 2
+DYING_JUMP_COOLDOWN_FAST    equ 1
 
 .zpvar          JUMP_COUNTER           .byte
 .zpvar          JUMP_COUNTER_RIGHT     .byte
@@ -273,7 +275,7 @@ START_JUMP_RIGHT
 SJR_X       rts
 
 CHECK_COLLISIONS
-            #if .byte P1_STATE <> #PS_DYING .and .byte P1_Y > #6
+            #if .byte P1_STATE = #PS_DYING .or .byte P1_Y > #6
                 rts
             #end
             ldy CURRENT_GAME_LEVEL
@@ -287,16 +289,49 @@ CHECK_COLLISIONS
             cmp CURRENT_FRAME
             beq CC_KILLED
             rts
-CC_KILLED
-            lda #PS_DYING
+CC_KILLED   jsr INIT_DYING
+            rts
+
+; Death animation depends on the speed of the rotator
+; There are 3 death speeds, they are assigned
+; to game levels in the following way:
+;
+; Level | Animation (S-Slow, M-medium, F-fase)
+;-------------------
+;   1   |     S
+;   2   |     S
+;   3   |     S
+;   4   |     M
+;   5   |     S
+;   6   |     M
+;   7   |     M
+;   8   |     F
+;   9   |     M
+;  10   |     M
+;  11   |     F
+;  12   |     F
+INIT_DYING  lda #PS_DYING
             sta P1_STATE
             lda #0
             sta DYING_POS_X_P1
             sta P1_Y
             lda #1
             sta DYING_JUMP_COUNTER
-            mwa #LEFT_KILL_Y_SPEED_3 P1_Y_TABLE
-            rts
+            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
+                mwa #LEFT_KILL_Y_SPEED_1 P1_Y_TABLE
+                mwa #LEFT_KILL_X_SPEED_1 P1_X_TABLE
+                rts
+            #end
+            #if .byte CURRENT_GAME_LEVEL = #3 .or .byte CURRENT_GAME_LEVEL = #5 .or .byte CURRENT_GAME_LEVEL = #6 .or .byte CURRENT_GAME_LEVEL = #8  .or .byte CURRENT_GAME_LEVEL = #9 
+                mwa #LEFT_KILL_Y_SPEED_2 P1_Y_TABLE
+                mwa #LEFT_KILL_X_SPEED_2 P1_X_TABLE
+                rts
+            #end
+            #if .byte CURRENT_GAME_LEVEL = #7 .or .byte CURRENT_GAME_LEVEL = #10 .or .byte CURRENT_GAME_LEVEL = #11
+                mwa #LEFT_KILL_Y_SPEED_3 P1_Y_TABLE
+                mwa #LEFT_KILL_X_SPEED_3 P1_X_TABLE
+                rts
+            #end
 
 CHECK_COLLISIONS_RIGHT
             #if .byte P2_Y > #6
@@ -391,19 +426,28 @@ INTERRUPT_JUMP_RIGHT
             sta JUMP_INTERRUPTED_RIGHT
 IJR_X       rts
 
+INIT_DYING_COOLDOWN
+            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
+                lda #DYING_JUMP_COOLDOWN
+                sta DYING_JUMP_COUNTER
+                rts
+            #end
+            lda #DYING_JUMP_COOLDOWN_FAST
+            sta DYING_JUMP_COUNTER
+            rts
+
 DYING_TICK
             dec DYING_JUMP_COUNTER
             bne DT_X
-            lda #DYING_JUMP_COOLDOWN
-            sta DYING_JUMP_COUNTER
+            jsr INIT_DYING_COOLDOWN
             ldy DYING_POS_X_P1
-            lda LEFT_KILL_X_SPEED_3,y
+            lda (P1_X_TABLE),y
             cmp #$ff
             beq DT_0
             jsr CLEAR_PLAYERS
             inc P1_Y
             ldy DYING_POS_X_P1
-            lda LEFT_KILL_X_SPEED_3,y
+            lda (P1_X_TABLE),y
             inc DYING_POS_X_P1
             sta HPOSP0
             sta HPOSP1
@@ -612,7 +656,7 @@ INIT_LEVEL_PARAMS
             rts
 
 GAME_STATE_INIT
-            lda #0
+            lda #2
             sta CURRENT_GAME_LEVEL
             tay
             lda FIRST_FRAME_PER_LEVEL,y
