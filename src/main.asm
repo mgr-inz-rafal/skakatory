@@ -26,7 +26,6 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_Y                   .byte
 .zpvar          P2_X                   .byte 
 .zpvar          P2_Y                   .byte
-.zpvar          OPTIONAL_LIFT_ALLOWED  .byte
 
 .zpvar          DYING_JUMP_COUNTER       .byte
 .zpvar          DYING_JUMP_COUNTER_RIGHT .byte
