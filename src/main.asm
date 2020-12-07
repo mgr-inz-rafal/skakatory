@@ -15,6 +15,8 @@ SCR_MEM_2_P2        equ $7000
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
+.zpvar          P2_Y_TABLE             .word
+.zpvar          P2_X_TABLE             .word
 
 //  0 -  51   - slower rotation (52 frames)
 // 52 -  85   - faster rotation (34 frames)
@@ -26,7 +28,8 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P2_Y                   .byte
 .zpvar          OPTIONAL_LIFT_ALLOWED  .byte
 
-.zpvar          DYING_JUMP_COUNTER     .byte
+.zpvar          DYING_JUMP_COUNTER       .byte
+.zpvar          DYING_JUMP_COUNTER_RIGHT .byte
 DYING_JUMP_COOLDOWN         equ 2
 DYING_JUMP_COOLDOWN_FAST    equ 1
 
@@ -38,6 +41,7 @@ JUMP_FRAME_COUNT    equ 46
 JUMP_FRAME_ADVANCE  equ 1
 
 .zpvar          DYING_POS_X_P1         .byte
+.zpvar          DYING_POS_X_P2         .byte
 
 .zpvar          P1_STATE               .byte
 .zpvar          P2_STATE               .byte
@@ -239,7 +243,7 @@ GAME_LOOP
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
 
-            jsr CHECK_COLLISIONS
+            ;jsr CHECK_COLLISIONS
             jsr CHECK_COLLISIONS_RIGHT
 
             lda STRIG0
@@ -274,24 +278,6 @@ START_JUMP_RIGHT
             sta P2_STATE
 SJR_X       rts
 
-CHECK_COLLISIONS
-            #if .byte P1_STATE = #PS_DYING .or .byte P1_Y > #6
-                rts
-            #end
-            ldy CURRENT_GAME_LEVEL
-            lda HIT_FRAMES_0,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            lda HIT_FRAMES_1,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            lda HIT_FRAMES_2,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            rts
-CC_KILLED   jsr INIT_DYING
-            rts
-
 ; Death animation depends on the speed of the rotator
 ; There are 3 death speeds, they are assigned
 ; to game levels in the following way:
@@ -310,7 +296,8 @@ CC_KILLED   jsr INIT_DYING
 ;  10   |     M
 ;  11   |     F
 ;  12   |     F
-INIT_DYING  lda #PS_DYING
+INIT_DYING
+            lda #PS_DYING
             sta P1_STATE
             lda #0
             sta DYING_POS_X_P1
@@ -333,8 +320,51 @@ INIT_DYING  lda #PS_DYING
                 rts
             #end
 
+INIT_DYING_RIGHT
+            lda #PS_DYING
+            sta P2_STATE
+            lda #0
+            sta DYING_POS_X_P2
+            sta P2_Y
+            lda #1
+            sta DYING_JUMP_COUNTER_RIGHT
+            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
+                // TODO: Change tables to "right-hand-side"
+                mwa #LEFT_KILL_Y_SPEED_1 P2_Y_TABLE
+                mwa #LEFT_KILL_X_SPEED_1 P2_X_TABLE
+                rts
+            #end
+            #if .byte CURRENT_GAME_LEVEL = #3 .or .byte CURRENT_GAME_LEVEL = #5 .or .byte CURRENT_GAME_LEVEL = #6 .or .byte CURRENT_GAME_LEVEL = #8  .or .byte CURRENT_GAME_LEVEL = #9 
+                mwa #LEFT_KILL_Y_SPEED_2 P2_Y_TABLE
+                mwa #LEFT_KILL_X_SPEED_2 P2_X_TABLE
+                rts
+            #end
+            #if .byte CURRENT_GAME_LEVEL = #7 .or .byte CURRENT_GAME_LEVEL = #10 .or .byte CURRENT_GAME_LEVEL = #11
+                mwa #LEFT_KILL_Y_SPEED_3 P2_Y_TABLE
+                mwa #LEFT_KILL_X_SPEED_3 P2_X_TABLE
+                rts
+            #end
+
+CHECK_COLLISIONS
+            #if .byte P1_STATE = #PS_DYING .or .byte P1_Y > #6
+                rts
+            #end
+            ldy CURRENT_GAME_LEVEL
+            lda HIT_FRAMES_0,y
+            cmp CURRENT_FRAME
+            beq CC_KILLED
+            lda HIT_FRAMES_1,y
+            cmp CURRENT_FRAME
+            beq CC_KILLED
+            lda HIT_FRAMES_2,y
+            cmp CURRENT_FRAME
+            beq CC_KILLED
+            rts
+CC_KILLED   jsr INIT_DYING
+            rts
+
 CHECK_COLLISIONS_RIGHT
-            #if .byte P2_Y > #6
+            #if .byte P2_STATE = #PS_DYING .or .byte P2_Y > #6
                 rts
             #end
             ldy CURRENT_GAME_LEVEL
@@ -348,9 +378,7 @@ CHECK_COLLISIONS_RIGHT
             cmp CURRENT_FRAME
             beq CCR_KILLED
             rts
-CCR_KILLED
-            lda #$af
-            sta COLBK
+CCR_KILLED  jsr INIT_DYING_RIGHT
             rts
 
 BACKGROUND_TICK
@@ -397,6 +425,10 @@ PLAYER_TICK_RIGHT
             cmp #PS_JUMP
             bne @+
             jsr JUMP_TICK_RIGHT
+            rts
+@           cmp #PS_DYING
+            bne @+
+            jsr DYING_TICK_RIGHT
 @
 PTR_X       rts
 
@@ -436,6 +468,16 @@ INIT_DYING_COOLDOWN
             sta DYING_JUMP_COUNTER
             rts
 
+INIT_DYING_COOLDOWN_RIGHT
+            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
+                lda #DYING_JUMP_COOLDOWN
+                sta DYING_JUMP_COUNTER_RIGHT
+                rts
+            #end
+            lda #DYING_JUMP_COOLDOWN_FAST
+            sta DYING_JUMP_COUNTER_RIGHT
+            rts
+
 DYING_TICK
             dec DYING_JUMP_COUNTER
             bne DT_X
@@ -445,7 +487,7 @@ DYING_TICK
             cmp #$ff
             beq DT_0
             jsr CLEAR_PLAYERS
-            inc P1_Y
+DUPA2            inc P1_Y
             ldy DYING_POS_X_P1
             lda (P1_X_TABLE),y
             inc DYING_POS_X_P1
@@ -457,6 +499,29 @@ DT_0        lda #0
             sta HPOSP0
             sta HPOSP1
 CHUJ        jmp CHUJ
+            rts
+
+DYING_TICK_RIGHT
+            dec DYING_JUMP_COUNTER_RIGHT
+            bne DTR_X
+            jsr INIT_DYING_COOLDOWN_RIGHT
+            ldy DYING_POS_X_P2
+            lda (P2_X_TABLE),y
+            cmp #$ff
+            beq DTR_0
+            jsr CLEAR_PLAYERS
+DUPA1       inc P2_Y
+            ldy DYING_POS_X_P2
+            lda (P2_X_TABLE),y
+            inc DYING_POS_X_P2
+            sta HPOSP2
+            sta HPOSP3
+            jsr PAINT_PLAYERS
+DTR_X       rts
+DTR_0       lda #0
+            sta HPOSP2
+            sta HPOSP3
+CIPA        jmp CIPA
             rts
 
 JUMP_TICK
@@ -530,7 +595,7 @@ CLEAR_PLAYERS
             cpx #20
             bne @-
             ldy P2_Y
-            lda JUMP_HEIGHT_TABLE,y
+            lda (P2_Y_TABLE),y
             tay
             ldx #0
 @           lda #0
@@ -558,7 +623,7 @@ PAINT_PLAYERS
             bne @-
 ; Paint right player
             ldy P2_Y
-            lda JUMP_HEIGHT_TABLE,y
+            lda (P2_Y_TABLE),y
             tay
             ldx #0
 @           lda PLAYER_DATA_02,x
@@ -656,7 +721,7 @@ INIT_LEVEL_PARAMS
             rts
 
 GAME_STATE_INIT
-            lda #2
+            lda #0
             sta CURRENT_GAME_LEVEL
             tay
             lda FIRST_FRAME_PER_LEVEL,y
@@ -677,6 +742,7 @@ GAME_STATE_INIT
             lda @TAB_MEM_BANKS,y
             sta PORTB
             mwa #JUMP_HEIGHT_TABLE P1_Y_TABLE
+            mwa #JUMP_HEIGHT_TABLE P2_Y_TABLE
             rts           
 
 ; Frame number in X
