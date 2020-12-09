@@ -15,6 +15,8 @@ SCR_MEM_2_P2        equ $7000
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
+.zpvar          P2_Y_TABLE             .word
+.zpvar          P2_X_TABLE             .word
 
 //  0 -  51   - slower rotation (52 frames)
 // 52 -  85   - faster rotation (34 frames)
@@ -24,9 +26,9 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_Y                   .byte
 .zpvar          P2_X                   .byte 
 .zpvar          P2_Y                   .byte
-.zpvar          OPTIONAL_LIFT_ALLOWED  .byte
 
-.zpvar          DYING_JUMP_COUNTER     .byte
+.zpvar          DYING_JUMP_COUNTER       .byte
+.zpvar          DYING_JUMP_COUNTER_RIGHT .byte
 DYING_JUMP_COOLDOWN         equ 2
 DYING_JUMP_COOLDOWN_FAST    equ 1
 
@@ -38,6 +40,7 @@ JUMP_FRAME_COUNT    equ 46
 JUMP_FRAME_ADVANCE  equ 1
 
 .zpvar          DYING_POS_X_P1         .byte
+.zpvar          DYING_POS_X_P2         .byte
 
 .zpvar          P1_STATE               .byte
 .zpvar          P2_STATE               .byte
@@ -274,24 +277,6 @@ START_JUMP_RIGHT
             sta P2_STATE
 SJR_X       rts
 
-CHECK_COLLISIONS
-            #if .byte P1_STATE = #PS_DYING .or .byte P1_Y > #6
-                rts
-            #end
-            ldy CURRENT_GAME_LEVEL
-            lda HIT_FRAMES_0,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            lda HIT_FRAMES_1,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            lda HIT_FRAMES_2,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            rts
-CC_KILLED   jsr INIT_DYING
-            rts
-
 ; Death animation depends on the speed of the rotator
 ; There are 3 death speeds, they are assigned
 ; to game levels in the following way:
@@ -310,7 +295,8 @@ CC_KILLED   jsr INIT_DYING
 ;  10   |     M
 ;  11   |     F
 ;  12   |     F
-INIT_DYING  lda #PS_DYING
+INIT_DYING
+            lda #PS_DYING
             sta P1_STATE
             lda #0
             sta DYING_POS_X_P1
@@ -333,8 +319,51 @@ INIT_DYING  lda #PS_DYING
                 rts
             #end
 
+INIT_DYING_RIGHT
+            lda #PS_DYING
+            sta P2_STATE
+            lda #0
+            sta DYING_POS_X_P2
+            sta P2_Y
+            lda #1
+            sta DYING_JUMP_COUNTER_RIGHT
+            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
+                // TODO: Change tables to "right-hand-side"
+                mwa #LEFT_KILL_Y_SPEED_1 P2_Y_TABLE
+                mwa #RIGHT_KILL_X_SPEED_1 P2_X_TABLE
+                rts
+            #end
+            #if .byte CURRENT_GAME_LEVEL = #3 .or .byte CURRENT_GAME_LEVEL = #5 .or .byte CURRENT_GAME_LEVEL = #6 .or .byte CURRENT_GAME_LEVEL = #8  .or .byte CURRENT_GAME_LEVEL = #9 
+                mwa #LEFT_KILL_Y_SPEED_2 P2_Y_TABLE
+                mwa #RIGHT_KILL_X_SPEED_2 P2_X_TABLE
+                rts
+            #end
+            #if .byte CURRENT_GAME_LEVEL = #7 .or .byte CURRENT_GAME_LEVEL = #10 .or .byte CURRENT_GAME_LEVEL = #11
+                mwa #LEFT_KILL_Y_SPEED_3 P2_Y_TABLE
+                mwa #RIGHT_KILL_X_SPEED_3 P2_X_TABLE
+                rts
+            #end
+
+CHECK_COLLISIONS
+            #if .byte P1_STATE = #PS_DYING .or .byte P1_Y > #6
+                rts
+            #end
+            ldy CURRENT_GAME_LEVEL
+            lda HIT_FRAMES_0,y
+            cmp CURRENT_FRAME
+            beq CC_KILLED
+            lda HIT_FRAMES_1,y
+            cmp CURRENT_FRAME
+            beq CC_KILLED
+            lda HIT_FRAMES_2,y
+            cmp CURRENT_FRAME
+            beq CC_KILLED
+            rts
+CC_KILLED   jsr INIT_DYING
+            rts
+
 CHECK_COLLISIONS_RIGHT
-            #if .byte P2_Y > #6
+            #if .byte P2_STATE = #PS_DYING .or .byte P2_Y > #6
                 rts
             #end
             ldy CURRENT_GAME_LEVEL
@@ -348,9 +377,7 @@ CHECK_COLLISIONS_RIGHT
             cmp CURRENT_FRAME
             beq CCR_KILLED
             rts
-CCR_KILLED
-            lda #$af
-            sta COLBK
+CCR_KILLED  jsr INIT_DYING_RIGHT
             rts
 
 BACKGROUND_TICK
@@ -397,6 +424,10 @@ PLAYER_TICK_RIGHT
             cmp #PS_JUMP
             bne @+
             jsr JUMP_TICK_RIGHT
+            rts
+@           cmp #PS_DYING
+            bne @+
+            jsr DYING_TICK_RIGHT
 @
 PTR_X       rts
 
@@ -436,6 +467,16 @@ INIT_DYING_COOLDOWN
             sta DYING_JUMP_COUNTER
             rts
 
+INIT_DYING_COOLDOWN_RIGHT
+            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
+                lda #DYING_JUMP_COOLDOWN
+                sta DYING_JUMP_COUNTER_RIGHT
+                rts
+            #end
+            lda #DYING_JUMP_COOLDOWN_FAST
+            sta DYING_JUMP_COUNTER_RIGHT
+            rts
+
 DYING_TICK
             dec DYING_JUMP_COUNTER
             bne DT_X
@@ -445,7 +486,7 @@ DYING_TICK
             cmp #$ff
             beq DT_0
             jsr CLEAR_PLAYERS
-            inc P1_Y
+DUPA2            inc P1_Y
             ldy DYING_POS_X_P1
             lda (P1_X_TABLE),y
             inc DYING_POS_X_P1
@@ -457,6 +498,29 @@ DT_0        lda #0
             sta HPOSP0
             sta HPOSP1
 CHUJ        jmp CHUJ
+            rts
+
+DYING_TICK_RIGHT
+            dec DYING_JUMP_COUNTER_RIGHT
+            bne DTR_X
+            jsr INIT_DYING_COOLDOWN_RIGHT
+            ldy DYING_POS_X_P2
+            lda (P2_X_TABLE),y
+            cmp #$ff
+            beq DTR_0
+            jsr CLEAR_PLAYERS
+DUPA1       inc P2_Y
+            ldy DYING_POS_X_P2
+            lda (P2_X_TABLE),y
+            inc DYING_POS_X_P2
+            sta HPOSP2
+            sta HPOSP3
+            jsr PAINT_PLAYERS
+DTR_X       rts
+DTR_0       lda #0
+            sta HPOSP2
+            sta HPOSP3
+CIPA        jmp CIPA
             rts
 
 JUMP_TICK
@@ -530,7 +594,7 @@ CLEAR_PLAYERS
             cpx #20
             bne @-
             ldy P2_Y
-            lda JUMP_HEIGHT_TABLE,y
+            lda (P2_Y_TABLE),y
             tay
             ldx #0
 @           lda #0
@@ -558,7 +622,7 @@ PAINT_PLAYERS
             bne @-
 ; Paint right player
             ldy P2_Y
-            lda JUMP_HEIGHT_TABLE,y
+            lda (P2_Y_TABLE),y
             tay
             ldx #0
 @           lda PLAYER_DATA_02,x
@@ -656,7 +720,7 @@ INIT_LEVEL_PARAMS
             rts
 
 GAME_STATE_INIT
-            lda #2
+            lda #10
             sta CURRENT_GAME_LEVEL
             tay
             lda FIRST_FRAME_PER_LEVEL,y
@@ -677,6 +741,7 @@ GAME_STATE_INIT
             lda @TAB_MEM_BANKS,y
             sta PORTB
             mwa #JUMP_HEIGHT_TABLE P1_Y_TABLE
+            mwa #JUMP_HEIGHT_TABLE P2_Y_TABLE
             rts           
 
 ; Frame number in X
@@ -891,7 +956,42 @@ LEFT_KILL_X_SPEED_1
             dta b(111)
             dta b(112)
             dta b($ff)
- 
+
+RIGHT_KILL_X_SPEED_1
+            dta b($aa-081+81)
+            dta b($aa-082+81)
+            dta b($aa-083+81)
+            dta b($aa-084+81)
+            dta b($aa-085+81)
+            dta b($aa-086+81)
+            dta b($aa-087+81)
+            dta b($aa-088+81)
+            dta b($aa-089+81)
+            dta b($aa-090+81)
+            dta b($aa-091+81)
+            dta b($aa-092+81)
+            dta b($aa-093+81)
+            dta b($aa-094+81)
+            dta b($aa-095+81)
+            dta b($aa-096+81)
+            dta b($aa-097+81)
+            dta b($aa-098+81)
+            dta b($aa-099+81)
+            dta b($aa-100+81)
+            dta b($aa-101+81)
+            dta b($aa-102+81)
+            dta b($aa-103+81)
+            dta b($aa-104+81)
+            dta b($aa-105+81)
+            dta b($aa-106+81)
+            dta b($aa-107+81)
+            dta b($aa-108+81)
+            dta b($aa-109+81)
+            dta b($aa-110+81)
+            dta b($aa-111+81)
+            dta b($aa-112+81)
+            dta b($ff)
+
 LEFT_KILL_Y_SPEED_1
             dta b(156)
             dta b(154)
@@ -986,6 +1086,65 @@ LEFT_KILL_X_SPEED_2
             dta b(175)
             dta b($ff)
  
+RIGHT_KILL_X_SPEED_2
+            dta b($aa-081+81)
+            dta b($aa-083+81)
+            dta b($aa-085+81)
+            dta b($aa-086+81)
+            dta b($aa-088+81)
+            dta b($aa-090+81)
+            dta b($aa-091+81)
+            dta b($aa-093+81)
+            dta b($aa-095+81)
+            dta b($aa-097+81)
+            dta b($aa-098+81)
+            dta b($aa-100+81)
+            dta b($aa-102+81)
+            dta b($aa-103+81)
+            dta b($aa-105+81)
+            dta b($aa-107+81)
+            dta b($aa-108+81)
+            dta b($aa-110+81)
+            dta b($aa-112+81)
+            dta b($aa-114+81)
+            dta b($aa-115+81)
+            dta b($aa-117+81)
+            dta b($aa-119+81)
+            dta b($aa-120+81)
+            dta b($aa-122+81)
+            dta b($aa-124+81)
+            dta b($aa-125+81)
+            dta b($aa-127+81)
+            dta b($aa-129+81)
+            dta b($aa-131+81)
+            dta b($aa-132+81)
+            dta b($aa-134+81)
+            dta b($aa-136+81)
+            dta b($aa-137+81)
+            dta b($aa-139+81)
+            dta b($aa-141+81)
+            dta b($aa-142+81)
+            dta b($aa-144+81)
+            dta b($aa-146+81)
+            dta b($aa-148+81)
+            dta b($aa-149+81)
+            dta b($aa-151+81)
+            dta b($aa-153+81)
+            dta b($aa-154+81)
+            dta b($aa-156+81)
+            dta b($aa-158+81)
+            dta b($aa-159+81)
+            dta b($aa-161+81)
+            dta b($aa-163+81)
+            dta b($aa-165+81)
+            dta b($aa-166+81)
+            dta b($aa-168+81)
+            dta b($aa-170+81)
+            dta b($aa-171+81)
+            dta b($aa-173+81)
+            dta b($aa-175+81)
+            dta b($ff)
+
 LEFT_KILL_Y_SPEED_2
             dta b(156)
             dta b(154)
@@ -1085,6 +1244,49 @@ LEFT_KILL_X_SPEED_3
             dta b(209)
             dta b(213)
             dta b(216)
+            dta b($ff)
+ 
+RIGHT_KILL_X_SPEED_3
+            dta b($aa-083+81)
+            dta b($aa-086+81)
+            dta b($aa-090+81)
+            dta b($aa-093+81)
+            dta b($aa-097+81)
+            dta b($aa-100+81)
+            dta b($aa-103+81)
+            dta b($aa-107+81)
+            dta b($aa-110+81)
+            dta b($aa-114+81)
+            dta b($aa-117+81)
+            dta b($aa-121+81)
+            dta b($aa-124+81)
+            dta b($aa-127+81)
+            dta b($aa-131+81)
+            dta b($aa-134+81)
+            dta b($aa-138+81)
+            dta b($aa-141+81)
+            dta b($aa-144+81)
+            dta b($aa-148+81)
+            dta b($aa-151+81)
+            dta b($aa-155+81)
+            dta b($aa-158+81)
+            dta b($aa-162+81)
+            dta b($aa-165+81)
+            dta b($aa-168+81)
+            dta b($aa-172+81)
+            dta b($aa-175+81)
+            dta b($aa-179+81)
+            dta b($aa-182+81)
+            dta b($aa-186+81)
+            dta b($aa-189+81)
+            dta b($aa-192+81)
+            dta b($aa-196+81)
+            dta b($aa-199+81)
+            dta b($aa-203+81)
+            dta b($aa-206+81)
+            dta b($aa-209+81)
+            dta b($aa-213+81)
+            dta b($aa-216+81)
             dta b($ff)
  
 LEFT_KILL_Y_SPEED_3
