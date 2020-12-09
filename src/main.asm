@@ -242,7 +242,7 @@ GAME_LOOP
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
 
-            ;jsr CHECK_COLLISIONS
+            jsr CHECK_COLLISIONS
             jsr CHECK_COLLISIONS_RIGHT
 
             lda STRIG0
@@ -330,17 +330,17 @@ INIT_DYING_RIGHT
             #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
                 // TODO: Change tables to "right-hand-side"
                 mwa #LEFT_KILL_Y_SPEED_1 P2_Y_TABLE
-                mwa #LEFT_KILL_X_SPEED_1 P2_X_TABLE
+                mwa #RIGHT_KILL_X_SPEED_1 P2_X_TABLE
                 rts
             #end
             #if .byte CURRENT_GAME_LEVEL = #3 .or .byte CURRENT_GAME_LEVEL = #5 .or .byte CURRENT_GAME_LEVEL = #6 .or .byte CURRENT_GAME_LEVEL = #8  .or .byte CURRENT_GAME_LEVEL = #9 
                 mwa #LEFT_KILL_Y_SPEED_2 P2_Y_TABLE
-                mwa #LEFT_KILL_X_SPEED_2 P2_X_TABLE
+                mwa #RIGHT_KILL_X_SPEED_2 P2_X_TABLE
                 rts
             #end
             #if .byte CURRENT_GAME_LEVEL = #7 .or .byte CURRENT_GAME_LEVEL = #10 .or .byte CURRENT_GAME_LEVEL = #11
                 mwa #LEFT_KILL_Y_SPEED_3 P2_Y_TABLE
-                mwa #LEFT_KILL_X_SPEED_3 P2_X_TABLE
+                mwa #RIGHT_KILL_X_SPEED_3 P2_X_TABLE
                 rts
             #end
 
@@ -720,7 +720,7 @@ INIT_LEVEL_PARAMS
             rts
 
 GAME_STATE_INIT
-            lda #0
+            lda #10
             sta CURRENT_GAME_LEVEL
             tay
             lda FIRST_FRAME_PER_LEVEL,y
@@ -956,7 +956,42 @@ LEFT_KILL_X_SPEED_1
             dta b(111)
             dta b(112)
             dta b($ff)
- 
+
+RIGHT_KILL_X_SPEED_1
+            dta b($aa-081+81)
+            dta b($aa-082+81)
+            dta b($aa-083+81)
+            dta b($aa-084+81)
+            dta b($aa-085+81)
+            dta b($aa-086+81)
+            dta b($aa-087+81)
+            dta b($aa-088+81)
+            dta b($aa-089+81)
+            dta b($aa-090+81)
+            dta b($aa-091+81)
+            dta b($aa-092+81)
+            dta b($aa-093+81)
+            dta b($aa-094+81)
+            dta b($aa-095+81)
+            dta b($aa-096+81)
+            dta b($aa-097+81)
+            dta b($aa-098+81)
+            dta b($aa-099+81)
+            dta b($aa-100+81)
+            dta b($aa-101+81)
+            dta b($aa-102+81)
+            dta b($aa-103+81)
+            dta b($aa-104+81)
+            dta b($aa-105+81)
+            dta b($aa-106+81)
+            dta b($aa-107+81)
+            dta b($aa-108+81)
+            dta b($aa-109+81)
+            dta b($aa-110+81)
+            dta b($aa-111+81)
+            dta b($aa-112+81)
+            dta b($ff)
+
 LEFT_KILL_Y_SPEED_1
             dta b(156)
             dta b(154)
@@ -1051,6 +1086,65 @@ LEFT_KILL_X_SPEED_2
             dta b(175)
             dta b($ff)
  
+RIGHT_KILL_X_SPEED_2
+            dta b($aa-081+81)
+            dta b($aa-083+81)
+            dta b($aa-085+81)
+            dta b($aa-086+81)
+            dta b($aa-088+81)
+            dta b($aa-090+81)
+            dta b($aa-091+81)
+            dta b($aa-093+81)
+            dta b($aa-095+81)
+            dta b($aa-097+81)
+            dta b($aa-098+81)
+            dta b($aa-100+81)
+            dta b($aa-102+81)
+            dta b($aa-103+81)
+            dta b($aa-105+81)
+            dta b($aa-107+81)
+            dta b($aa-108+81)
+            dta b($aa-110+81)
+            dta b($aa-112+81)
+            dta b($aa-114+81)
+            dta b($aa-115+81)
+            dta b($aa-117+81)
+            dta b($aa-119+81)
+            dta b($aa-120+81)
+            dta b($aa-122+81)
+            dta b($aa-124+81)
+            dta b($aa-125+81)
+            dta b($aa-127+81)
+            dta b($aa-129+81)
+            dta b($aa-131+81)
+            dta b($aa-132+81)
+            dta b($aa-134+81)
+            dta b($aa-136+81)
+            dta b($aa-137+81)
+            dta b($aa-139+81)
+            dta b($aa-141+81)
+            dta b($aa-142+81)
+            dta b($aa-144+81)
+            dta b($aa-146+81)
+            dta b($aa-148+81)
+            dta b($aa-149+81)
+            dta b($aa-151+81)
+            dta b($aa-153+81)
+            dta b($aa-154+81)
+            dta b($aa-156+81)
+            dta b($aa-158+81)
+            dta b($aa-159+81)
+            dta b($aa-161+81)
+            dta b($aa-163+81)
+            dta b($aa-165+81)
+            dta b($aa-166+81)
+            dta b($aa-168+81)
+            dta b($aa-170+81)
+            dta b($aa-171+81)
+            dta b($aa-173+81)
+            dta b($aa-175+81)
+            dta b($ff)
+
 LEFT_KILL_Y_SPEED_2
             dta b(156)
             dta b(154)
@@ -1150,6 +1244,49 @@ LEFT_KILL_X_SPEED_3
             dta b(209)
             dta b(213)
             dta b(216)
+            dta b($ff)
+ 
+RIGHT_KILL_X_SPEED_3
+            dta b($aa-083+81)
+            dta b($aa-086+81)
+            dta b($aa-090+81)
+            dta b($aa-093+81)
+            dta b($aa-097+81)
+            dta b($aa-100+81)
+            dta b($aa-103+81)
+            dta b($aa-107+81)
+            dta b($aa-110+81)
+            dta b($aa-114+81)
+            dta b($aa-117+81)
+            dta b($aa-121+81)
+            dta b($aa-124+81)
+            dta b($aa-127+81)
+            dta b($aa-131+81)
+            dta b($aa-134+81)
+            dta b($aa-138+81)
+            dta b($aa-141+81)
+            dta b($aa-144+81)
+            dta b($aa-148+81)
+            dta b($aa-151+81)
+            dta b($aa-155+81)
+            dta b($aa-158+81)
+            dta b($aa-162+81)
+            dta b($aa-165+81)
+            dta b($aa-168+81)
+            dta b($aa-172+81)
+            dta b($aa-175+81)
+            dta b($aa-179+81)
+            dta b($aa-182+81)
+            dta b($aa-186+81)
+            dta b($aa-189+81)
+            dta b($aa-192+81)
+            dta b($aa-196+81)
+            dta b($aa-199+81)
+            dta b($aa-203+81)
+            dta b($aa-206+81)
+            dta b($aa-209+81)
+            dta b($aa-213+81)
+            dta b($aa-216+81)
             dta b($ff)
  
 LEFT_KILL_Y_SPEED_3
