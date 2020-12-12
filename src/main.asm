@@ -20,6 +20,9 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_SCORE               .byte
 .zpvar          P1_SCORE_H             .byte ; 'H' is for hundred
 .zpvar          P1_H_PAINTED           .byte
+.zpvar          P2_SCORE               .byte
+.zpvar          P2_SCORE_H             .byte ; 'H' is for hundred
+.zpvar          P2_H_PAINTED           .byte
 
 .zpvar          SCORE_JUST_INCREASED   .byte
 SCORE_INCREASE_COOLDOWN     equ 4
@@ -236,7 +239,7 @@ GAME_LOOP
             jsr SHOW_FRAME
 
             jsr CHECK_SCORE
-            ;jsr CHECK_COLLISIONS
+            jsr CHECK_COLLISIONS
             jsr CHECK_COLLISIONS_RIGHT
 
             lda STRIG0
@@ -267,12 +270,18 @@ CHECK_SCORE
             #end
 CS_X        rts
 CS_1        jsr ADVANCE_SCORES
+            jsr ADVANCE_SCORES_RIGHT
             jsr PAINT_POINTS
             ldx #SCORE_INCREASE_COOLDOWN
             stx SCORE_JUST_INCREASED
             rts
 
 ADVANCE_SCORES
+            lda P1_STATE
+            cmp #PS_BURIED
+            beq AS_X
+            cmp #PS_DYING
+            beq AS_X
             sed
             lda P1_SCORE
             clc
@@ -281,12 +290,34 @@ ADVANCE_SCORES
             cld
             cmp #0
             beq AS_1
-            rts
+AS_X        rts
 AS_1        sed
             clc
             lda P1_SCORE_H
             adc #1
             sta P1_SCORE_H
+            rts
+
+ADVANCE_SCORES_RIGHT
+            lda P2_STATE
+            cmp #PS_BURIED
+            beq ASR_X
+            cmp #PS_DYING
+            beq AS_X
+            sed
+            lda P2_SCORE
+            clc
+            adc #1
+            sta P2_SCORE
+            cld
+            cmp #0
+            beq ASR_1
+ASR_X       rts
+ASR_1       sed
+            clc
+            lda P2_SCORE_H
+            adc #1
+            sta P2_SCORE_H
             rts
 
 START_JUMP
@@ -767,8 +798,10 @@ GAME_STATE_INIT
             sta CURRENT_GAME_LEVEL
             lda #$00
             sta P1_SCORE
+            sta P2_SCORE
             lda #0
             sta P1_SCORE_H
+            sta P2_SCORE_H
             tay
             lda FIRST_FRAME_PER_LEVEL,y
             sta FIRST_FRAME
@@ -803,6 +836,10 @@ CLEAR_STATUS_BAR
             rts
 
 PAINT_POINTS
+            jsr PAINT_POINTS_LEFT
+            jsr PAINT_POINTS_RIGHT
+
+PAINT_POINTS_LEFT
             lda #0
             sta P1_H_PAINTED
             ldy #0
@@ -829,6 +866,39 @@ PP_3        clc
             sta STATUS_BAR_BUFFER,y
             iny
 PP_2        lda P1_SCORE
+            and #%00001111
+            clc
+            adc #16
+            sta STATUS_BAR_BUFFER,y
+            rts
+
+PAINT_POINTS_RIGHT
+            lda #0
+            sta P2_H_PAINTED
+            ldy #37
+            lda P2_SCORE_H
+            beq PPR_1
+            inc P2_H_PAINTED
+            clc
+            adc #16
+            sta STATUS_BAR_BUFFER,y
+            iny
+PPR_1       lda P2_SCORE
+            and #%11110000
+            lsr
+            lsr
+            lsr
+            lsr
+            ldx P2_H_PAINTED
+            cpx #1
+            beq PPR_3
+            cmp #0
+            beq PPR_2
+PPR_3       clc
+            adc #16
+            sta STATUS_BAR_BUFFER,y
+            iny
+PPR_2       lda P2_SCORE
             and #%00001111
             clc
             adc #16
