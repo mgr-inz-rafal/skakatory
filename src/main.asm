@@ -566,8 +566,8 @@ DYING_TICK
             lda (P1_X_TABLE),y
             cmp #$ff
             beq DT_0
-            jsr CLEAR_PLAYERS
-DUPA2            inc P1_Y
+            jsr CLEAR_PLAYER_LEFT
+            inc P1_Y
             ldy DYING_POS_X_P1
             lda (P1_X_TABLE),y
             inc DYING_POS_X_P1
@@ -578,7 +578,7 @@ DT_X        rts
 DT_0        lda #0
             sta HPOSP0
             sta HPOSP1
-            jsr CLEAR_PLAYERS
+            jsr CLEAR_PLAYER_LEFT
             lda #PS_BURIED
             sta P1_STATE
             rts
@@ -591,7 +591,7 @@ DYING_TICK_RIGHT
             lda (P2_X_TABLE),y
             cmp #$ff
             beq DTR_0
-            jsr CLEAR_PLAYERS
+            jsr CLEAR_PLAYER_RIGHT
             inc P2_Y
             ldy DYING_POS_X_P2
             lda (P2_X_TABLE),y
@@ -603,7 +603,7 @@ DTR_X       rts
 DTR_0       lda #0
             sta HPOSP2
             sta HPOSP3
-            jsr CLEAR_PLAYERS
+            jsr CLEAR_PLAYER_RIGHT
             lda #PS_BURIED
             sta P2_STATE
             rts
@@ -666,7 +666,7 @@ JTR_1       lda P2_Y
             sta P2_Y
 JTR_X       rts
 
-CLEAR_PLAYERS
+CLEAR_PLAYER_LEFT
             ldy P1_Y
             lda (P1_Y_TABLE),y
             tay
@@ -678,6 +678,9 @@ CLEAR_PLAYERS
             inx
             cpx #20
             bne @-
+            rts
+
+CLEAR_PLAYER_RIGHT
             ldy P2_Y
             lda (P2_Y_TABLE),y
             tay
@@ -689,6 +692,11 @@ CLEAR_PLAYERS
             inx
             cpx #20
             bne @-
+            rts
+
+CLEAR_PLAYERS
+            jsr CLEAR_PLAYER_LEFT
+            jsr CLEAR_PLAYER_RIGHT
             rts
 
 PAINT_PLAYERS
