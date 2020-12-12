@@ -228,10 +228,9 @@ PROGRAM_START_FIRST_PART
             stx SDLSTL
             sty SDLSTL+1
 
-            jsr PAINT_PLAYERS
-
 GAME_LOOP
             jsr SYNCHRO
+            jsr RESTART_TICK
             jsr PLAYER_TICK
             jsr PLAYER_TICK_RIGHT
 
@@ -249,6 +248,18 @@ GAME_LOOP
             bne @+
             jsr START_JUMP_RIGHT
 @           jmp GAME_LOOP
+
+RESTART_TICK
+            #if .byte P1_STATE <> #PS_BURIED .or .byte P2_STATE <> #PS_BURIED
+                rts
+            #end
+            lda CONSOL
+            cmp #6
+            bne RT_X
+
+            jsr GAME_STATE_INIT
+
+RT_X        rts
 
 ; A=1 - yes
 ; A=0 - no
@@ -567,6 +578,7 @@ DT_X        rts
 DT_0        lda #0
             sta HPOSP0
             sta HPOSP1
+            jsr CLEAR_PLAYERS
             lda #PS_BURIED
             sta P1_STATE
             rts
@@ -591,6 +603,7 @@ DTR_X       rts
 DTR_0       lda #0
             sta HPOSP2
             sta HPOSP3
+            jsr CLEAR_PLAYERS
             lda #PS_BURIED
             sta P2_STATE
             rts
@@ -736,7 +749,6 @@ GAME_ENGINE_INIT
             lda #7
             jsr SETVBV
 
-            jsr INIT_PLAYERS
             rts
         
 INIT_PLAYERS
@@ -824,6 +836,8 @@ GAME_STATE_INIT
             mwa #JUMP_HEIGHT_TABLE P2_Y_TABLE
             jsr CLEAR_STATUS_BAR
             jsr PAINT_POINTS
+            jsr INIT_PLAYERS
+            jsr PAINT_PLAYERS
             rts           
 
 CLEAR_STATUS_BAR
