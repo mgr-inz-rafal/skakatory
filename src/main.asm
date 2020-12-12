@@ -17,6 +17,12 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_X_TABLE             .word
 .zpvar          P2_Y_TABLE             .word
 .zpvar          P2_X_TABLE             .word
+.zpvar          P1_SCORE               .byte
+.zpvar          P1_SCORE_H             .byte ; 'H' is for hundred
+.zpvar          P1_H_PAINTED           .byte
+
+.zpvar          SCORE_JUST_INCREASED   .byte
+SCORE_INCREASE_COOLDOWN     equ 6
 
 //  0 -  51   - slower rotation (52 frames)
 // 52 -  85   - faster rotation (34 frames)
@@ -55,6 +61,7 @@ PS_BURIED           equ 3
 ; 2) First animation frame
 ; 3) Last animation frame
 .zpvar          CURRENT_GAME_LEVEL          .byte
+LAST_GAME_LEVEL     equ 12
 
 .zpvar          CURRENT_ROTATION_COOLDOWN   .byte
 .zpvar          CURRENT_ROTATIONS           .byte
@@ -221,21 +228,6 @@ PROGRAM_START_FIRST_PART
             jsr PAINT_PLAYERS
 
 GAME_LOOP
-            lda CURRENT_GAME_LEVEL
-            clc
-            adc #16
-            sta STATUS_BAR_BUFFER+0
-
-            lda CURRENT_ROTATION_COOLDOWN
-            clc
-            adc #16
-            sta STATUS_BAR_BUFFER+3
-
-            lda CURRENT_ROTATIONS
-            clc
-            adc #16
-            sta STATUS_BAR_BUFFER+5
-
             jsr SYNCHRO
             jsr PLAYER_TICK
             jsr PLAYER_TICK_RIGHT
@@ -243,7 +235,8 @@ GAME_LOOP
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
 
-            jsr CHECK_COLLISIONS
+            jsr CHECK_SCORE
+            ;jsr CHECK_COLLISIONS
             jsr CHECK_COLLISIONS_RIGHT
 
             lda STRIG0
@@ -253,6 +246,92 @@ GAME_LOOP
             bne @+
             jsr START_JUMP_RIGHT
 @           jmp GAME_LOOP
+
+; A=1 - yes
+; A=0 - no
+SHOULD_UPDATE_SCORE
+            lda SCORE_JUST_INCREASED
+            cmp #0
+            beq SUS_0
+            dec SCORE_JUST_INCREASED
+            lda #0
+            rts
+SUS_0       lda #1
+            rts
+
+CHECK_SCORE
+            jsr SHOULD_UPDATE_SCORE
+            beq CS_X
+            ldy #0
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            iny
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+            lda SCORE_FRAMES,y
+            cmp CURRENT_FRAME
+            beq CS_1
+CS_X        rts
+CS_1        jsr ADVANCE_SCORES
+            jsr PAINT_POINTS
+            ldx #SCORE_INCREASE_COOLDOWN
+            sta SCORE_JUST_INCREASED
+            rts
+
+ADVANCE_SCORES
+            sed
+            lda P1_SCORE
+            clc
+            adc #1
+            sta P1_SCORE
+            cld
+            cmp #0
+            beq AS_1
+            rts
+AS_1        sed
+            clc
+            lda P1_SCORE_H
+            adc #1
+            sta P1_SCORE_H
+            rts
 
 START_JUMP
             lda P1_STATE
@@ -396,6 +475,9 @@ BACKGROUND_TICK
             dec CURRENT_ROTATIONS
             bne BT_X
             ; Advance to next level
+            lda CURRENT_GAME_LEVEL
+            cmp #LAST_GAME_LEVEL-1
+            beq BT_X
             inc CURRENT_GAME_LEVEL
             jsr INIT_LEVEL_PARAMS
             ldy CURRENT_GAME_LEVEL
@@ -724,7 +806,13 @@ INIT_LEVEL_PARAMS
 
 GAME_STATE_INIT
             lda #0
+            sta SCORE_JUST_INCREASED
+            lda #0
             sta CURRENT_GAME_LEVEL
+            lda #$00
+            sta P1_SCORE
+            lda #0
+            sta P1_SCORE_H
             tay
             lda FIRST_FRAME_PER_LEVEL,y
             sta FIRST_FRAME
@@ -745,7 +833,51 @@ GAME_STATE_INIT
             sta PORTB
             mwa #JUMP_HEIGHT_TABLE P1_Y_TABLE
             mwa #JUMP_HEIGHT_TABLE P2_Y_TABLE
+            jsr CLEAR_STATUS_BAR
+            jsr PAINT_POINTS
             rts           
+
+CLEAR_STATUS_BAR
+            lda #0
+            ldx #39
+@           sta STATUS_BAR_BUFFER,x
+            dex
+            bne @-
+            sta STATUS_BAR_BUFFER,x
+            rts
+
+PAINT_POINTS
+            lda #0
+            sta P1_H_PAINTED
+            ldy #0
+            lda P1_SCORE_H
+            beq PP_1
+            inc P1_H_PAINTED
+            clc
+            adc #16
+            sta STATUS_BAR_BUFFER,y
+            iny
+PP_1        lda P1_SCORE
+            and #%11110000
+            lsr
+            lsr
+            lsr
+            lsr
+            ldx P1_H_PAINTED
+            cpx #1
+            beq PP_3
+            cmp #0
+            beq PP_2
+PP_3        clc
+            adc #16
+            sta STATUS_BAR_BUFFER,y
+            iny
+PP_2        lda P1_SCORE
+            and #%00001111
+            clc
+            adc #16
+            sta STATUS_BAR_BUFFER,y
+            rts
 
 ; Frame number in X
 SHOW_FRAME
@@ -824,7 +956,7 @@ VBI_ROUTINE
             jmp XITVBV
 
 STATUS_BAR_BUFFER
-:20         dta b('A')
+:40         dta b('A')
 
 ; Level difficulty parameters
 ROTATIONS_PER_LEVEL
@@ -924,6 +1056,20 @@ HIT_FRAMES_2
             dta b(86)
             dta b(86)
             dta b(86)
+
+SCORE_FRAMES
+            dta b(0+5)
+            dta b(52+5)
+            dta b(86+5)
+            dta b(0+6)
+            dta b(52+6)
+            dta b(86+6)
+            dta b(0+7)
+            dta b(52+7)
+            dta b(86+7)
+            dta b(0+8)
+            dta b(52+8)
+            dta b(86+8)
 
 LEFT_KILL_X_SPEED_1
             dta b(081)
