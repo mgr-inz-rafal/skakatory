@@ -22,7 +22,7 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_H_PAINTED           .byte
 
 .zpvar          SCORE_JUST_INCREASED   .byte
-SCORE_INCREASE_COOLDOWN     equ 6
+SCORE_INCREASE_COOLDOWN     equ 4
 
 //  0 -  51   - slower rotation (52 frames)
 // 52 -  85   - faster rotation (34 frames)
@@ -262,58 +262,14 @@ SUS_0       lda #1
 CHECK_SCORE
             jsr SHOULD_UPDATE_SCORE
             beq CS_X
-            ldy #0
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            iny
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
-            lda SCORE_FRAMES,y
-            cmp CURRENT_FRAME
-            beq CS_1
+            #if .byte CURRENT_FRAME = #0+3 .or .byte CURRENT_FRAME = #52+3 .or .byte CURRENT_FRAME = #86+3
+                jmp CS_1
+            #end
 CS_X        rts
 CS_1        jsr ADVANCE_SCORES
             jsr PAINT_POINTS
             ldx #SCORE_INCREASE_COOLDOWN
-            sta SCORE_JUST_INCREASED
+            stx SCORE_JUST_INCREASED
             rts
 
 ADVANCE_SCORES
@@ -1056,20 +1012,6 @@ HIT_FRAMES_2
             dta b(86)
             dta b(86)
             dta b(86)
-
-SCORE_FRAMES
-            dta b(0+5)
-            dta b(52+5)
-            dta b(86+5)
-            dta b(0+6)
-            dta b(52+6)
-            dta b(86+6)
-            dta b(0+7)
-            dta b(52+7)
-            dta b(86+7)
-            dta b(0+8)
-            dta b(52+8)
-            dta b(86+8)
 
 LEFT_KILL_X_SPEED_1
             dta b(081)
