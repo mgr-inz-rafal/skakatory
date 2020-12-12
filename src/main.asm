@@ -47,6 +47,7 @@ JUMP_FRAME_ADVANCE  equ 1
 PS_IDLE             equ 0
 PS_JUMP             equ 1
 PS_DYING            equ 2
+PS_BURIED           equ 3
 
 ; Each level maps to these parameters that control
 ; the speed of background rotation
@@ -497,7 +498,8 @@ DT_X        rts
 DT_0        lda #0
             sta HPOSP0
             sta HPOSP1
-CHUJ        jmp CHUJ
+            lda #PS_BURIED
+            sta P1_STATE
             rts
 
 DYING_TICK_RIGHT
@@ -509,7 +511,7 @@ DYING_TICK_RIGHT
             cmp #$ff
             beq DTR_0
             jsr CLEAR_PLAYERS
-DUPA1       inc P2_Y
+            inc P2_Y
             ldy DYING_POS_X_P2
             lda (P2_X_TABLE),y
             inc DYING_POS_X_P2
@@ -520,7 +522,8 @@ DTR_X       rts
 DTR_0       lda #0
             sta HPOSP2
             sta HPOSP3
-CIPA        jmp CIPA
+            lda #PS_BURIED
+            sta P2_STATE
             rts
 
 JUMP_TICK
@@ -720,7 +723,7 @@ INIT_LEVEL_PARAMS
             rts
 
 GAME_STATE_INIT
-            lda #10
+            lda #0
             sta CURRENT_GAME_LEVEL
             tay
             lda FIRST_FRAME_PER_LEVEL,y
