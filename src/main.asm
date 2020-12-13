@@ -451,6 +451,8 @@ INIT_DYING_RIGHT
             #end
 
 CHECK_COLLISIONS
+            lda P1_INVUL
+            bne CC_X
             #if .byte P1_STATE = #PS_DYING .or .byte P1_Y > #6
                 rts
             #end
@@ -466,7 +468,7 @@ CHECK_COLLISIONS
             beq CC_KILLED
             rts
 CC_KILLED   jsr INIT_DYING
-            rts
+CC_X        rts
 
 CHECK_COLLISIONS_RIGHT
             #if .byte P2_STATE = #PS_DYING .or .byte P2_Y > #6
