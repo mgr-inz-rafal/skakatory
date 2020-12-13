@@ -897,34 +897,35 @@ PP_2        lda P1_SCORE
 PAINT_POINTS_RIGHT
             lda #0
             sta P2_H_PAINTED
-            ldy #37
-            lda P2_SCORE_H
-            beq PPR_1
-            inc P2_H_PAINTED
+            ldy #39
+            lda P2_SCORE
+            and #%00001111
             clc
             adc #16
             sta STATUS_BAR_BUFFER,y
-            iny
+            lda P2_SCORE_H
+            beq PPR_1
+            clc
+            adc #16
+            dey
+            dey
+            sta STATUS_BAR_BUFFER,y
+            inc P2_H_PAINTED
 PPR_1       lda P2_SCORE
             and #%11110000
             lsr
             lsr
             lsr
             lsr
-            ldx P2_H_PAINTED
-            cpx #1
-            beq PPR_3
-            cmp #0
             beq PPR_2
 PPR_3       clc
             adc #16
+            ldy #38
             sta STATUS_BAR_BUFFER,y
-            iny
-PPR_2       lda P2_SCORE
-            and #%00001111
-            clc
-            adc #16
-            sta STATUS_BAR_BUFFER,y
+            rts
+PPR_2       ldx P2_H_PAINTED
+            cpx #0
+            bne PPR_3
             rts
 
 ; Frame number in X
