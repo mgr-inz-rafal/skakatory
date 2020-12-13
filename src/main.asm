@@ -23,6 +23,14 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P2_SCORE               .byte
 .zpvar          P2_SCORE_H             .byte ; 'H' is for hundred
 .zpvar          P2_H_PAINTED           .byte
+.zpvar          P1_INVUL               .byte
+.zpvar          P1_VISIBLE             .byte
+.zpvar          P2_INVUL               .byte
+.zpvar          P2_VISIBLE             .byte
+
+.zpvar          P1_INVUL_COUNTER       .byte
+.zpvar          P2_INVUL_COUNTER       .byte
+INVUL_COOLDOWN              equ 5
 
 .zpvar          SCORE_JUST_INCREASED   .byte
 SCORE_INCREASE_COOLDOWN     equ 4
@@ -35,6 +43,8 @@ SCORE_INCREASE_COOLDOWN     equ 4
 .zpvar          P1_Y                   .byte
 .zpvar          P2_X                   .byte 
 .zpvar          P2_Y                   .byte
+P1_X_POSITION    equ $50
+P2_X_POSITION    equ $aa
 
 .zpvar          DYING_JUMP_COUNTER       .byte
 .zpvar          DYING_JUMP_COUNTER_RIGHT .byte
@@ -476,27 +486,52 @@ BACKGROUND_TICK
             lda CURRENT_GAME_LEVEL
             cmp #LAST_GAME_LEVEL-1
             beq BT_X
+            jsr ADVANCE_LEVEL
+BT_X        rts
+
+ADVANCE_LEVEL
             inc CURRENT_GAME_LEVEL
+            sta P1_INVUL
+            sta P2_INVUL
+            lda #INVUL_COOLDOWN
+            sta P1_INVUL_COUNTER
+            sta P2_INVUL_COUNTER
             jsr INIT_LEVEL_PARAMS
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
             sta CURRENT_ROTATIONS
-BT_X        rts
+            rts
 
 PLAYER_TICK
             lda P1_STATE
             cmp #PS_IDLE
-            beq PT_X
+            beq PT_INVUL
             cmp #PS_JUMP
-            bne @+
+            bne PT_1
             jsr JUMP_TICK
-            rts
-@           cmp #PS_DYING
-            bne @+
+            jmp PT_INVUL
+PT_1        cmp #PS_DYING
+            bne PT_X
             jsr DYING_TICK
-            rts
-@            
 PT_X        rts
+PT_INVUL    dec P1_INVUL_COUNTER
+            bne PT_X
+            lda #INVUL_COOLDOWN
+            sta P1_INVUL_COUNTER
+            lda P1_INVUL
+            bne PT_X
+            lda P1_VISIBLE
+            beq PT_2
+            dec P1_VISIBLE
+            lda #$ff
+            sta HPOSP0
+            sta HPOSP1
+            rts
+PT_2        inc P1_VISIBLE
+            lda #P1_X_POSITION
+            sta HPOSP0
+            sta HPOSP1
+            rts
 
 PLAYER_TICK_RIGHT
             lda P2_STATE
@@ -760,9 +795,9 @@ GAME_ENGINE_INIT
             rts
         
 INIT_PLAYERS
-            lda #$50
+            lda #P1_X_POSITION
             sta P1_X
-            lda #$aa
+            lda #P2_X_POSITION
             sta P2_X
             lda #0
             sta P1_Y
@@ -812,16 +847,18 @@ INIT_LEVEL_PARAMS
             rts
 
 GAME_STATE_INIT
+            lda #1
+            sta P1_VISIBLE
+            sta P2_VISIBLE
             lda #0
             sta SCORE_JUST_INCREASED
-            lda #0
             sta CURRENT_GAME_LEVEL
-            lda #$00
             sta P1_SCORE
             sta P2_SCORE
-            lda #0
             sta P1_SCORE_H
             sta P2_SCORE_H
+            sta P1_INVUL
+            sta P2_INVUL
             tay
             lda FIRST_FRAME_PER_LEVEL,y
             sta FIRST_FRAME
@@ -1004,12 +1041,9 @@ VBI_ROUTINE
             jsr BACKGROUND_TICK
             jmp XITVBV
 
-STATUS_BAR_BUFFER
-:40         dta b('A')
-
 ; Level difficulty parameters
 ROTATIONS_PER_LEVEL
-            dta b(10)
+            dta b(1)
             dta b(10)
             dta b(10)
             dta b(10)
@@ -1519,6 +1553,10 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
 ; Call mem detect proc
             ini INIT_00
+
+            org $8000
+STATUS_BAR_BUFFER
+:40         dta b('A')
 
 //------------------------------------------------
 // Loading data into extram
