@@ -32,6 +32,10 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P2_INVUL_COUNTER       .byte
 INVUL_COOLDOWN              equ 5
 
+.zpvar          P1_INVUL_DISABLE_COUNTER .byte
+.zpvar          P2_INVUL_DISABLE_COUNTER .byte
+INVUL_ROTATIONS             equ 4
+
 .zpvar          SCORE_JUST_INCREASED   .byte
 SCORE_INCREASE_COOLDOWN     equ 4
 
@@ -298,6 +302,8 @@ CS_1        jsr ADVANCE_SCORES
             rts
 
 ADVANCE_SCORES
+            lda P1_INVUL
+            bne AS_2
             lda P1_STATE
             cmp #PS_BURIED
             beq AS_X
@@ -317,6 +323,15 @@ AS_1        sed
             lda P1_SCORE_H
             adc #1
             sta P1_SCORE_H
+            rts
+AS_2        dec P1_INVUL_DISABLE_COUNTER
+            bne AS_X
+            jsr DISABLE_INVUL
+            rts
+
+DISABLE_INVUL
+            lda #0
+            sta P1_INVUL
             rts
 
 ADVANCE_SCORES_RIGHT
@@ -491,11 +506,15 @@ BT_X        rts
 
 ADVANCE_LEVEL
             inc CURRENT_GAME_LEVEL
+            lda #1
             sta P1_INVUL
             sta P2_INVUL
             lda #INVUL_COOLDOWN
             sta P1_INVUL_COUNTER
             sta P2_INVUL_COUNTER
+            lda #INVUL_ROTATIONS
+            sta P1_INVUL_DISABLE_COUNTER
+            sta P2_INVUL_DISABLE_COUNTER
             jsr INIT_LEVEL_PARAMS
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
@@ -514,12 +533,14 @@ PT_1        cmp #PS_DYING
             bne PT_X
             jsr DYING_TICK
 PT_X        rts
-PT_INVUL    dec P1_INVUL_COUNTER
+PT_INVUL    lda P1_INVUL
+            beq PT_X
+            dec P1_INVUL_COUNTER
             bne PT_X
             lda #INVUL_COOLDOWN
             sta P1_INVUL_COUNTER
             lda P1_INVUL
-            bne PT_X
+            beq PT_X
             lda P1_VISIBLE
             beq PT_2
             dec P1_VISIBLE
