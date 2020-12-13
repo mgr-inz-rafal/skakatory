@@ -332,6 +332,9 @@ AS_2        dec P1_INVUL_DISABLE_COUNTER
 DISABLE_INVUL
             lda #0
             sta P1_INVUL
+            lda #P1_X_POSITION
+            sta HPOSP0
+            sta HPOSP1
             rts
 
 ADVANCE_SCORES_RIGHT
