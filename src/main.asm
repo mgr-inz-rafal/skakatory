@@ -371,16 +371,37 @@ ENABLE_INVUL
             sta P2_INVUL_DISABLE_COUNTER
             rts
 
-DISABLE_INVUL
+DISABLE_INVUL_LEFT
+            lda P1_STATE
+            cmp #PS_DYING
+            beq DIL_X
+            lda P1_STATE
+            cmp #PS_BURIED
+            beq DIL_X
             lda #0
             sta P1_INVUL
-            sta P2_INVUL
             lda #P1_X_POSITION
             sta HPOSP0
             sta HPOSP1
+DIL_X       rts
+
+DISABLE_INVUL_RIGHT
+            lda P2_STATE
+            cmp #PS_DYING
+            beq DIR_X
+            lda P2_STATE
+            cmp #PS_BURIED
+            beq DIR_X
+            lda #0
+            sta P2_INVUL
             lda #P2_X_POSITION
             sta HPOSP2
             sta HPOSP3
+DIR_X       rts
+
+DISABLE_INVUL
+            jsr DISABLE_INVUL_LEFT
+            jsr DISABLE_INVUL_RIGHT
             rts
 
 START_JUMP
