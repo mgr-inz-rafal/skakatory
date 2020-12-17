@@ -329,6 +329,18 @@ AS_2        dec P1_INVUL_DISABLE_COUNTER
             jsr DISABLE_INVUL
             rts
 
+ENABLE_INVUL
+            lda #1
+            sta P1_INVUL
+            sta P2_INVUL
+            lda #INVUL_COOLDOWN
+            sta P1_INVUL_COUNTER
+            sta P2_INVUL_COUNTER
+            lda #INVUL_ROTATIONS
+            sta P1_INVUL_DISABLE_COUNTER
+            sta P2_INVUL_DISABLE_COUNTER
+            rts
+
 DISABLE_INVUL
             lda #0
             sta P1_INVUL
@@ -402,6 +414,7 @@ SJR_X       rts
 ;  11   |     F
 ;  12   |     F
 INIT_DYING
+            jsr CLEAR_PLAYER_LEFT
             lda #PS_DYING
             sta P1_STATE
             lda #0
@@ -426,6 +439,7 @@ INIT_DYING
             #end
 
 INIT_DYING_RIGHT
+            jsr CLEAR_PLAYER_RIGHT
             lda #PS_DYING
             sta P2_STATE
             lda #0
@@ -511,15 +525,7 @@ BT_X        rts
 
 ADVANCE_LEVEL
             inc CURRENT_GAME_LEVEL
-            lda #1
-            sta P1_INVUL
-            sta P2_INVUL
-            lda #INVUL_COOLDOWN
-            sta P1_INVUL_COUNTER
-            sta P2_INVUL_COUNTER
-            lda #INVUL_ROTATIONS
-            sta P1_INVUL_DISABLE_COUNTER
-            sta P2_INVUL_DISABLE_COUNTER
+            jsr ENABLE_INVUL
             jsr INIT_LEVEL_PARAMS
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
@@ -1069,7 +1075,7 @@ VBI_ROUTINE
 
 ; Level difficulty parameters
 ROTATIONS_PER_LEVEL
-            dta b(1)
+            dta b(10)
             dta b(10)
             dta b(10)
             dta b(10)
