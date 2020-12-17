@@ -329,32 +329,14 @@ AS_2        dec P1_INVUL_DISABLE_COUNTER
             jsr DISABLE_INVUL
             rts
 
-ENABLE_INVUL
-            lda #1
-            sta P1_INVUL
-            sta P2_INVUL
-            lda #INVUL_COOLDOWN
-            sta P1_INVUL_COUNTER
-            sta P2_INVUL_COUNTER
-            lda #INVUL_ROTATIONS
-            sta P1_INVUL_DISABLE_COUNTER
-            sta P2_INVUL_DISABLE_COUNTER
-            rts
-
-DISABLE_INVUL
-            lda #0
-            sta P1_INVUL
-            lda #P1_X_POSITION
-            sta HPOSP0
-            sta HPOSP1
-            rts
-
 ADVANCE_SCORES_RIGHT
+            lda P2_INVUL
+            bne ASR_2
             lda P2_STATE
             cmp #PS_BURIED
             beq ASR_X
             cmp #PS_DYING
-            beq AS_X
+            beq ASR_X
             sed
             lda P2_SCORE
             clc
@@ -369,6 +351,36 @@ ASR_1       sed
             lda P2_SCORE_H
             adc #1
             sta P2_SCORE_H
+            rts
+ASR_2       dec P2_INVUL_DISABLE_COUNTER
+            bne ASR_X
+            jsr DISABLE_INVUL
+            rts
+
+ENABLE_INVUL
+            jsr ADVANCE_SCORES
+            jsr ADVANCE_SCORES_RIGHT
+            lda #1
+            sta P1_INVUL
+            sta P2_INVUL
+            lda #INVUL_COOLDOWN
+            sta P1_INVUL_COUNTER
+            sta P2_INVUL_COUNTER
+            lda #INVUL_ROTATIONS
+            sta P1_INVUL_DISABLE_COUNTER
+            sta P2_INVUL_DISABLE_COUNTER
+            rts
+
+DISABLE_INVUL
+            lda #0
+            sta P1_INVUL
+            sta P2_INVUL
+            lda #P1_X_POSITION
+            sta HPOSP0
+            sta HPOSP1
+            lda #P2_X_POSITION
+            sta HPOSP2
+            sta HPOSP3
             rts
 
 START_JUMP
@@ -568,16 +580,35 @@ PT_2        inc P1_VISIBLE
 PLAYER_TICK_RIGHT
             lda P2_STATE
             cmp #PS_IDLE
-            beq PTR_X
+            beq PT_INVUL_R
             cmp #PS_JUMP
-            bne @+
+            bne PTR_1
             jsr JUMP_TICK_RIGHT
-            rts
-@           cmp #PS_DYING
-            bne @+
+            jmp PT_INVUL_R
+PTR_1       cmp #PS_DYING
+            bne PTR_X
             jsr DYING_TICK_RIGHT
-@
 PTR_X       rts
+PT_INVUL_R  lda P2_INVUL
+            beq PTR_X
+            dec P2_INVUL_COUNTER
+            bne PTR_X
+            lda #INVUL_COOLDOWN
+            sta P2_INVUL_COUNTER
+            lda P2_INVUL
+            beq PTR_X
+            lda P2_VISIBLE
+            beq PTR_2
+            dec P2_VISIBLE
+            lda #$ff
+            sta HPOSP2
+            sta HPOSP3
+            rts
+PTR_2       inc P2_VISIBLE
+            lda #P2_X_POSITION
+            sta HPOSP2
+            sta HPOSP3
+            rts
 
 INTERRUPT_JUMP
             lda STRIG0
@@ -1075,7 +1106,7 @@ VBI_ROUTINE
 
 ; Level difficulty parameters
 ROTATIONS_PER_LEVEL
-            dta b(10)
+            dta b(2)
             dta b(10)
             dta b(10)
             dta b(10)
