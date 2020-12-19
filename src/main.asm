@@ -476,6 +476,7 @@ INIT_DYING
 
 INIT_DYING_RIGHT
             jsr CLEAR_PLAYER_RIGHT
+            jsr INIT_DYING_PAINT_OFFSET_RIGHT
             lda #PS_DYING
             sta P2_STATE
             lda #0
@@ -507,6 +508,16 @@ INIT_DYING_PAINT_OFFSET
             sec
             sbc (P2_Y_TABLE),y
             sta P1_DRAWING_Y_OFFSET
+            rts
+
+
+INIT_DYING_PAINT_OFFSET_RIGHT
+            ldy #0
+            lda (P2_Y_TABLE),y
+            ldy P2_Y
+            sec
+            sbc (P2_Y_TABLE),y
+            sta P2_DRAWING_Y_OFFSET
             rts
 
 CHECK_COLLISIONS
@@ -816,6 +827,8 @@ CLEAR_PLAYER_LEFT
 CLEAR_PLAYER_RIGHT
             ldy P2_Y
             lda (P2_Y_TABLE),y
+            sec
+            sbc P2_DRAWING_Y_OFFSET
             tay
             ldx #0
 @           lda #0
@@ -851,6 +864,8 @@ PAINT_PLAYERS
 ; Paint right player
             ldy P2_Y
             lda (P2_Y_TABLE),y
+            sec
+            sbc P2_DRAWING_Y_OFFSET
             tay
             ldx #0
 @           lda PLAYER_DATA_02,x
