@@ -27,6 +27,8 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_VISIBLE             .byte
 .zpvar          P2_INVUL               .byte
 .zpvar          P2_VISIBLE             .byte
+.zpvar          P1_DRAWING_Y_OFFSET    .byte
+.zpvar          P2_DRAWING_Y_OFFSET    .byte
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
@@ -788,6 +790,8 @@ JTR_X       rts
 CLEAR_PLAYER_LEFT
             ldy P1_Y
             lda (P1_Y_TABLE),y
+            sec
+            sbc P1_DRAWING_Y_OFFSET
             tay
             ldx #0
 @           lda #0
@@ -822,6 +826,8 @@ PAINT_PLAYERS
 ; Paint left player
             ldy P1_Y
             lda (P1_Y_TABLE),y
+            sec
+            sbc P1_DRAWING_Y_OFFSET
             tay
             ldx #0
 @           lda PLAYER_DATA_00,x
@@ -935,6 +941,8 @@ GAME_STATE_INIT
             sta P1_VISIBLE
             sta P2_VISIBLE
             lda #0
+            sta P1_DRAWING_Y_OFFSET
+            sta P2_DRAWING_Y_OFFSET
             sta SCORE_JUST_INCREASED
             sta CURRENT_GAME_LEVEL
             sta P1_SCORE
@@ -967,6 +975,10 @@ GAME_STATE_INIT
             jsr PAINT_POINTS
             jsr INIT_PLAYERS
             jsr PAINT_PLAYERS
+
+            lda #32
+            sta P1_DRAWING_Y_OFFSET
+
             rts           
 
 CLEAR_STATUS_BAR
