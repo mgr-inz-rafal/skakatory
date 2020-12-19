@@ -27,6 +27,8 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P1_VISIBLE             .byte
 .zpvar          P2_INVUL               .byte
 .zpvar          P2_VISIBLE             .byte
+.zpvar          P1_DRAWING_Y_OFFSET    .byte
+.zpvar          P2_DRAWING_Y_OFFSET    .byte
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
@@ -448,6 +450,7 @@ SJR_X       rts
 ;  12   |     F
 INIT_DYING
             jsr CLEAR_PLAYER_LEFT
+            jsr INIT_DYING_PAINT_OFFSET
             lda #PS_DYING
             sta P1_STATE
             lda #0
@@ -473,6 +476,7 @@ INIT_DYING
 
 INIT_DYING_RIGHT
             jsr CLEAR_PLAYER_RIGHT
+            jsr INIT_DYING_PAINT_OFFSET_RIGHT
             lda #PS_DYING
             sta P2_STATE
             lda #0
@@ -496,6 +500,25 @@ INIT_DYING_RIGHT
                 mwa #RIGHT_KILL_X_SPEED_3 P2_X_TABLE
                 rts
             #end
+
+INIT_DYING_PAINT_OFFSET
+            ldy #0
+            lda (P2_Y_TABLE),y
+            ldy P1_Y
+            sec
+            sbc (P2_Y_TABLE),y
+            sta P1_DRAWING_Y_OFFSET
+            rts
+
+
+INIT_DYING_PAINT_OFFSET_RIGHT
+            ldy #0
+            lda (P2_Y_TABLE),y
+            ldy P2_Y
+            sec
+            sbc (P2_Y_TABLE),y
+            sta P2_DRAWING_Y_OFFSET
+            rts
 
 CHECK_COLLISIONS
             lda P1_INVUL
@@ -788,6 +811,8 @@ JTR_X       rts
 CLEAR_PLAYER_LEFT
             ldy P1_Y
             lda (P1_Y_TABLE),y
+            sec
+            sbc P1_DRAWING_Y_OFFSET
             tay
             ldx #0
 @           lda #0
@@ -802,6 +827,8 @@ CLEAR_PLAYER_LEFT
 CLEAR_PLAYER_RIGHT
             ldy P2_Y
             lda (P2_Y_TABLE),y
+            sec
+            sbc P2_DRAWING_Y_OFFSET
             tay
             ldx #0
 @           lda #0
@@ -822,6 +849,8 @@ PAINT_PLAYERS
 ; Paint left player
             ldy P1_Y
             lda (P1_Y_TABLE),y
+            sec
+            sbc P1_DRAWING_Y_OFFSET
             tay
             ldx #0
 @           lda PLAYER_DATA_00,x
@@ -835,6 +864,8 @@ PAINT_PLAYERS
 ; Paint right player
             ldy P2_Y
             lda (P2_Y_TABLE),y
+            sec
+            sbc P2_DRAWING_Y_OFFSET
             tay
             ldx #0
 @           lda PLAYER_DATA_02,x
@@ -935,6 +966,8 @@ GAME_STATE_INIT
             sta P1_VISIBLE
             sta P2_VISIBLE
             lda #0
+            sta P1_DRAWING_Y_OFFSET
+            sta P2_DRAWING_Y_OFFSET
             sta SCORE_JUST_INCREASED
             sta CURRENT_GAME_LEVEL
             sta P1_SCORE
