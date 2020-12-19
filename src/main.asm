@@ -450,6 +450,7 @@ SJR_X       rts
 ;  12   |     F
 INIT_DYING
             jsr CLEAR_PLAYER_LEFT
+            jsr INIT_DYING_PAINT_OFFSET
             lda #PS_DYING
             sta P1_STATE
             lda #0
@@ -498,6 +499,15 @@ INIT_DYING_RIGHT
                 mwa #RIGHT_KILL_X_SPEED_3 P2_X_TABLE
                 rts
             #end
+
+INIT_DYING_PAINT_OFFSET
+            ldy #0
+            lda (P2_Y_TABLE),y
+            ldy P1_Y
+            sec
+            sbc (P2_Y_TABLE),y
+            sta P1_DRAWING_Y_OFFSET
+            rts
 
 CHECK_COLLISIONS
             lda P1_INVUL
@@ -975,10 +985,6 @@ GAME_STATE_INIT
             jsr PAINT_POINTS
             jsr INIT_PLAYERS
             jsr PAINT_PLAYERS
-
-            lda #32
-            sta P1_DRAWING_Y_OFFSET
-
             rts           
 
 CLEAR_STATUS_BAR
