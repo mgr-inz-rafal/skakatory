@@ -373,37 +373,30 @@ ENABLE_INVUL
             sta P2_INVUL_DISABLE_COUNTER
             rts
 
-DISABLE_INVUL_LEFT
-            lda P1_STATE
+.macro DISABLE_PLAYER_INVUL P12
+            lda P%%1_STATE
             cmp #PS_DYING
-            beq DIL_X
-            lda P1_STATE
+            beq DI%%1_X
+            lda P%%1_STATE
             cmp #PS_BURIED
-            beq DIL_X
+            beq DI%%1_X
             lda #0
-            sta P1_INVUL
-            lda #P1_X_POSITION
-            sta HPOSP0
-            sta HPOSP1
-DIL_X       rts
-
-DISABLE_INVUL_RIGHT
-            lda P2_STATE
-            cmp #PS_DYING
-            beq DIR_X
-            lda P2_STATE
-            cmp #PS_BURIED
-            beq DIR_X
-            lda #0
-            sta P2_INVUL
-            lda #P2_X_POSITION
-            sta HPOSP2
-            sta HPOSP3
-DIR_X       rts
+            sta P%%1_INVUL
+            lda #P%%1_X_POSITION
+            .if :1 = 1
+                sta HPOSP0
+                sta HPOSP1
+            .endif
+            .if :1 = 2
+                sta HPOSP2
+                sta HPOSP3
+            .endif
+DI%%1_X     
+.endm
 
 DISABLE_INVUL
-            jsr DISABLE_INVUL_LEFT
-            jsr DISABLE_INVUL_RIGHT
+            DISABLE_PLAYER_INVUL 1
+            DISABLE_PLAYER_INVUL 2
             rts
 
 START_JUMP
