@@ -147,18 +147,13 @@ IJ%%1_X
 
 .macro DYING_PLAYER_TICK P12
             dec DYING_JUMP_COUNTER_%%1
-            bne DT%%1_X
+            jne DT%%1_X
             INIT_DYING_COOLDOWN %%1
             ldy DYING_POS_X_P%%1
             lda (P%%1_X_TABLE),y
             cmp #$ff
             beq DT%%1_0
-            .if :1 = 1
-                jsr CLEAR_PLAYER_LEFT
-            .endif
-            .if :1 = 2
-                jsr CLEAR_PLAYER_RIGHT
-            .endif
+            CLEAR_PLAYER %%1
             inc P%%1_Y
             ldy DYING_POS_X_P%%1
             lda (P%%1_X_TABLE),y
@@ -182,12 +177,7 @@ DT%%1_0     lda #0
                 sta HPOSP2
                 sta HPOSP3
             .endif
-            .if :1 = 1
-                jsr CLEAR_PLAYER_LEFT
-            .endif
-            .if :1 = 2
-                jsr CLEAR_PLAYER_RIGHT
-            .endif
+            CLEAR_PLAYER %%1
             lda #PS_BURIED
             sta P%%1_STATE
 DT%%1_X     
@@ -202,4 +192,26 @@ DT%%1_X
             lda #DYING_JUMP_COOLDOWN_FAST
             sta DYING_JUMP_COUNTER_%%1
 IDC%%1_X
+.endm
+
+.macro CLEAR_PLAYER P12
+            ldy P%%1_Y
+            lda (P%%1_Y_TABLE),y
+            sec
+            sbc P%%1_DRAWING_Y_OFFSET
+            tay
+            ldx #0
+@           lda #0
+            .if :1 = 1
+                sta PMG_P0,y
+                sta PMG_P1,y
+            .endif
+            .if :1 = 2
+                sta PMG_P2,y
+                sta PMG_P3,y
+            .endif
+            iny
+            inx
+            cpx #20
+            bne @-
 .endm

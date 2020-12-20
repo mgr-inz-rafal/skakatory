@@ -373,7 +373,7 @@ SJR_X       rts
 ;  11   |     F
 ;  12   |     F
 INIT_DYING
-            jsr CLEAR_PLAYER_LEFT
+            CLEAR_PLAYER 1
             jsr INIT_DYING_PAINT_OFFSET
             lda #PS_DYING
             sta P1_STATE
@@ -399,7 +399,7 @@ INIT_DYING
             #end
 
 INIT_DYING_RIGHT
-            jsr CLEAR_PLAYER_RIGHT
+            CLEAR_PLAYER 2
             jsr INIT_DYING_PAINT_OFFSET_RIGHT
             lda #PS_DYING
             sta P2_STATE
@@ -512,41 +512,9 @@ ADVANCE_LEVEL
             sta CURRENT_ROTATIONS
             rts
 
-CLEAR_PLAYER_LEFT
-            ldy P1_Y
-            lda (P1_Y_TABLE),y
-            sec
-            sbc P1_DRAWING_Y_OFFSET
-            tay
-            ldx #0
-@           lda #0
-            sta PMG_P0,y
-            sta PMG_P1,y
-            iny
-            inx
-            cpx #20
-            bne @-
-            rts
-
-CLEAR_PLAYER_RIGHT
-            ldy P2_Y
-            lda (P2_Y_TABLE),y
-            sec
-            sbc P2_DRAWING_Y_OFFSET
-            tay
-            ldx #0
-@           lda #0
-            sta PMG_P2,y
-            sta PMG_P3,y
-            iny
-            inx
-            cpx #20
-            bne @-
-            rts
-
 CLEAR_PLAYERS
-            jsr CLEAR_PLAYER_LEFT
-            jsr CLEAR_PLAYER_RIGHT
+            CLEAR_PLAYER 1
+            CLEAR_PLAYER 2
             rts
 
 PAINT_PLAYERS
