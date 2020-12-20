@@ -41,9 +41,11 @@ AS%%1_1     sed
             lda P%%1_SCORE_H
             adc #1
             sta P%%1_SCORE_H
-            rts
+            jmp AS%%1_X
 AS%%1_2     dec P%%1_INVUL_DISABLE_COUNTER
             bne AS%%1_X
-            jsr DISABLE_INVUL
+            .if :1 = 2
+                jsr DISABLE_INVUL
+            .endif
 AS%%1_X
 .endm
