@@ -249,7 +249,6 @@ GAME_LOOP
             jsr SYNCHRO
             jsr RESTART_TICK
             jsr PLAYER_TICK
-            jsr PLAYER_TICK_RIGHT
 
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
@@ -324,6 +323,11 @@ DISABLE_INVUL
 ADVANCE_SCORES
             ADVANCE_PLAYER_SCORES 1
             ADVANCE_PLAYER_SCORES 2
+            rts
+
+PLAYER_TICK
+            PLAYER_PLAYER_TICK 1
+            PLAYER_PLAYER_TICK 2
             rts
 
 START_JUMP
@@ -506,72 +510,6 @@ ADVANCE_LEVEL
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
             sta CURRENT_ROTATIONS
-            rts
-
-PLAYER_TICK
-            lda P1_STATE
-            cmp #PS_IDLE
-            beq PT_INVUL
-            cmp #PS_JUMP
-            bne PT_1
-            jsr JUMP_TICK
-            jmp PT_INVUL
-PT_1        cmp #PS_DYING
-            bne PT_X
-            jsr DYING_TICK
-PT_X        rts
-PT_INVUL    lda P1_INVUL
-            beq PT_X
-            dec P1_INVUL_COUNTER
-            bne PT_X
-            lda #INVUL_COOLDOWN
-            sta P1_INVUL_COUNTER
-            lda P1_INVUL
-            beq PT_X
-            lda P1_VISIBLE
-            beq PT_2
-            dec P1_VISIBLE
-            lda #$ff
-            sta HPOSP0
-            sta HPOSP1
-            rts
-PT_2        inc P1_VISIBLE
-            lda #P1_X_POSITION
-            sta HPOSP0
-            sta HPOSP1
-            rts
-
-PLAYER_TICK_RIGHT
-            lda P2_STATE
-            cmp #PS_IDLE
-            beq PT_INVUL_R
-            cmp #PS_JUMP
-            bne PTR_1
-            jsr JUMP_TICK_RIGHT
-            jmp PT_INVUL_R
-PTR_1       cmp #PS_DYING
-            bne PTR_X
-            jsr DYING_TICK_RIGHT
-PTR_X       rts
-PT_INVUL_R  lda P2_INVUL
-            beq PTR_X
-            dec P2_INVUL_COUNTER
-            bne PTR_X
-            lda #INVUL_COOLDOWN
-            sta P2_INVUL_COUNTER
-            lda P2_INVUL
-            beq PTR_X
-            lda P2_VISIBLE
-            beq PTR_2
-            dec P2_VISIBLE
-            lda #$ff
-            sta HPOSP2
-            sta HPOSP3
-            rts
-PTR_2       inc P2_VISIBLE
-            lda #P2_X_POSITION
-            sta HPOSP2
-            sta HPOSP3
             rts
 
 INTERRUPT_JUMP
