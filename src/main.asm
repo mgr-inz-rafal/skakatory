@@ -30,6 +30,10 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P2_VISIBLE             .byte
 .zpvar          P1_DRAWING_Y_OFFSET    .byte
 .zpvar          P2_DRAWING_Y_OFFSET    .byte
+.zpvar          P1_CPU                 .byte
+.zpvar          P2_CPU                 .byte
+.zpvar          STRIG_0_SOURCE         .word
+.zpvar          STRIG_1_SOURCE         .word
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
@@ -256,10 +260,12 @@ GAME_LOOP
             jsr CHECK_SCORE
             jsr CHECK_COLLISIONS
 
-            lda STRIG0
+            ldy #0
+            lda (STRIG_0_SOURCE),y
             bne @+
             START_JUMP 1
-@           lda STRIG1
+@           ldx #0
+            lda (STRIG_1_SOURCE,x)
             bne @+
             START_JUMP 2
 @           jmp GAME_LOOP
@@ -489,6 +495,16 @@ GAME_STATE_INIT
             lda #1
             sta P1_VISIBLE
             sta P2_VISIBLE
+            sta P1_CPU
+            sta P2_CPU
+            lda #<STRIG0
+            sta STRIG_0_SOURCE
+            lda #>STRIG0
+            sta STRIG_0_SOURCE+1
+            lda #<STRIG1
+            sta STRIG_1_SOURCE
+            lda #>STRIG1
+            sta STRIG_1_SOURCE+1
             lda #0
             sta P1_DRAWING_Y_OFFSET
             sta P2_DRAWING_Y_OFFSET
