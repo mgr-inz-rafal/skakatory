@@ -5,6 +5,7 @@
             ins "frames/f1.bin"
 
             icl 'src\atari.inc'
+            icl 'src\macros.asm'
 
 FRAME_COUNT         equ 104
 SCR_MEM_1           equ $4150
@@ -52,15 +53,15 @@ SCORE_INCREASE_COOLDOWN     equ 4
 P1_X_POSITION    equ $50
 P2_X_POSITION    equ $aa
 
-.zpvar          DYING_JUMP_COUNTER       .byte
-.zpvar          DYING_JUMP_COUNTER_RIGHT .byte
+.zpvar          DYING_JUMP_COUNTER_1   .byte
+.zpvar          DYING_JUMP_COUNTER_2   .byte
 DYING_JUMP_COOLDOWN         equ 2
 DYING_JUMP_COOLDOWN_FAST    equ 1
 
-.zpvar          JUMP_COUNTER           .byte
-.zpvar          JUMP_COUNTER_RIGHT     .byte
-.zpvar          JUMP_INTERRUPTED       .byte
-.zpvar          JUMP_INTERRUPTED_RIGHT .byte
+.zpvar          JUMP_COUNTER_1         .byte
+.zpvar          JUMP_COUNTER_2         .byte
+.zpvar          JUMP_INTERRUPTED_1     .byte
+.zpvar          JUMP_INTERRUPTED_2     .byte
 JUMP_FRAME_COUNT    equ 46
 JUMP_FRAME_ADVANCE  equ 1
 
@@ -248,21 +249,19 @@ GAME_LOOP
             jsr SYNCHRO
             jsr RESTART_TICK
             jsr PLAYER_TICK
-            jsr PLAYER_TICK_RIGHT
 
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
 
             jsr CHECK_SCORE
             jsr CHECK_COLLISIONS
-            jsr CHECK_COLLISIONS_RIGHT
 
             lda STRIG0
             bne @+
-            jsr START_JUMP
+            START_JUMP 1
 @           lda STRIG1
             bne @+
-            jsr START_JUMP_RIGHT
+            START_JUMP 2
 @           jmp GAME_LOOP
 
 RESTART_TICK
@@ -297,71 +296,13 @@ CHECK_SCORE
             #end
 CS_X        rts
 CS_1        jsr ADVANCE_SCORES
-            jsr ADVANCE_SCORES_RIGHT
             jsr PAINT_POINTS
             ldx #SCORE_INCREASE_COOLDOWN
             stx SCORE_JUST_INCREASED
             rts
 
-ADVANCE_SCORES
-            lda P1_INVUL
-            bne AS_2
-            lda P1_STATE
-            cmp #PS_BURIED
-            beq AS_X
-            cmp #PS_DYING
-            beq AS_X
-            sed
-            lda P1_SCORE
-            clc
-            adc #1
-            sta P1_SCORE
-            cld
-            cmp #0
-            beq AS_1
-AS_X        rts
-AS_1        sed
-            clc
-            lda P1_SCORE_H
-            adc #1
-            sta P1_SCORE_H
-            rts
-AS_2        dec P1_INVUL_DISABLE_COUNTER
-            bne AS_X
-            jsr DISABLE_INVUL
-            rts
-
-ADVANCE_SCORES_RIGHT
-            lda P2_INVUL
-            bne ASR_2
-            lda P2_STATE
-            cmp #PS_BURIED
-            beq ASR_X
-            cmp #PS_DYING
-            beq ASR_X
-            sed
-            lda P2_SCORE
-            clc
-            adc #1
-            sta P2_SCORE
-            cld
-            cmp #0
-            beq ASR_1
-ASR_X       rts
-ASR_1       sed
-            clc
-            lda P2_SCORE_H
-            adc #1
-            sta P2_SCORE_H
-            rts
-ASR_2       dec P2_INVUL_DISABLE_COUNTER
-            bne ASR_X
-            jsr DISABLE_INVUL
-            rts
-
 ENABLE_INVUL
             jsr ADVANCE_SCORES
-            jsr ADVANCE_SCORES_RIGHT
             lda #1
             sta P1_INVUL
             sta P2_INVUL
@@ -373,189 +314,29 @@ ENABLE_INVUL
             sta P2_INVUL_DISABLE_COUNTER
             rts
 
-DISABLE_INVUL_LEFT
-            lda P1_STATE
-            cmp #PS_DYING
-            beq DIL_X
-            lda P1_STATE
-            cmp #PS_BURIED
-            beq DIL_X
-            lda #0
-            sta P1_INVUL
-            lda #P1_X_POSITION
-            sta HPOSP0
-            sta HPOSP1
-DIL_X       rts
-
-DISABLE_INVUL_RIGHT
-            lda P2_STATE
-            cmp #PS_DYING
-            beq DIR_X
-            lda P2_STATE
-            cmp #PS_BURIED
-            beq DIR_X
-            lda #0
-            sta P2_INVUL
-            lda #P2_X_POSITION
-            sta HPOSP2
-            sta HPOSP3
-DIR_X       rts
-
 DISABLE_INVUL
-            jsr DISABLE_INVUL_LEFT
-            jsr DISABLE_INVUL_RIGHT
+            DISABLE_PLAYER_INVUL 1
+            DISABLE_PLAYER_INVUL 2
             rts
 
-START_JUMP
-            lda P1_STATE
-            cmp #PS_IDLE
-            bne SJ_X    ; Only idle can jump
-            lda #0
-            sta JUMP_INTERRUPTED
-            lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER
-            lda #PS_JUMP
-            sta P1_STATE
-SJ_X        rts
-
-START_JUMP_RIGHT
-            lda P2_STATE
-            cmp #PS_IDLE
-            bne SJR_X    ; Only idle can jump
-            lda #0
-            sta JUMP_INTERRUPTED_RIGHT
-            lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER_RIGHT
-            lda #PS_JUMP
-            sta P2_STATE
-SJR_X       rts
-
-; Death animation depends on the speed of the rotator
-; There are 3 death speeds, they are assigned
-; to game levels in the following way:
-;
-; Level | Animation (S-Slow, M-medium, F-fase)
-;-------------------
-;   1   |     S
-;   2   |     S
-;   3   |     S
-;   4   |     M
-;   5   |     S
-;   6   |     M
-;   7   |     M
-;   8   |     F
-;   9   |     M
-;  10   |     M
-;  11   |     F
-;  12   |     F
-INIT_DYING
-            jsr CLEAR_PLAYER_LEFT
-            jsr INIT_DYING_PAINT_OFFSET
-            lda #PS_DYING
-            sta P1_STATE
-            lda #0
-            sta DYING_POS_X_P1
-            sta P1_Y
-            lda #1
-            sta DYING_JUMP_COUNTER
-            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
-                mwa #LEFT_KILL_Y_SPEED_1 P1_Y_TABLE
-                mwa #LEFT_KILL_X_SPEED_1 P1_X_TABLE
-                rts
-            #end
-            #if .byte CURRENT_GAME_LEVEL = #3 .or .byte CURRENT_GAME_LEVEL = #5 .or .byte CURRENT_GAME_LEVEL = #6 .or .byte CURRENT_GAME_LEVEL = #8  .or .byte CURRENT_GAME_LEVEL = #9 
-                mwa #LEFT_KILL_Y_SPEED_2 P1_Y_TABLE
-                mwa #LEFT_KILL_X_SPEED_2 P1_X_TABLE
-                rts
-            #end
-            #if .byte CURRENT_GAME_LEVEL = #7 .or .byte CURRENT_GAME_LEVEL = #10 .or .byte CURRENT_GAME_LEVEL = #11
-                mwa #LEFT_KILL_Y_SPEED_3 P1_Y_TABLE
-                mwa #LEFT_KILL_X_SPEED_3 P1_X_TABLE
-                rts
-            #end
-
-INIT_DYING_RIGHT
-            jsr CLEAR_PLAYER_RIGHT
-            jsr INIT_DYING_PAINT_OFFSET_RIGHT
-            lda #PS_DYING
-            sta P2_STATE
-            lda #0
-            sta DYING_POS_X_P2
-            sta P2_Y
-            lda #1
-            sta DYING_JUMP_COUNTER_RIGHT
-            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
-                // TODO: Change tables to "right-hand-side"
-                mwa #LEFT_KILL_Y_SPEED_1 P2_Y_TABLE
-                mwa #RIGHT_KILL_X_SPEED_1 P2_X_TABLE
-                rts
-            #end
-            #if .byte CURRENT_GAME_LEVEL = #3 .or .byte CURRENT_GAME_LEVEL = #5 .or .byte CURRENT_GAME_LEVEL = #6 .or .byte CURRENT_GAME_LEVEL = #8  .or .byte CURRENT_GAME_LEVEL = #9 
-                mwa #LEFT_KILL_Y_SPEED_2 P2_Y_TABLE
-                mwa #RIGHT_KILL_X_SPEED_2 P2_X_TABLE
-                rts
-            #end
-            #if .byte CURRENT_GAME_LEVEL = #7 .or .byte CURRENT_GAME_LEVEL = #10 .or .byte CURRENT_GAME_LEVEL = #11
-                mwa #LEFT_KILL_Y_SPEED_3 P2_Y_TABLE
-                mwa #RIGHT_KILL_X_SPEED_3 P2_X_TABLE
-                rts
-            #end
-
-INIT_DYING_PAINT_OFFSET
-            ldy #0
-            lda (P2_Y_TABLE),y
-            ldy P1_Y
-            sec
-            sbc (P2_Y_TABLE),y
-            sta P1_DRAWING_Y_OFFSET
+ADVANCE_SCORES
+            ADVANCE_PLAYER_SCORES 1
+            ADVANCE_PLAYER_SCORES 2
             rts
 
+PLAYER_TICK
+            PLAYER_PLAYER_TICK 1
+            PLAYER_PLAYER_TICK 2
+            rts
 
-INIT_DYING_PAINT_OFFSET_RIGHT
-            ldy #0
-            lda (P2_Y_TABLE),y
-            ldy P2_Y
-            sec
-            sbc (P2_Y_TABLE),y
-            sta P2_DRAWING_Y_OFFSET
+CLEAR_PLAYERS
+            CLEAR_PLAYER 1
+            CLEAR_PLAYER 2
             rts
 
 CHECK_COLLISIONS
-            lda P1_INVUL
-            bne CC_X
-            #if .byte P1_STATE = #PS_DYING .or .byte P1_Y > #6
-                rts
-            #end
-            ldy CURRENT_GAME_LEVEL
-            lda HIT_FRAMES_0,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            lda HIT_FRAMES_1,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            lda HIT_FRAMES_2,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            rts
-CC_KILLED   jsr INIT_DYING
-CC_X        rts
-
-CHECK_COLLISIONS_RIGHT
-            #if .byte P2_STATE = #PS_DYING .or .byte P2_Y > #6
-                rts
-            #end
-            ldy CURRENT_GAME_LEVEL
-            lda HIT_FRAMES_0,y
-            cmp CURRENT_FRAME
-            beq CCR_KILLED
-            lda HIT_FRAMES_1,y
-            cmp CURRENT_FRAME
-            beq CCR_KILLED
-            lda HIT_FRAMES_2,y
-            cmp CURRENT_FRAME
-            beq CCR_KILLED
-            rts
-CCR_KILLED  jsr INIT_DYING_RIGHT
+            CHECK_PLAYER_COLLISIONS 1
+            CHECK_PLAYER_COLLISIONS 2
             rts
 
 BACKGROUND_TICK
@@ -586,263 +367,6 @@ ADVANCE_LEVEL
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
             sta CURRENT_ROTATIONS
-            rts
-
-PLAYER_TICK
-            lda P1_STATE
-            cmp #PS_IDLE
-            beq PT_INVUL
-            cmp #PS_JUMP
-            bne PT_1
-            jsr JUMP_TICK
-            jmp PT_INVUL
-PT_1        cmp #PS_DYING
-            bne PT_X
-            jsr DYING_TICK
-PT_X        rts
-PT_INVUL    lda P1_INVUL
-            beq PT_X
-            dec P1_INVUL_COUNTER
-            bne PT_X
-            lda #INVUL_COOLDOWN
-            sta P1_INVUL_COUNTER
-            lda P1_INVUL
-            beq PT_X
-            lda P1_VISIBLE
-            beq PT_2
-            dec P1_VISIBLE
-            lda #$ff
-            sta HPOSP0
-            sta HPOSP1
-            rts
-PT_2        inc P1_VISIBLE
-            lda #P1_X_POSITION
-            sta HPOSP0
-            sta HPOSP1
-            rts
-
-PLAYER_TICK_RIGHT
-            lda P2_STATE
-            cmp #PS_IDLE
-            beq PT_INVUL_R
-            cmp #PS_JUMP
-            bne PTR_1
-            jsr JUMP_TICK_RIGHT
-            jmp PT_INVUL_R
-PTR_1       cmp #PS_DYING
-            bne PTR_X
-            jsr DYING_TICK_RIGHT
-PTR_X       rts
-PT_INVUL_R  lda P2_INVUL
-            beq PTR_X
-            dec P2_INVUL_COUNTER
-            bne PTR_X
-            lda #INVUL_COOLDOWN
-            sta P2_INVUL_COUNTER
-            lda P2_INVUL
-            beq PTR_X
-            lda P2_VISIBLE
-            beq PTR_2
-            dec P2_VISIBLE
-            lda #$ff
-            sta HPOSP2
-            sta HPOSP3
-            rts
-PTR_2       inc P2_VISIBLE
-            lda #P2_X_POSITION
-            sta HPOSP2
-            sta HPOSP3
-            rts
-
-INTERRUPT_JUMP
-            lda STRIG0
-            beq IJ_X ; Button still pressed, do not interrupt
-            lda JUMP_INTERRUPTED
-            bne IJ_X ; This jump has already been interrupted
-            lda #JUMP_FRAME_COUNT-1
-            sec
-            sbc P1_Y
-            sta P1_Y
-            lda #1
-            sta JUMP_INTERRUPTED
-IJ_X        rts
-
-INTERRUPT_JUMP_RIGHT
-            lda STRIG1
-            beq IJR_X ; Button still pressed, do not interrupt
-            lda JUMP_INTERRUPTED_RIGHT
-            bne IJR_X ; This jump has already been interrupted
-            lda #JUMP_FRAME_COUNT-1
-            sec
-            sbc P2_Y
-            sta P2_Y
-            lda #1
-            sta JUMP_INTERRUPTED_RIGHT
-IJR_X       rts
-
-INIT_DYING_COOLDOWN
-            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
-                lda #DYING_JUMP_COOLDOWN
-                sta DYING_JUMP_COUNTER
-                rts
-            #end
-            lda #DYING_JUMP_COOLDOWN_FAST
-            sta DYING_JUMP_COUNTER
-            rts
-
-INIT_DYING_COOLDOWN_RIGHT
-            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
-                lda #DYING_JUMP_COOLDOWN
-                sta DYING_JUMP_COUNTER_RIGHT
-                rts
-            #end
-            lda #DYING_JUMP_COOLDOWN_FAST
-            sta DYING_JUMP_COUNTER_RIGHT
-            rts
-
-DYING_TICK
-            dec DYING_JUMP_COUNTER
-            bne DT_X
-            jsr INIT_DYING_COOLDOWN
-            ldy DYING_POS_X_P1
-            lda (P1_X_TABLE),y
-            cmp #$ff
-            beq DT_0
-            jsr CLEAR_PLAYER_LEFT
-            inc P1_Y
-            ldy DYING_POS_X_P1
-            lda (P1_X_TABLE),y
-            inc DYING_POS_X_P1
-            sta HPOSP0
-            sta HPOSP1
-            jsr PAINT_PLAYERS
-DT_X        rts
-DT_0        lda #0
-            sta HPOSP0
-            sta HPOSP1
-            jsr CLEAR_PLAYER_LEFT
-            lda #PS_BURIED
-            sta P1_STATE
-            rts
-
-DYING_TICK_RIGHT
-            dec DYING_JUMP_COUNTER_RIGHT
-            bne DTR_X
-            jsr INIT_DYING_COOLDOWN_RIGHT
-            ldy DYING_POS_X_P2
-            lda (P2_X_TABLE),y
-            cmp #$ff
-            beq DTR_0
-            jsr CLEAR_PLAYER_RIGHT
-            inc P2_Y
-            ldy DYING_POS_X_P2
-            lda (P2_X_TABLE),y
-            inc DYING_POS_X_P2
-            sta HPOSP2
-            sta HPOSP3
-            jsr PAINT_PLAYERS
-DTR_X       rts
-DTR_0       lda #0
-            sta HPOSP2
-            sta HPOSP3
-            jsr CLEAR_PLAYER_RIGHT
-            lda #PS_BURIED
-            sta P2_STATE
-            rts
-
-JUMP_TICK
-            dec JUMP_COUNTER
-            bne JT_X    ; Do not advance yet
-            lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER
-            jsr CLEAR_PLAYERS
-            inc P1_Y
-            jsr PAINT_PLAYERS
-            lda P1_Y
-            cmp #JUMP_FRAME_COUNT/2
-            bne JT_2
-            ; We're just started to go down, it's too late to interrupt the jump
-            lda #1
-            sta JUMP_INTERRUPTED
-JT_2        lda P1_Y
-            sec
-            sbc #JUMP_FRAME_COUNT/4
-            bcc JT_1    ; Do not allow to interrupt the jump yet
-            jsr INTERRUPT_JUMP
-JT_1        lda P1_Y
-            cmp #JUMP_FRAME_COUNT-1
-            bne JT_X
-            ; Finish the jump
-            lda #PS_IDLE
-            sta P1_STATE
-            lda #0
-            sta P1_Y
-JT_X        rts
-
-JUMP_TICK_RIGHT
-            dec JUMP_COUNTER_RIGHT
-            bne JTR_X    ; Do not advance yet
-            lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER_RIGHT
-            jsr CLEAR_PLAYERS
-            inc P2_Y
-            jsr PAINT_PLAYERS
-            lda P2_Y
-            cmp #JUMP_FRAME_COUNT/2
-            bne JTR_2
-            ; We're just started to go down, it's too late to interrupt the jump
-            lda #1
-            sta JUMP_INTERRUPTED_RIGHT
-JTR_2       lda P2_Y
-            sec
-            sbc #JUMP_FRAME_COUNT/4
-            bcc JTR_1    ; Do not allow to interrupt the jump yet
-            jsr INTERRUPT_JUMP_RIGHT
-JTR_1       lda P2_Y
-            cmp #JUMP_FRAME_COUNT-1
-            bne JTR_X
-            ; Finish the jump
-            lda #PS_IDLE
-            sta P2_STATE
-            lda #0
-            sta P2_Y
-JTR_X       rts
-
-CLEAR_PLAYER_LEFT
-            ldy P1_Y
-            lda (P1_Y_TABLE),y
-            sec
-            sbc P1_DRAWING_Y_OFFSET
-            tay
-            ldx #0
-@           lda #0
-            sta PMG_P0,y
-            sta PMG_P1,y
-            iny
-            inx
-            cpx #20
-            bne @-
-            rts
-
-CLEAR_PLAYER_RIGHT
-            ldy P2_Y
-            lda (P2_Y_TABLE),y
-            sec
-            sbc P2_DRAWING_Y_OFFSET
-            tay
-            ldx #0
-@           lda #0
-            sta PMG_P2,y
-            sta PMG_P3,y
-            iny
-            inx
-            cpx #20
-            bne @-
-            rts
-
-CLEAR_PLAYERS
-            jsr CLEAR_PLAYER_LEFT
-            jsr CLEAR_PLAYER_RIGHT
             rts
 
 PAINT_PLAYERS
