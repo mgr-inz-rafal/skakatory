@@ -259,10 +259,10 @@ GAME_LOOP
 
             lda STRIG0
             bne @+
-            jsr START_JUMP
+            START_JUMP 1
 @           lda STRIG1
             bne @+
-            jsr START_JUMP_RIGHT
+            START_JUMP 2
 @           jmp GAME_LOOP
 
 RESTART_TICK
@@ -334,30 +334,6 @@ CLEAR_PLAYERS
             CLEAR_PLAYER 1
             CLEAR_PLAYER 2
             rts
-
-START_JUMP
-            lda P1_STATE
-            cmp #PS_IDLE
-            bne SJ_X    ; Only idle can jump
-            lda #0
-            sta JUMP_INTERRUPTED_1
-            lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER_1
-            lda #PS_JUMP
-            sta P1_STATE
-SJ_X        rts
-
-START_JUMP_RIGHT
-            lda P2_STATE
-            cmp #PS_IDLE
-            bne SJR_X    ; Only idle can jump
-            lda #0
-            sta JUMP_INTERRUPTED_2
-            lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER_2
-            lda #PS_JUMP
-            sta P2_STATE
-SJR_X       rts
 
 ; Death animation depends on the speed of the rotator
 ; There are 3 death speeds, they are assigned

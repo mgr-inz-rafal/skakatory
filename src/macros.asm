@@ -215,3 +215,16 @@ IDC%%1_X
             cpx #20
             bne @-
 .endm
+
+.macro START_JUMP P12
+            lda P%%1_STATE
+            cmp #PS_IDLE
+            bne SJ%%1_X    ; Only idle can jump
+            lda #0
+            sta JUMP_INTERRUPTED_%%1
+            lda #JUMP_FRAME_ADVANCE
+            sta JUMP_COUNTER_%%1
+            lda #PS_JUMP
+            sta P%%1_STATE
+SJ%%1_X
+.endm
