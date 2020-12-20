@@ -5,6 +5,7 @@
             ins "frames/f1.bin"
 
             icl 'src\atari.inc'
+            icl 'src\macros.asm'
 
 FRAME_COUNT         equ 104
 SCR_MEM_1           equ $4150
@@ -297,71 +298,13 @@ CHECK_SCORE
             #end
 CS_X        rts
 CS_1        jsr ADVANCE_SCORES
-            jsr ADVANCE_SCORES_RIGHT
             jsr PAINT_POINTS
             ldx #SCORE_INCREASE_COOLDOWN
             stx SCORE_JUST_INCREASED
             rts
 
-ADVANCE_SCORES
-            lda P1_INVUL
-            bne AS_2
-            lda P1_STATE
-            cmp #PS_BURIED
-            beq AS_X
-            cmp #PS_DYING
-            beq AS_X
-            sed
-            lda P1_SCORE
-            clc
-            adc #1
-            sta P1_SCORE
-            cld
-            cmp #0
-            beq AS_1
-AS_X        rts
-AS_1        sed
-            clc
-            lda P1_SCORE_H
-            adc #1
-            sta P1_SCORE_H
-            rts
-AS_2        dec P1_INVUL_DISABLE_COUNTER
-            bne AS_X
-            jsr DISABLE_INVUL
-            rts
-
-ADVANCE_SCORES_RIGHT
-            lda P2_INVUL
-            bne ASR_2
-            lda P2_STATE
-            cmp #PS_BURIED
-            beq ASR_X
-            cmp #PS_DYING
-            beq ASR_X
-            sed
-            lda P2_SCORE
-            clc
-            adc #1
-            sta P2_SCORE
-            cld
-            cmp #0
-            beq ASR_1
-ASR_X       rts
-ASR_1       sed
-            clc
-            lda P2_SCORE_H
-            adc #1
-            sta P2_SCORE_H
-            rts
-ASR_2       dec P2_INVUL_DISABLE_COUNTER
-            bne ASR_X
-            jsr DISABLE_INVUL
-            rts
-
 ENABLE_INVUL
             jsr ADVANCE_SCORES
-            jsr ADVANCE_SCORES_RIGHT
             lda #1
             sta P1_INVUL
             sta P2_INVUL
@@ -373,30 +316,14 @@ ENABLE_INVUL
             sta P2_INVUL_DISABLE_COUNTER
             rts
 
-.macro DISABLE_PLAYER_INVUL P12
-            lda P%%1_STATE
-            cmp #PS_DYING
-            beq DI%%1_X
-            lda P%%1_STATE
-            cmp #PS_BURIED
-            beq DI%%1_X
-            lda #0
-            sta P%%1_INVUL
-            lda #P%%1_X_POSITION
-            .if :1 = 1
-                sta HPOSP0
-                sta HPOSP1
-            .endif
-            .if :1 = 2
-                sta HPOSP2
-                sta HPOSP3
-            .endif
-DI%%1_X     
-.endm
-
 DISABLE_INVUL
             DISABLE_PLAYER_INVUL 1
             DISABLE_PLAYER_INVUL 2
+            rts
+
+ADVANCE_SCORES
+            ADVANCE_PLAYER_SCORES 1
+            ADVANCE_PLAYER_SCORES 2
             rts
 
 START_JUMP
