@@ -58,8 +58,8 @@ P2_X_POSITION    equ $aa
 DYING_JUMP_COOLDOWN         equ 2
 DYING_JUMP_COOLDOWN_FAST    equ 1
 
-.zpvar          JUMP_COUNTER           .byte
-.zpvar          JUMP_COUNTER_RIGHT     .byte
+.zpvar          JUMP_COUNTER_1         .byte
+.zpvar          JUMP_COUNTER_2         .byte
 .zpvar          JUMP_INTERRUPTED_1     .byte
 .zpvar          JUMP_INTERRUPTED_2     .byte
 JUMP_FRAME_COUNT    equ 46
@@ -337,7 +337,7 @@ START_JUMP
             lda #0
             sta JUMP_INTERRUPTED_1
             lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER
+            sta JUMP_COUNTER_1
             lda #PS_JUMP
             sta P1_STATE
 SJ_X        rts
@@ -349,7 +349,7 @@ START_JUMP_RIGHT
             lda #0
             sta JUMP_INTERRUPTED_2
             lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER_RIGHT
+            sta JUMP_COUNTER_2
             lda #PS_JUMP
             sta P2_STATE
 SJR_X       rts

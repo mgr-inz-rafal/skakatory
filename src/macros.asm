@@ -102,20 +102,10 @@ PT%%1_X
 .endm
 
 .macro JUMP_PLAYER_TICK P12
-            .if :1 = 1
-                dec JUMP_COUNTER
-            .endif
-            .if :1 = 2
-                dec JUMP_COUNTER_RIGHT
-            .endif
+            dec JUMP_COUNTER_%%1
             bne JT%%1_X    ; Do not advance yet
             lda #JUMP_FRAME_ADVANCE
-            .if :1 = 1
-                sta JUMP_COUNTER
-            .endif
-            .if :1 = 2
-                sta JUMP_COUNTER_RIGHT
-            .endif
+            sta JUMP_COUNTER_%%1
             jsr CLEAR_PLAYERS
             inc P%%1_Y
             jsr PAINT_PLAYERS
