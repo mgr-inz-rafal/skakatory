@@ -532,56 +532,6 @@ INIT_DYING_COOLDOWN_RIGHT
             sta DYING_JUMP_COUNTER_RIGHT
             rts
 
-DYING_TICK
-            dec DYING_JUMP_COUNTER
-            bne DT_X
-            jsr INIT_DYING_COOLDOWN
-            ldy DYING_POS_X_P1
-            lda (P1_X_TABLE),y
-            cmp #$ff
-            beq DT_0
-            jsr CLEAR_PLAYER_LEFT
-            inc P1_Y
-            ldy DYING_POS_X_P1
-            lda (P1_X_TABLE),y
-            inc DYING_POS_X_P1
-            sta HPOSP0
-            sta HPOSP1
-            jsr PAINT_PLAYERS
-DT_X        rts
-DT_0        lda #0
-            sta HPOSP0
-            sta HPOSP1
-            jsr CLEAR_PLAYER_LEFT
-            lda #PS_BURIED
-            sta P1_STATE
-            rts
-
-DYING_TICK_RIGHT
-            dec DYING_JUMP_COUNTER_RIGHT
-            bne DTR_X
-            jsr INIT_DYING_COOLDOWN_RIGHT
-            ldy DYING_POS_X_P2
-            lda (P2_X_TABLE),y
-            cmp #$ff
-            beq DTR_0
-            jsr CLEAR_PLAYER_RIGHT
-            inc P2_Y
-            ldy DYING_POS_X_P2
-            lda (P2_X_TABLE),y
-            inc DYING_POS_X_P2
-            sta HPOSP2
-            sta HPOSP3
-            jsr PAINT_PLAYERS
-DTR_X       rts
-DTR_0       lda #0
-            sta HPOSP2
-            sta HPOSP3
-            jsr CLEAR_PLAYER_RIGHT
-            lda #PS_BURIED
-            sta P2_STATE
-            rts
-
 CLEAR_PLAYER_LEFT
             ldy P1_Y
             lda (P1_Y_TABLE),y

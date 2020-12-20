@@ -53,21 +53,16 @@ AS%%1_X
 .macro PLAYER_PLAYER_TICK P12
             lda P%%1_STATE
             cmp #PS_IDLE
-            beq PT_INVUL
+            jeq PT%%1_INVUL
             cmp #PS_JUMP
             bne PT%%1_1
             JUMP_PLAYER_TICK %%1
-            jmp PT_INVUL
+            jmp PT%%1_INVUL
 PT%%1_1     cmp #PS_DYING
             bne PT%%1_X
-            .if :1 = 1
-                jsr DYING_TICK
-            .endif
-            .if :1 = 2
-                jsr DYING_TICK_RIGHT ; TODO: Fix
-            .endif
+            DYING_PLAYER_TICK %%1
             jmp PT%%1_X
-PT_INVUL    lda P%%1_INVUL
+PT%%1_INVUL lda P%%1_INVUL
             beq PT%%1_X
             dec P%%1_INVUL_COUNTER
             bne PT%%1_X
@@ -148,4 +143,62 @@ JT%%1_X
             lda #1
             sta JUMP_INTERRUPTED_%%1
 IJ%%1_X     
+.endm
+
+.macro DYING_PLAYER_TICK P12
+            .if :1 = 1
+                dec DYING_JUMP_COUNTER
+            .endif
+            .if :1 = 2
+                dec DYING_JUMP_COUNTER_RIGHT
+            .endif
+            bne DT%%1_X
+            .if :1 = 1
+                jsr INIT_DYING_COOLDOWN
+            .endif
+            .if :1 = 2
+                jsr INIT_DYING_COOLDOWN_RIGHT
+            .endif
+            ldy DYING_POS_X_P%%1
+            lda (P%%1_X_TABLE),y
+            cmp #$ff
+            beq DT%%1_0
+            .if :1 = 1
+                jsr CLEAR_PLAYER_LEFT
+            .endif
+            .if :1 = 2
+                jsr CLEAR_PLAYER_RIGHT
+            .endif
+            inc P%%1_Y
+            ldy DYING_POS_X_P%%1
+            lda (P%%1_X_TABLE),y
+            inc DYING_POS_X_P%%1
+            .if :1 = 1
+                sta HPOSP0
+                sta HPOSP1
+            .endif
+            .if :1 = 2
+                sta HPOSP2
+                sta HPOSP3
+            .endif
+            jsr PAINT_PLAYERS
+            jmp DT%%1_X
+DT%%1_0     lda #0
+            .if :1 = 1
+                sta HPOSP0
+                sta HPOSP1
+            .endif
+            .if :1 = 2
+                sta HPOSP2
+                sta HPOSP3
+            .endif
+            .if :1 = 1
+                jsr CLEAR_PLAYER_LEFT
+            .endif
+            .if :1 = 2
+                jsr CLEAR_PLAYER_RIGHT
+            .endif
+            lda #PS_BURIED
+            sta P%%1_STATE
+DT%%1_X     
 .endm
