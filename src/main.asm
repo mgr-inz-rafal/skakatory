@@ -330,6 +330,11 @@ PLAYER_TICK
             PLAYER_PLAYER_TICK 2
             rts
 
+CLEAR_PLAYERS
+            CLEAR_PLAYER 1
+            CLEAR_PLAYER 2
+            rts
+
 START_JUMP
             lda P1_STATE
             cmp #PS_IDLE
@@ -510,11 +515,6 @@ ADVANCE_LEVEL
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
             sta CURRENT_ROTATIONS
-            rts
-
-CLEAR_PLAYERS
-            CLEAR_PLAYER 1
-            CLEAR_PLAYER 2
             rts
 
 PAINT_PLAYERS
