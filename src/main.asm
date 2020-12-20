@@ -335,76 +335,6 @@ CLEAR_PLAYERS
             CLEAR_PLAYER 2
             rts
 
-; Death animation depends on the speed of the rotator
-; There are 3 death speeds, they are assigned
-; to game levels in the following way:
-;
-; Level | Animation (S-Slow, M-medium, F-fase)
-;-------------------
-;   1   |     S
-;   2   |     S
-;   3   |     S
-;   4   |     M
-;   5   |     S
-;   6   |     M
-;   7   |     M
-;   8   |     F
-;   9   |     M
-;  10   |     M
-;  11   |     F
-;  12   |     F
-INIT_DYING
-            CLEAR_PLAYER 1
-            jsr INIT_DYING_PAINT_OFFSET
-            lda #PS_DYING
-            sta P1_STATE
-            lda #0
-            sta DYING_POS_X_P1
-            sta P1_Y
-            lda #1
-            sta DYING_JUMP_COUNTER_1
-            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
-                mwa #LEFT_KILL_Y_SPEED_1 P1_Y_TABLE
-                mwa #LEFT_KILL_X_SPEED_1 P1_X_TABLE
-                rts
-            #end
-            #if .byte CURRENT_GAME_LEVEL = #3 .or .byte CURRENT_GAME_LEVEL = #5 .or .byte CURRENT_GAME_LEVEL = #6 .or .byte CURRENT_GAME_LEVEL = #8  .or .byte CURRENT_GAME_LEVEL = #9 
-                mwa #LEFT_KILL_Y_SPEED_2 P1_Y_TABLE
-                mwa #LEFT_KILL_X_SPEED_2 P1_X_TABLE
-                rts
-            #end
-            #if .byte CURRENT_GAME_LEVEL = #7 .or .byte CURRENT_GAME_LEVEL = #10 .or .byte CURRENT_GAME_LEVEL = #11
-                mwa #LEFT_KILL_Y_SPEED_3 P1_Y_TABLE
-                mwa #LEFT_KILL_X_SPEED_3 P1_X_TABLE
-                rts
-            #end
-
-INIT_DYING_RIGHT
-            CLEAR_PLAYER 2
-            jsr INIT_DYING_PAINT_OFFSET_RIGHT
-            lda #PS_DYING
-            sta P2_STATE
-            lda #0
-            sta DYING_POS_X_P2
-            sta P2_Y
-            lda #1
-            sta DYING_JUMP_COUNTER_2
-            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
-                // TODO: Change tables to "right-hand-side"
-                mwa #LEFT_KILL_Y_SPEED_1 P2_Y_TABLE
-                mwa #RIGHT_KILL_X_SPEED_1 P2_X_TABLE
-                rts
-            #end
-            #if .byte CURRENT_GAME_LEVEL = #3 .or .byte CURRENT_GAME_LEVEL = #5 .or .byte CURRENT_GAME_LEVEL = #6 .or .byte CURRENT_GAME_LEVEL = #8  .or .byte CURRENT_GAME_LEVEL = #9 
-                mwa #LEFT_KILL_Y_SPEED_2 P2_Y_TABLE
-                mwa #RIGHT_KILL_X_SPEED_2 P2_X_TABLE
-                rts
-            #end
-            #if .byte CURRENT_GAME_LEVEL = #7 .or .byte CURRENT_GAME_LEVEL = #10 .or .byte CURRENT_GAME_LEVEL = #11
-                mwa #LEFT_KILL_Y_SPEED_3 P2_Y_TABLE
-                mwa #RIGHT_KILL_X_SPEED_3 P2_X_TABLE
-                rts
-            #end
 
 INIT_DYING_PAINT_OFFSET
             ldy #0
@@ -427,7 +357,7 @@ INIT_DYING_PAINT_OFFSET_RIGHT
 
 CHECK_COLLISIONS
             lda P1_INVUL
-            bne CC_X
+            jne CC_X
             #if .byte P1_STATE = #PS_DYING .or .byte P1_Y > #6
                 rts
             #end
@@ -442,7 +372,7 @@ CHECK_COLLISIONS
             cmp CURRENT_FRAME
             beq CC_KILLED
             rts
-CC_KILLED   jsr INIT_DYING
+CC_KILLED   INIT_DYING 1
 CC_X        rts
 
 CHECK_COLLISIONS_RIGHT
@@ -460,7 +390,7 @@ CHECK_COLLISIONS_RIGHT
             cmp CURRENT_FRAME
             beq CCR_KILLED
             rts
-CCR_KILLED  jsr INIT_DYING_RIGHT
+CCR_KILLED  INIT_DYING 2
             rts
 
 BACKGROUND_TICK

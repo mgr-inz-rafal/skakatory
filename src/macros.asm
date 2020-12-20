@@ -228,3 +228,69 @@ IDC%%1_X
             sta P%%1_STATE
 SJ%%1_X
 .endm
+
+; Death animation depends on the speed of the rotator
+; There are 3 death speeds, they are assigned
+; to game levels in the following way:
+;
+; Level | Animation (S-Slow, M-medium, F-fase)
+;-------------------
+;   1   |     S
+;   2   |     S
+;   3   |     S
+;   4   |     M
+;   5   |     S
+;   6   |     M
+;   7   |     M
+;   8   |     F
+;   9   |     M
+;  10   |     M
+;  11   |     F
+;  12   |     F
+.macro INIT_DYING P12
+            CLEAR_PLAYER %%1
+            .if :1 = 1
+                jsr INIT_DYING_PAINT_OFFSET
+            .endif
+            .if :1 = 2
+                jsr INIT_DYING_PAINT_OFFSET_RIGHT
+            .endif
+            lda #PS_DYING
+            sta P%%1_STATE
+            lda #0
+            sta DYING_POS_X_P%%1
+            sta P%%1_Y
+            lda #1
+            sta DYING_JUMP_COUNTER_%%1
+            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
+                mwa #LEFT_KILL_Y_SPEED_1 P%%1_Y_TABLE
+                .if :1 = 1
+                    mwa #LEFT_KILL_X_SPEED_1 P%%1_X_TABLE
+                .endif
+                .if :1 = 2
+                    mwa #RIGHT_KILL_X_SPEED_1 P%%1_X_TABLE
+                .endif
+                jmp ID%%1_X
+            #end
+            #if .byte CURRENT_GAME_LEVEL = #3 .or .byte CURRENT_GAME_LEVEL = #5 .or .byte CURRENT_GAME_LEVEL = #6 .or .byte CURRENT_GAME_LEVEL = #8  .or .byte CURRENT_GAME_LEVEL = #9 
+                mwa #LEFT_KILL_Y_SPEED_2 P%%1_Y_TABLE
+                .if :1 = 1
+                    mwa #LEFT_KILL_X_SPEED_2 P%%1_X_TABLE
+                .endif
+                .if :1 = 2
+                    mwa #RIGHT_KILL_X_SPEED_2 P%%1_X_TABLE
+                .endif
+                jmp ID%%1_X
+            #end
+            #if .byte CURRENT_GAME_LEVEL = #7 .or .byte CURRENT_GAME_LEVEL = #10 .or .byte CURRENT_GAME_LEVEL = #11
+                mwa #LEFT_KILL_Y_SPEED_3 P%%1_Y_TABLE
+                .if :1 = 1
+                    mwa #LEFT_KILL_X_SPEED_3 P%%1_X_TABLE
+                .endif
+                .if :1 = 2
+                    mwa #RIGHT_KILL_X_SPEED_3 P%%1_X_TABLE
+                .endif
+                jmp ID%%1_X
+            #end
+ID%%1_X
+.endm
