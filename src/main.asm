@@ -255,7 +255,6 @@ GAME_LOOP
 
             jsr CHECK_SCORE
             jsr CHECK_COLLISIONS
-            jsr CHECK_COLLISIONS_RIGHT
 
             lda STRIG0
             bne @+
@@ -336,41 +335,8 @@ CLEAR_PLAYERS
             rts
 
 CHECK_COLLISIONS
-            lda P1_INVUL
-            jne CC_X
-            #if .byte P1_STATE = #PS_DYING .or .byte P1_Y > #6
-                rts
-            #end
-            ldy CURRENT_GAME_LEVEL
-            lda HIT_FRAMES_0,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            lda HIT_FRAMES_1,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            lda HIT_FRAMES_2,y
-            cmp CURRENT_FRAME
-            beq CC_KILLED
-            rts
-CC_KILLED   INIT_DYING 1
-CC_X        rts
-
-CHECK_COLLISIONS_RIGHT
-            #if .byte P2_STATE = #PS_DYING .or .byte P2_Y > #6
-                rts
-            #end
-            ldy CURRENT_GAME_LEVEL
-            lda HIT_FRAMES_0,y
-            cmp CURRENT_FRAME
-            beq CCR_KILLED
-            lda HIT_FRAMES_1,y
-            cmp CURRENT_FRAME
-            beq CCR_KILLED
-            lda HIT_FRAMES_2,y
-            cmp CURRENT_FRAME
-            beq CCR_KILLED
-            rts
-CCR_KILLED  INIT_DYING 2
+            CHECK_PLAYER_COLLISIONS 1
+            CHECK_PLAYER_COLLISIONS 2
             rts
 
 BACKGROUND_TICK

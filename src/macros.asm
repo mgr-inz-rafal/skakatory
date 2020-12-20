@@ -298,3 +298,24 @@ ID%%1_X
             sbc (P2_Y_TABLE),y
             sta P%%1_DRAWING_Y_OFFSET
 .endm
+
+.macro CHECK_PLAYER_COLLISIONS P12
+            lda P%%1_INVUL
+            jne CC%%1_X
+            #if .byte P%%1_STATE = #PS_DYING .or .byte P%%1_Y > #6
+                jmp CC%%1_X
+            #end
+            ldy CURRENT_GAME_LEVEL
+            lda HIT_FRAMES_0,y
+            cmp CURRENT_FRAME
+            beq CC_%%1KILLD
+            lda HIT_FRAMES_1,y
+            cmp CURRENT_FRAME
+            beq CC_%%1KILLD
+            lda HIT_FRAMES_2,y
+            cmp CURRENT_FRAME
+            beq CC_%%1KILLD
+            jmp CC%%1_X
+CC_%%1KILLD INIT_DYING %%1
+CC%%1_X
+.endm
