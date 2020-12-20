@@ -146,12 +146,7 @@ IJ%%1_X
 .endm
 
 .macro DYING_PLAYER_TICK P12
-            .if :1 = 1
-                dec DYING_JUMP_COUNTER
-            .endif
-            .if :1 = 2
-                dec DYING_JUMP_COUNTER_RIGHT
-            .endif
+            dec DYING_JUMP_COUNTER_%%1
             bne DT%%1_X
             .if :1 = 1
                 jsr INIT_DYING_COOLDOWN

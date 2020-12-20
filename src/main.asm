@@ -53,8 +53,8 @@ SCORE_INCREASE_COOLDOWN     equ 4
 P1_X_POSITION    equ $50
 P2_X_POSITION    equ $aa
 
-.zpvar          DYING_JUMP_COUNTER       .byte
-.zpvar          DYING_JUMP_COUNTER_RIGHT .byte
+.zpvar          DYING_JUMP_COUNTER_1   .byte
+.zpvar          DYING_JUMP_COUNTER_2   .byte
 DYING_JUMP_COOLDOWN         equ 2
 DYING_JUMP_COOLDOWN_FAST    equ 1
 
@@ -381,7 +381,7 @@ INIT_DYING
             sta DYING_POS_X_P1
             sta P1_Y
             lda #1
-            sta DYING_JUMP_COUNTER
+            sta DYING_JUMP_COUNTER_1
             #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
                 mwa #LEFT_KILL_Y_SPEED_1 P1_Y_TABLE
                 mwa #LEFT_KILL_X_SPEED_1 P1_X_TABLE
@@ -407,7 +407,7 @@ INIT_DYING_RIGHT
             sta DYING_POS_X_P2
             sta P2_Y
             lda #1
-            sta DYING_JUMP_COUNTER_RIGHT
+            sta DYING_JUMP_COUNTER_2
             #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
                 // TODO: Change tables to "right-hand-side"
                 mwa #LEFT_KILL_Y_SPEED_1 P2_Y_TABLE
@@ -515,21 +515,21 @@ ADVANCE_LEVEL
 INIT_DYING_COOLDOWN
             #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
                 lda #DYING_JUMP_COOLDOWN
-                sta DYING_JUMP_COUNTER
+                sta DYING_JUMP_COUNTER_1
                 rts
             #end
             lda #DYING_JUMP_COOLDOWN_FAST
-            sta DYING_JUMP_COUNTER
+            sta DYING_JUMP_COUNTER_1
             rts
 
 INIT_DYING_COOLDOWN_RIGHT
             #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
                 lda #DYING_JUMP_COOLDOWN
-                sta DYING_JUMP_COUNTER_RIGHT
+                sta DYING_JUMP_COUNTER_2
                 rts
             #end
             lda #DYING_JUMP_COOLDOWN_FAST
-            sta DYING_JUMP_COUNTER_RIGHT
+            sta DYING_JUMP_COUNTER_2
             rts
 
 CLEAR_PLAYER_LEFT
