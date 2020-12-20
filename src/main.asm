@@ -643,6 +643,8 @@ STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
 
+DATA_END
+
 //------------------------------------------------
 // Loading data into extram
 //------------------------------------------------
