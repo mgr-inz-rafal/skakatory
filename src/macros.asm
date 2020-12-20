@@ -124,12 +124,7 @@ PT%%1_X
             bne JT%%1_2
             ; We're just started to go down, it's too late to interrupt the jump
             lda #1
-            .if :1 = 1
-                sta JUMP_INTERRUPTED
-            .endif
-            .if :1 = 2
-                sta JUMP_INTERRUPTED_RIGHT
-            .endif
+            sta JUMP_INTERRUPTED_%%1
 JT%%1_2     lda P%%1_Y
             sec
             sbc #JUMP_FRAME_COUNT/4
@@ -154,23 +149,13 @@ JT%%1_X
                 lda STRIG1
             .endif
             beq IJ%%1_X ; Button still pressed, do not interrupt
-            .if :1 = 1
-                lda JUMP_INTERRUPTED
-            .endif
-            .if :1 = 2
-                lda JUMP_INTERRUPTED_RIGHT
-            .endif
+            lda JUMP_INTERRUPTED_%%1
             bne IJ%%1_X ; This jump has already been interrupted
             lda #JUMP_FRAME_COUNT-1
             sec
             sbc P%%1_Y
             sta P%%1_Y
             lda #1
-            .if :1 = 1
-                sta JUMP_INTERRUPTED
-            .endif
-            .if :1 = 2
-                sta JUMP_INTERRUPTED_RIGHT
-            .endif
+            sta JUMP_INTERRUPTED_%%1
 IJ%%1_X     
 .endm

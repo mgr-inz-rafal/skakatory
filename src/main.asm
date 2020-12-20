@@ -60,8 +60,8 @@ DYING_JUMP_COOLDOWN_FAST    equ 1
 
 .zpvar          JUMP_COUNTER           .byte
 .zpvar          JUMP_COUNTER_RIGHT     .byte
-.zpvar          JUMP_INTERRUPTED       .byte
-.zpvar          JUMP_INTERRUPTED_RIGHT .byte
+.zpvar          JUMP_INTERRUPTED_1     .byte
+.zpvar          JUMP_INTERRUPTED_2     .byte
 JUMP_FRAME_COUNT    equ 46
 JUMP_FRAME_ADVANCE  equ 1
 
@@ -335,7 +335,7 @@ START_JUMP
             cmp #PS_IDLE
             bne SJ_X    ; Only idle can jump
             lda #0
-            sta JUMP_INTERRUPTED
+            sta JUMP_INTERRUPTED_1
             lda #JUMP_FRAME_ADVANCE
             sta JUMP_COUNTER
             lda #PS_JUMP
@@ -347,7 +347,7 @@ START_JUMP_RIGHT
             cmp #PS_IDLE
             bne SJR_X    ; Only idle can jump
             lda #0
-            sta JUMP_INTERRUPTED_RIGHT
+            sta JUMP_INTERRUPTED_2
             lda #JUMP_FRAME_ADVANCE
             sta JUMP_COUNTER_RIGHT
             lda #PS_JUMP
