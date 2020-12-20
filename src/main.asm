@@ -512,26 +512,6 @@ ADVANCE_LEVEL
             sta CURRENT_ROTATIONS
             rts
 
-INIT_DYING_COOLDOWN
-            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
-                lda #DYING_JUMP_COOLDOWN
-                sta DYING_JUMP_COUNTER_1
-                rts
-            #end
-            lda #DYING_JUMP_COOLDOWN_FAST
-            sta DYING_JUMP_COUNTER_1
-            rts
-
-INIT_DYING_COOLDOWN_RIGHT
-            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
-                lda #DYING_JUMP_COOLDOWN
-                sta DYING_JUMP_COUNTER_2
-                rts
-            #end
-            lda #DYING_JUMP_COOLDOWN_FAST
-            sta DYING_JUMP_COUNTER_2
-            rts
-
 CLEAR_PLAYER_LEFT
             ldy P1_Y
             lda (P1_Y_TABLE),y

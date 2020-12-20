@@ -59,7 +59,7 @@ AS%%1_X
             JUMP_PLAYER_TICK %%1
             jmp PT%%1_INVUL
 PT%%1_1     cmp #PS_DYING
-            bne PT%%1_X
+            jne PT%%1_X
             DYING_PLAYER_TICK %%1
             jmp PT%%1_X
 PT%%1_INVUL lda P%%1_INVUL
@@ -148,12 +148,7 @@ IJ%%1_X
 .macro DYING_PLAYER_TICK P12
             dec DYING_JUMP_COUNTER_%%1
             bne DT%%1_X
-            .if :1 = 1
-                jsr INIT_DYING_COOLDOWN
-            .endif
-            .if :1 = 2
-                jsr INIT_DYING_COOLDOWN_RIGHT
-            .endif
+            INIT_DYING_COOLDOWN %%1
             ldy DYING_POS_X_P%%1
             lda (P%%1_X_TABLE),y
             cmp #$ff
@@ -196,4 +191,15 @@ DT%%1_0     lda #0
             lda #PS_BURIED
             sta P%%1_STATE
 DT%%1_X     
+.endm
+
+.macro INIT_DYING_COOLDOWN P12
+            #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
+                lda #DYING_JUMP_COOLDOWN
+                sta DYING_JUMP_COUNTER_%%1
+                jmp IDC%%1_X
+            #end
+            lda #DYING_JUMP_COOLDOWN_FAST
+            sta DYING_JUMP_COUNTER_%%1
+IDC%%1_X
 .endm
