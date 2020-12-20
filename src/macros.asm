@@ -134,12 +134,7 @@ JT%%1_2     lda P%%1_Y
             sec
             sbc #JUMP_FRAME_COUNT/4
             bcc JT%%1_1    ; Do not allow to interrupt the jump yet
-            .if :1 = 1
-                jsr INTERRUPT_JUMP
-            .endif
-            .if :1 = 2
-                jsr INTERRUPT_JUMP_RIGHT
-            .endif
+            INTERRUPT_JUMP %%1
 JT%%1_1     lda P%%1_Y
             cmp #JUMP_FRAME_COUNT-1
             bne JT%%1_X
@@ -149,4 +144,33 @@ JT%%1_1     lda P%%1_Y
             lda #0
             sta P%%1_Y
 JT%%1_X 
+.endm
+
+.macro INTERRUPT_JUMP P12
+            .if :1 = 1
+                lda STRIG0
+            .endif
+            .if :1 = 2
+                lda STRIG1
+            .endif
+            beq IJ%%1_X ; Button still pressed, do not interrupt
+            .if :1 = 1
+                lda JUMP_INTERRUPTED
+            .endif
+            .if :1 = 2
+                lda JUMP_INTERRUPTED_RIGHT
+            .endif
+            bne IJ%%1_X ; This jump has already been interrupted
+            lda #JUMP_FRAME_COUNT-1
+            sec
+            sbc P%%1_Y
+            sta P%%1_Y
+            lda #1
+            .if :1 = 1
+                sta JUMP_INTERRUPTED
+            .endif
+            .if :1 = 2
+                sta JUMP_INTERRUPTED_RIGHT
+            .endif
+IJ%%1_X     
 .endm

@@ -512,32 +512,6 @@ ADVANCE_LEVEL
             sta CURRENT_ROTATIONS
             rts
 
-INTERRUPT_JUMP
-            lda STRIG0
-            beq IJ_X ; Button still pressed, do not interrupt
-            lda JUMP_INTERRUPTED
-            bne IJ_X ; This jump has already been interrupted
-            lda #JUMP_FRAME_COUNT-1
-            sec
-            sbc P1_Y
-            sta P1_Y
-            lda #1
-            sta JUMP_INTERRUPTED
-IJ_X        rts
-
-INTERRUPT_JUMP_RIGHT
-            lda STRIG1
-            beq IJR_X ; Button still pressed, do not interrupt
-            lda JUMP_INTERRUPTED_RIGHT
-            bne IJR_X ; This jump has already been interrupted
-            lda #JUMP_FRAME_COUNT-1
-            sec
-            sbc P2_Y
-            sta P2_Y
-            lda #1
-            sta JUMP_INTERRUPTED_RIGHT
-IJR_X       rts
-
 INIT_DYING_COOLDOWN
             #if .byte CURRENT_GAME_LEVEL = #0 .or .byte CURRENT_GAME_LEVEL = #1 .or .byte CURRENT_GAME_LEVEL = #2 .or .byte CURRENT_GAME_LEVEL = #4 
                 lda #DYING_JUMP_COOLDOWN
