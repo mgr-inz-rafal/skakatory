@@ -495,6 +495,7 @@ GAME_STATE_INIT
             lda #1
             sta P1_VISIBLE
             sta P2_VISIBLE
+            lda #0
             sta P1_CPU
             sta P2_CPU
             lda #<STRIG0
@@ -538,6 +539,7 @@ GAME_STATE_INIT
             mwa #JUMP_HEIGHT_TABLE P2_Y_TABLE
             jsr CLEAR_STATUS_BAR
             jsr PAINT_POINTS
+            jsr PAINT_AI_INDICATORS
             jsr INIT_PLAYERS
             jsr PAINT_PLAYERS
             rts           
@@ -551,7 +553,75 @@ CLEAR_STATUS_BAR
             sta STATUS_BAR_BUFFER,x
             rts
 
+PAINT_AI_INDICATORS
+            ldy #4
+            lda P1_CPU
+            beq PAI_1
+            jsr PRINT_CPU
+            jmp PAI_2
+PAI_1       jsr PRINT_PL1
+PAI_2       ldy #31
+            lda P2_CPU
+            beq PAI_3
+            jsr PRINT_CPU
+            jmp PAI_4
+PAI_3       jsr PRINT_PL2
+PAI_4       rts          
+
+PRINT_CPU
+            lda #"["*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"C"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"P"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"U"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"]"*
+            sta STATUS_BAR_BUFFER,y
+            rts
+
+PRINT_PL1
+            lda #"["*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"P"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #" "*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"1"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"]"*
+            sta STATUS_BAR_BUFFER,y
+            rts
+
+PRINT_PL2
+            lda #"["*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"P"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #" "*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"2"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"]"*
+            sta STATUS_BAR_BUFFER,y
+            rts
+
 PAINT_POINTS
+            ; Note: These two cannot be deduped, since the
+            ; implementation is different
             jsr PAINT_POINTS_LEFT
             jsr PAINT_POINTS_RIGHT
 
