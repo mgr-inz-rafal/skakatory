@@ -249,12 +249,7 @@ SJ%%1_X
 ;  12   |     F
 .macro INIT_DYING P12
             CLEAR_PLAYER %%1
-            .if :1 = 1
-                jsr INIT_DYING_PAINT_OFFSET
-            .endif
-            .if :1 = 2
-                jsr INIT_DYING_PAINT_OFFSET_RIGHT
-            .endif
+            INIT_DYING_PAINT_OFFSET %%1
             lda #PS_DYING
             sta P%%1_STATE
             lda #0
@@ -293,4 +288,13 @@ SJ%%1_X
                 jmp ID%%1_X
             #end
 ID%%1_X
+.endm
+
+.macro INIT_DYING_PAINT_OFFSET P12
+            ldy #0
+            lda (P2_Y_TABLE),y
+            ldy P%%1_Y
+            sec
+            sbc (P2_Y_TABLE),y
+            sta P%%1_DRAWING_Y_OFFSET
 .endm

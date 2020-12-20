@@ -335,26 +335,6 @@ CLEAR_PLAYERS
             CLEAR_PLAYER 2
             rts
 
-
-INIT_DYING_PAINT_OFFSET
-            ldy #0
-            lda (P2_Y_TABLE),y
-            ldy P1_Y
-            sec
-            sbc (P2_Y_TABLE),y
-            sta P1_DRAWING_Y_OFFSET
-            rts
-
-
-INIT_DYING_PAINT_OFFSET_RIGHT
-            ldy #0
-            lda (P2_Y_TABLE),y
-            ldy P2_Y
-            sec
-            sbc (P2_Y_TABLE),y
-            sta P2_DRAWING_Y_OFFSET
-            rts
-
 CHECK_COLLISIONS
             lda P1_INVUL
             jne CC_X
