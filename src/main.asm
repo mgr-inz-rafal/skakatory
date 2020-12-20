@@ -608,64 +608,6 @@ DTR_0       lda #0
             sta P2_STATE
             rts
 
-JUMP_TICK
-            dec JUMP_COUNTER
-            bne JT_X    ; Do not advance yet
-            lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER
-            jsr CLEAR_PLAYERS
-            inc P1_Y
-            jsr PAINT_PLAYERS
-            lda P1_Y
-            cmp #JUMP_FRAME_COUNT/2
-            bne JT_2
-            ; We're just started to go down, it's too late to interrupt the jump
-            lda #1
-            sta JUMP_INTERRUPTED
-JT_2        lda P1_Y
-            sec
-            sbc #JUMP_FRAME_COUNT/4
-            bcc JT_1    ; Do not allow to interrupt the jump yet
-            jsr INTERRUPT_JUMP
-JT_1        lda P1_Y
-            cmp #JUMP_FRAME_COUNT-1
-            bne JT_X
-            ; Finish the jump
-            lda #PS_IDLE
-            sta P1_STATE
-            lda #0
-            sta P1_Y
-JT_X        rts
-
-JUMP_TICK_RIGHT
-            dec JUMP_COUNTER_RIGHT
-            bne JTR_X    ; Do not advance yet
-            lda #JUMP_FRAME_ADVANCE
-            sta JUMP_COUNTER_RIGHT
-            jsr CLEAR_PLAYERS
-            inc P2_Y
-            jsr PAINT_PLAYERS
-            lda P2_Y
-            cmp #JUMP_FRAME_COUNT/2
-            bne JTR_2
-            ; We're just started to go down, it's too late to interrupt the jump
-            lda #1
-            sta JUMP_INTERRUPTED_RIGHT
-JTR_2       lda P2_Y
-            sec
-            sbc #JUMP_FRAME_COUNT/4
-            bcc JTR_1    ; Do not allow to interrupt the jump yet
-            jsr INTERRUPT_JUMP_RIGHT
-JTR_1       lda P2_Y
-            cmp #JUMP_FRAME_COUNT-1
-            bne JTR_X
-            ; Finish the jump
-            lda #PS_IDLE
-            sta P2_STATE
-            lda #0
-            sta P2_Y
-JTR_X       rts
-
 CLEAR_PLAYER_LEFT
             ldy P1_Y
             lda (P1_Y_TABLE),y

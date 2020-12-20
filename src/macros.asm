@@ -56,12 +56,7 @@ AS%%1_X
             beq PT_INVUL
             cmp #PS_JUMP
             bne PT%%1_1
-            .if :1 = 1
-                jsr JUMP_TICK
-            .endif
-            .if :1 = 2
-                jsr JUMP_TICK_RIGHT ; TODO: Fix
-            .endif
+            JUMP_PLAYER_TICK %%1
             jmp PT_INVUL
 PT%%1_1     cmp #PS_DYING
             bne PT%%1_X
@@ -104,4 +99,54 @@ PT%%1_2        inc P%%1_VISIBLE
                 sta HPOSP3
             .endif
 PT%%1_X
+.endm
+
+.macro JUMP_PLAYER_TICK P12
+            .if :1 = 1
+                dec JUMP_COUNTER
+            .endif
+            .if :1 = 2
+                dec JUMP_COUNTER_RIGHT
+            .endif
+            bne JT%%1_X    ; Do not advance yet
+            lda #JUMP_FRAME_ADVANCE
+            .if :1 = 1
+                sta JUMP_COUNTER
+            .endif
+            .if :1 = 2
+                sta JUMP_COUNTER_RIGHT
+            .endif
+            jsr CLEAR_PLAYERS
+            inc P%%1_Y
+            jsr PAINT_PLAYERS
+            lda P%%1_Y
+            cmp #JUMP_FRAME_COUNT/2
+            bne JT%%1_2
+            ; We're just started to go down, it's too late to interrupt the jump
+            lda #1
+            .if :1 = 1
+                sta JUMP_INTERRUPTED
+            .endif
+            .if :1 = 2
+                sta JUMP_INTERRUPTED_RIGHT
+            .endif
+JT%%1_2     lda P%%1_Y
+            sec
+            sbc #JUMP_FRAME_COUNT/4
+            bcc JT%%1_1    ; Do not allow to interrupt the jump yet
+            .if :1 = 1
+                jsr INTERRUPT_JUMP
+            .endif
+            .if :1 = 2
+                jsr INTERRUPT_JUMP_RIGHT
+            .endif
+JT%%1_1     lda P%%1_Y
+            cmp #JUMP_FRAME_COUNT-1
+            bne JT%%1_X
+            ; Finish the jump
+            lda #PS_IDLE
+            sta P%%1_STATE
+            lda #0
+            sta P%%1_Y
+JT%%1_X 
 .endm
