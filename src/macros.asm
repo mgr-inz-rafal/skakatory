@@ -319,3 +319,20 @@ ID%%1_X
 CC_%%1KILLD INIT_DYING %%1
 CC%%1_X
 .endm
+
+.macro PRINT_PL P12
+            lda #"["*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"P"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #" "*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"%%1"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"]"*
+            sta STATUS_BAR_BUFFER,y
+.endm

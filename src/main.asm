@@ -559,13 +559,13 @@ PAINT_AI_INDICATORS
             beq PAI_1
             jsr PRINT_CPU
             jmp PAI_2
-PAI_1       jsr PRINT_PL1
+PAI_1       PRINT_PL 1
 PAI_2       ldy #31
             lda P2_CPU
             beq PAI_3
             jsr PRINT_CPU
             jmp PAI_4
-PAI_3       jsr PRINT_PL2
+PAI_3       PRINT_PL 2
 PAI_4       rts          
 
 PRINT_CPU
