@@ -34,6 +34,8 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P2_CPU                 .byte
 .zpvar          STRIG_0_SOURCE         .word
 .zpvar          STRIG_1_SOURCE         .word
+.zpvar          STRIG0_CPU             .word
+.zpvar          STRIG1_CPU             .word
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
@@ -251,9 +253,9 @@ PROGRAM_START_FIRST_PART
 
 GAME_LOOP
             jsr SYNCHRO
-            jsr JOIN_PLAYER_TICK
             jsr RESTART_TICK
             jsr PLAYER_TICK
+            jsr JOIN_PLAYER_TICK
 
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
@@ -277,6 +279,10 @@ JOIN_PLAYER_TICK
             lda STRIG0
             bne JPT_1
             dec P1_CPU
+            lda #<STRIG0
+            sta STRIG_0_SOURCE
+            lda #>STRIG0
+            sta STRIG_0_SOURCE+1
             jsr PAINT_AI_INDICATORS
             rts
 JPT_1       lda P2_CPU
@@ -284,6 +290,10 @@ JPT_1       lda P2_CPU
             lda STRIG1
             bne JPT_2
             dec P2_CPU
+            lda #<STRIG1
+            sta STRIG_1_SOURCE
+            lda #>STRIG1
+            sta STRIG_1_SOURCE+1
             jsr PAINT_AI_INDICATORS
 JPT_2       rts
 
@@ -514,13 +524,15 @@ GAME_STATE_INIT
             sta P2_VISIBLE
             sta P1_CPU
             sta P2_CPU
-            lda #<STRIG0
+            sta STRIG0_CPU
+            sta STRIG1_CPU
+            lda #<STRIG0_CPU
             sta STRIG_0_SOURCE
-            lda #>STRIG0
+            lda #>STRIG0_CPU
             sta STRIG_0_SOURCE+1
-            lda #<STRIG1
+            lda #<STRIG1_CPU
             sta STRIG_1_SOURCE
-            lda #>STRIG1
+            lda #>STRIG1_CPU
             sta STRIG_1_SOURCE+1
             lda #0
             sta P1_DRAWING_Y_OFFSET
