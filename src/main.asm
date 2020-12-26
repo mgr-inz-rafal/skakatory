@@ -251,6 +251,7 @@ PROGRAM_START_FIRST_PART
 
 GAME_LOOP
             jsr SYNCHRO
+            jsr JOIN_PLAYER_TICK
             jsr RESTART_TICK
             jsr PLAYER_TICK
 
@@ -269,6 +270,22 @@ GAME_LOOP
             bne @+
             START_JUMP 2
 @           jmp GAME_LOOP
+
+JOIN_PLAYER_TICK
+            lda P1_CPU
+            beq JPT_1
+            lda STRIG0
+            bne JPT_1
+            dec P1_CPU
+            jsr PAINT_AI_INDICATORS
+            rts
+JPT_1       lda P2_CPU
+            beq JPT_2
+            lda STRIG1
+            bne JPT_2
+            dec P2_CPU
+            jsr PAINT_AI_INDICATORS
+JPT_2       rts
 
 RESTART_TICK
             #if .byte P1_STATE <> #PS_BURIED .or .byte P2_STATE <> #PS_BURIED
@@ -495,7 +512,6 @@ GAME_STATE_INIT
             lda #1
             sta P1_VISIBLE
             sta P2_VISIBLE
-            lda #0
             sta P1_CPU
             sta P2_CPU
             lda #<STRIG0
