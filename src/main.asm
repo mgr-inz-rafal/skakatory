@@ -36,6 +36,8 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          STRIG_1_SOURCE         .word
 .zpvar          STRIG0_CPU             .word
 .zpvar          STRIG1_CPU             .word
+.zpvar          STRIG0_CPU_HOLD        .byte
+.zpvar          STRIG1_CPU_HOLD        .byte
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
@@ -254,6 +256,7 @@ PROGRAM_START_FIRST_PART
 GAME_LOOP
             jsr SYNCHRO
             jsr RESTART_TICK
+            jsr AI_TICK
             jsr PLAYER_TICK
             jsr JOIN_PLAYER_TICK
 
@@ -272,6 +275,70 @@ GAME_LOOP
             bne @+
             START_JUMP 2
 @           jmp GAME_LOOP
+
+AI_TICK     jsr AI_TICK_LEFT
+            jsr AI_TICK_RIGHT
+            jsr RELEASE_AI_KEY_LEFT
+            jsr RELEASE_AI_KEY_RIGHT
+
+            rts
+
+; TODO: Dedup
+RELEASE_AI_KEY_LEFT
+            lda P1_CPU
+            beq RAKL_X
+            lda STRIG0_CPU_HOLD
+            bne RAKL_1
+            lda #1
+            sta STRIG0_CPU
+            rts
+RAKL_1      dec STRIG0_CPU_HOLD
+RAKL_X      rts
+
+RELEASE_AI_KEY_RIGHT
+            lda P2_CPU
+            beq RAKR_X
+            lda STRIG1_CPU_HOLD
+            bne RAKR_X
+            lda #1
+            sta STRIG1_CPU
+RAKR_X      dec STRIG1_CPU_HOLD
+            rts
+
+; TODO: Dedup
+AI_TICK_LEFT   
+            lda P1_CPU
+            beq ATL_X
+            lda CURRENT_GAME_LEVEL
+            asl
+            asl
+            tay
+            lda CURRENT_FRAME
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq ATL_1
+            iny
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq ATL_1
+            iny
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq ATL_1
+            iny
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq ATL_1
+ATL_X       rts         
+ATL_1       lda TRIG_HOLD_FRAMES_PER_LEVEL,y
+            tax
+            lda #0
+            sta STRIG0_CPU
+            #if STRIG0_CPU_HOLD = #0
+                stx STRIG0_CPU_HOLD
+            #end
+            rts
+
+AI_TICK_RIGHT
+            lda P2_CPU
+            beq ATR_X
+ATR_X       rts         
 
 JOIN_PLAYER_TICK
             lda P1_CPU
@@ -535,6 +602,8 @@ GAME_STATE_INIT
             lda #>STRIG1_CPU
             sta STRIG_1_SOURCE+1
             lda #0
+            sta STRIG0_CPU_HOLD
+            sta STRIG1_CPU_HOLD
             sta P1_DRAWING_Y_OFFSET
             sta P2_DRAWING_Y_OFFSET
             sta SCORE_JUST_INCREASED

@@ -128,10 +128,12 @@ JT%%1_X
 
 .macro INTERRUPT_JUMP P12
             .if :1 = 1
-                lda STRIG0
+                ldy #0
+                lda (STRIG_0_SOURCE),y
             .endif
             .if :1 = 2
-                lda STRIG1
+                ldy #0
+                lda (STRIG_1_SOURCE),y
             .endif
             beq IJ%%1_X ; Button still pressed, do not interrupt
             lda JUMP_INTERRUPTED_%%1

@@ -553,3 +553,63 @@ LEFT_KILL_Y_SPEED_3
             dta b(129)
             dta b(130)
             dta b(132)
+
+; This is the info for AI on which frames it
+; should consider initiating a jump.
+; Levels 0 - 3: first frame: 0   - last frame: 51
+; Levels 4 - 7: first frame: 52  - last frame: 85
+; Levels 8 -11: first frame: 86  - last frame: 103
+JUMP_FRAMES_PER_LEVEL
+            ; Level 0
+            dta b(44), b(44), b(44), b(44)
+            ; Level 1
+            dta b(255), b(255), b(255), b(255)
+            ; Level 2
+            dta b(255), b(255), b(255), b(255)
+            ; Level 3
+            dta b(255), b(255), b(255), b(255)
+            ; Level 4
+            dta b(255), b(255), b(255), b(255)
+            ; Level 5
+            dta b(255), b(255), b(255), b(255)
+            ; Level 6
+            dta b(255), b(255), b(255), b(255)
+            ; Level 7
+            dta b(255), b(255), b(255), b(255)
+            ; Level 8
+            dta b(255), b(255), b(255), b(255)
+            ; Level 9
+            dta b(255), b(255), b(255), b(255)
+            ; Level 10
+            dta b(255), b(255), b(255), b(255)
+            ; Level 11
+            dta b(255), b(255), b(255), b(255)
+
+;  ~7 - shortest jump
+; ~15 - mid jump
+; ~30 - full jump
+TRIG_HOLD_FRAMES_PER_LEVEL
+            ; Level 0
+            dta b(17), b(45), b(46), b(47)
+            ; Level 1
+            dta b(255), b(255), b(255), b(255)
+            ; Level 2
+            dta b(255), b(255), b(255), b(255)
+            ; Level 3
+            dta b(255), b(255), b(255), b(255)
+            ; Level 4
+            dta b(255), b(255), b(255), b(255)
+            ; Level 5
+            dta b(255), b(255), b(255), b(255)
+            ; Level 6
+            dta b(255), b(255), b(255), b(255)
+            ; Level 7
+            dta b(255), b(255), b(255), b(255)
+            ; Level 8
+            dta b(255), b(255), b(255), b(255)
+            ; Level 9
+            dta b(255), b(255), b(255), b(255)
+            ; Level 10
+            dta b(255), b(255), b(255), b(255)
+            ; Level 11
+            dta b(255), b(255), b(255), b(255)
