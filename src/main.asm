@@ -259,6 +259,8 @@ PROGRAM_START_FIRST_PART
 GAME_LOOP
             jsr SYNCHRO
             jsr RESTART_TICK
+            lda #$ff
+            sta CH
             jsr AI_TICK
             jsr PLAYER_TICK
             jsr JOIN_PLAYER_TICK
@@ -310,6 +312,10 @@ JPT_1       lda P2_CPU
 JPT_2       rts
 
 RESTART_TICK
+            lda CH
+            cmp #28
+            beq RT_1
+
             #if .byte P1_STATE <> #PS_BURIED .or .byte P2_STATE <> #PS_BURIED
                 rts
             #end
@@ -317,7 +323,7 @@ RESTART_TICK
             cmp #6
             bne RT_X
 
-            jsr GAME_STATE_INIT
+RT_1        jsr GAME_STATE_INIT
 
 RT_X        rts
 
@@ -560,11 +566,6 @@ GAME_STATE_INIT
             sta P1_INVUL
             sta P2_INVUL
             tay
-
-            lda #3
-            sta CURRENT_GAME_LEVEL
-            tay
-
             lda FIRST_FRAME_PER_LEVEL,y
             sta FIRST_FRAME
             lda LAST_FRAME_PER_LEVEL,y
