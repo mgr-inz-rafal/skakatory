@@ -613,3 +613,17 @@ TRIG_HOLD_FRAMES_PER_LEVEL
             dta b(18), b(16), b(13), b(11)
             ; Level 11
             dta b(5), b(5), b(5), b(5)
+
+AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL
+            dta b(100)
+            dta b(40)
+            dta b(40)
+            dta b(30)
+            dta b(30)
+            dta b(20)
+            dta b(20)
+            dta b(10)
+            dta b(10)
+            dta b(5)
+            dta b(2)
+            dta b(2)

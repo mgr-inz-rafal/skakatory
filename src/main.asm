@@ -38,6 +38,7 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          STRIG1_CPU             .word
 .zpvar          STRIG0_CPU_HOLD        .byte
 .zpvar          STRIG1_CPU_HOLD        .byte
+.zpvar          TMP                    .word
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
@@ -73,6 +74,7 @@ DYING_JUMP_COOLDOWN_FAST    equ 1
 JUMP_FRAME_COUNT     equ 46
 JUMP_FRAME_ADVANCE   equ 1
 JUMP_INTERRUPT_RATIO equ 6
+JUMP_HOLD_DISRUPTION equ 6
 
 .zpvar          DYING_POS_X_P1         .byte
 .zpvar          DYING_POS_X_P2         .byte
@@ -310,6 +312,9 @@ RAKR_X      dec STRIG1_CPU_HOLD
 AI_TICK_LEFT   
             lda P1_CPU
             beq ATL_X
+            lda P1_STATE
+            cmp #PS_IDLE
+            bne ATL_X
             lda CURRENT_GAME_LEVEL
             asl
             asl
@@ -329,6 +334,22 @@ AI_TICK_LEFT
 ATL_X       rts         
 ATL_1       lda TRIG_HOLD_FRAMES_PER_LEVEL,y
             tax
+            lda RANDOM
+            sta TMP
+            ldy CURRENT_GAME_LEVEL
+            lda AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL,y
+            sta TMP+1
+            #if .byte TMP+1 > TMP
+                ; Let's dirupt the perfect AI jump a bit
+                lda TMP
+                and #%00000001
+                beq ATL_2
+:JUMP_HOLD_DISRUPTION dex
+                jmp ATL_3
+ATL_2           
+:JUMP_HOLD_DISRUPTION inx
+ATL_3
+            #end
             lda #0
             sta STRIG0_CPU
             #if STRIG0_CPU_HOLD = #0
@@ -617,7 +638,7 @@ GAME_STATE_INIT
             sta P2_INVUL
             tay
 
-            lda #11
+            lda #3
             sta CURRENT_GAME_LEVEL
             tay
 
