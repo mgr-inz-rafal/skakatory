@@ -48,7 +48,7 @@ JUMP_HEIGHT_TABLE
 
 ; Level difficulty parameters
 ROTATIONS_PER_LEVEL
-            dta b(2)
+            dta b(10)
             dta b(10)
             dta b(10)
             dta b(10)
@@ -129,7 +129,7 @@ HIT_FRAMES_1
             dta b(86)
             dta b(86)
             dta b(86)
-            dta b(86)
+            dta b(87)
 
 HIT_FRAMES_2
             dta b(01)
@@ -569,21 +569,21 @@ JUMP_FRAMES_PER_LEVEL
             ; Level 3
             dta b(38), b(43), b(44), b(45)
             ; Level 4
-            dta b(255), b(255), b(255), b(255)
+            dta b(80), b(81), b(82), b(83)
             ; Level 5
-            dta b(255), b(255), b(255), b(255)
+            dta b(80), b(81), b(82), b(83)
             ; Level 6
-            dta b(255), b(255), b(255), b(255)
+            dta b(80), b(81), b(82), b(83)
             ; Level 7
-            dta b(255), b(255), b(255), b(255)
+            dta b(75), b(76), b(77), b(78)
             ; Level 8
-            dta b(255), b(255), b(255), b(255)
+            dta b(97), b(98), b(99), b(100)
             ; Level 9
-            dta b(255), b(255), b(255), b(255)
+            dta b(97), b(98), b(99), b(100)
             ; Level 10
-            dta b(255), b(255), b(255), b(255)
+            dta b(95), b(96), b(97), b(98)
             ; Level 11
-            dta b(255), b(255), b(255), b(255)
+            dta b(95), b(255), b(255), b(255)
 
 ;  ~7 - shortest jump
 ; ~15 - mid jump
@@ -598,18 +598,18 @@ TRIG_HOLD_FRAMES_PER_LEVEL
             ; Level 3
             dta b(17), b(16), b(15), b(10)
             ; Level 4
-            dta b(255), b(255), b(255), b(255)
+            dta b(26), b(21), b(16), b(13)
             ; Level 5
-            dta b(255), b(255), b(255), b(255)
+            dta b(26), b(21), b(16), b(13)
             ; Level 6
-            dta b(255), b(255), b(255), b(255)
+            dta b(16), b(14), b(11), b(8)
             ; Level 7
-            dta b(255), b(255), b(255), b(255)
+            dta b(12), b(9), b(8), b(7)
             ; Level 8
-            dta b(255), b(255), b(255), b(255)
+            dta b(20), b(18), b(16), b(14)
             ; Level 9
-            dta b(255), b(255), b(255), b(255)
+            dta b(18), b(16), b(13), b(11)
             ; Level 10
-            dta b(255), b(255), b(255), b(255)
+            dta b(18), b(16), b(13), b(11)
             ; Level 11
-            dta b(255), b(255), b(255), b(255)
+            dta b(5), b(5), b(5), b(5)

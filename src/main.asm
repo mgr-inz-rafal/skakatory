@@ -617,8 +617,9 @@ GAME_STATE_INIT
             sta P2_INVUL
             tay
 
-            lda #3
+            lda #11
             sta CURRENT_GAME_LEVEL
+            tay
 
             lda FIRST_FRAME_PER_LEVEL,y
             sta FIRST_FRAME
