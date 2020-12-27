@@ -70,8 +70,9 @@ DYING_JUMP_COOLDOWN_FAST    equ 1
 .zpvar          JUMP_COUNTER_2         .byte
 .zpvar          JUMP_INTERRUPTED_1     .byte
 .zpvar          JUMP_INTERRUPTED_2     .byte
-JUMP_FRAME_COUNT    equ 46
-JUMP_FRAME_ADVANCE  equ 1
+JUMP_FRAME_COUNT     equ 46
+JUMP_FRAME_ADVANCE   equ 1
+JUMP_INTERRUPT_RATIO equ 6
 
 .zpvar          DYING_POS_X_P1         .byte
 .zpvar          DYING_POS_X_P2         .byte
@@ -615,6 +616,10 @@ GAME_STATE_INIT
             sta P1_INVUL
             sta P2_INVUL
             tay
+
+            lda #3
+            sta CURRENT_GAME_LEVEL
+
             lda FIRST_FRAME_PER_LEVEL,y
             sta FIRST_FRAME
             lda LAST_FRAME_PER_LEVEL,y

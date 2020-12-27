@@ -561,13 +561,13 @@ LEFT_KILL_Y_SPEED_3
 ; Levels 8 -11: first frame: 86  - last frame: 103
 JUMP_FRAMES_PER_LEVEL
             ; Level 0
-            dta b(44), b(44), b(44), b(44)
+            dta b(46), b(47), b(48), b(49)
             ; Level 1
-            dta b(255), b(255), b(255), b(255)
+            dta b(46), b(47), b(48), b(49)
             ; Level 2
-            dta b(255), b(255), b(255), b(255)
+            dta b(44), b(45), b(46), b(47)
             ; Level 3
-            dta b(255), b(255), b(255), b(255)
+            dta b(38), b(43), b(44), b(45)
             ; Level 4
             dta b(255), b(255), b(255), b(255)
             ; Level 5
@@ -590,13 +590,13 @@ JUMP_FRAMES_PER_LEVEL
 ; ~30 - full jump
 TRIG_HOLD_FRAMES_PER_LEVEL
             ; Level 0
-            dta b(17), b(45), b(46), b(47)
+            dta b(26), b(21), b(16), b(13)
             ; Level 1
-            dta b(255), b(255), b(255), b(255)
+            dta b(26), b(21), b(16), b(13)
             ; Level 2
-            dta b(255), b(255), b(255), b(255)
+            dta b(20), b(18), b(16), b(12)
             ; Level 3
-            dta b(255), b(255), b(255), b(255)
+            dta b(17), b(16), b(15), b(10)
             ; Level 4
             dta b(255), b(255), b(255), b(255)
             ; Level 5

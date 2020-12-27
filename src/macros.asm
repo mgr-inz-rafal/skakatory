@@ -112,7 +112,7 @@ PT%%1_X
             sta JUMP_INTERRUPTED_%%1
 JT%%1_2     lda P%%1_Y
             sec
-            sbc #JUMP_FRAME_COUNT/4
+            sbc #JUMP_FRAME_COUNT/JUMP_INTERRUPT_RATIO
             bcc JT%%1_1    ; Do not allow to interrupt the jump yet
             INTERRUPT_JUMP %%1
 JT%%1_1     lda P%%1_Y
@@ -326,13 +326,13 @@ CC%%1_X
             lda #"["*
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"P"*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #" "*
-            sta STATUS_BAR_BUFFER,y
-            iny
             lda #"%%1"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"U"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"P"*
             sta STATUS_BAR_BUFFER,y
             iny
             lda #"]"*
