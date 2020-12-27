@@ -590,9 +590,9 @@ JUMP_FRAMES_PER_LEVEL
 ; ~30 - full jump
 TRIG_HOLD_FRAMES_PER_LEVEL
             ; Level 0
-            dta b(26), b(21), b(16), b(13)
+            dta b(23), b(21), b(16), b(13)
             ; Level 1
-            dta b(26), b(21), b(16), b(13)
+            dta b(23), b(21), b(16), b(13)
             ; Level 2
             dta b(20), b(18), b(16), b(12)
             ; Level 3
@@ -615,13 +615,13 @@ TRIG_HOLD_FRAMES_PER_LEVEL
             dta b(5), b(5), b(5), b(5)
 
 AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL
+            dta b(240)
+            dta b(180)
             dta b(100)
             dta b(40)
-            dta b(40)
+            dta b(100)
+            dta b(90)
             dta b(30)
-            dta b(30)
-            dta b(20)
-            dta b(20)
             dta b(10)
             dta b(10)
             dta b(5)
@@ -629,11 +629,11 @@ AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL
             dta b(2)
 
 AI_SKIP_JUMP_PROBABILITY_PER_LEVEL
-            dta b(29)
-            dta b(27)
+            dta b(100)
+            dta b(50)
             dta b(25)
             dta b(23)
-            dta b(21)
+            dta b(100)
             dta b(19)
             dta b(17)
             dta b(15)
