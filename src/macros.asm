@@ -112,7 +112,7 @@ PT%%1_X
             sta JUMP_INTERRUPTED_%%1
 JT%%1_2     lda P%%1_Y
             sec
-            sbc #JUMP_FRAME_COUNT/4
+            sbc #JUMP_FRAME_COUNT/JUMP_INTERRUPT_RATIO
             bcc JT%%1_1    ; Do not allow to interrupt the jump yet
             INTERRUPT_JUMP %%1
 JT%%1_1     lda P%%1_Y
@@ -128,10 +128,12 @@ JT%%1_X
 
 .macro INTERRUPT_JUMP P12
             .if :1 = 1
-                lda STRIG0
+                ldy #0
+                lda (STRIG_0_SOURCE),y
             .endif
             .if :1 = 2
-                lda STRIG1
+                ldy #0
+                lda (STRIG_1_SOURCE),y
             .endif
             beq IJ%%1_X ; Button still pressed, do not interrupt
             lda JUMP_INTERRUPTED_%%1
@@ -318,4 +320,21 @@ ID%%1_X
             jmp CC%%1_X
 CC_%%1KILLD INIT_DYING %%1
 CC%%1_X
+.endm
+
+.macro PRINT_PL P12
+            lda #"["*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"%%1"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"U"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"P"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"]"*
+            sta STATUS_BAR_BUFFER,y
 .endm

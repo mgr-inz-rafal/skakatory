@@ -30,6 +30,15 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          P2_VISIBLE             .byte
 .zpvar          P1_DRAWING_Y_OFFSET    .byte
 .zpvar          P2_DRAWING_Y_OFFSET    .byte
+.zpvar          P1_CPU                 .byte
+.zpvar          P2_CPU                 .byte
+.zpvar          STRIG_0_SOURCE         .word
+.zpvar          STRIG_1_SOURCE         .word
+.zpvar          STRIG0_CPU             .word
+.zpvar          STRIG1_CPU             .word
+.zpvar          STRIG0_CPU_HOLD        .byte
+.zpvar          STRIG1_CPU_HOLD        .byte
+.zpvar          TMP                    .word
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
@@ -62,8 +71,10 @@ DYING_JUMP_COOLDOWN_FAST    equ 1
 .zpvar          JUMP_COUNTER_2         .byte
 .zpvar          JUMP_INTERRUPTED_1     .byte
 .zpvar          JUMP_INTERRUPTED_2     .byte
-JUMP_FRAME_COUNT    equ 46
-JUMP_FRAME_ADVANCE  equ 1
+JUMP_FRAME_COUNT     equ 46
+JUMP_FRAME_ADVANCE   equ 1
+JUMP_INTERRUPT_RATIO equ 6
+JUMP_HOLD_DISRUPTION equ 6
 
 .zpvar          DYING_POS_X_P1         .byte
 .zpvar          DYING_POS_X_P2         .byte
@@ -248,7 +259,9 @@ PROGRAM_START_FIRST_PART
 GAME_LOOP
             jsr SYNCHRO
             jsr RESTART_TICK
+            jsr AI_TICK
             jsr PLAYER_TICK
+            jsr JOIN_PLAYER_TICK
 
             ldx CURRENT_FRAME
             jsr SHOW_FRAME
@@ -256,13 +269,137 @@ GAME_LOOP
             jsr CHECK_SCORE
             jsr CHECK_COLLISIONS
 
-            lda STRIG0
+            ldy #0
+            lda (STRIG_0_SOURCE),y
             bne @+
             START_JUMP 1
-@           lda STRIG1
+@           ldx #0
+            lda (STRIG_1_SOURCE,x)
             bne @+
             START_JUMP 2
 @           jmp GAME_LOOP
+
+AI_TICK     jsr AI_TICK_LEFT
+            jsr AI_TICK_RIGHT
+            jsr RELEASE_AI_KEY_LEFT
+            jsr RELEASE_AI_KEY_RIGHT
+
+            rts
+
+; TODO: Dedup
+RELEASE_AI_KEY_LEFT
+            lda P1_CPU
+            beq RAKL_X
+            lda STRIG0_CPU_HOLD
+            bne RAKL_1
+            lda #1
+            sta STRIG0_CPU
+            rts
+RAKL_1      dec STRIG0_CPU_HOLD
+RAKL_X      rts
+
+RELEASE_AI_KEY_RIGHT
+            lda P2_CPU
+            beq RAKR_X
+            lda STRIG1_CPU_HOLD
+            bne RAKR_X
+            lda #1
+            sta STRIG1_CPU
+RAKR_X      dec STRIG1_CPU_HOLD
+            rts
+
+; TODO: Dedup
+AI_TICK_LEFT   
+            lda P1_CPU
+            beq ATL_X
+            lda P1_STATE
+            cmp #PS_IDLE
+            bne ATL_X
+            lda P1_INVUL
+            bne ATL_X
+            lda CURRENT_GAME_LEVEL
+            asl
+            asl
+            tay
+            lda CURRENT_FRAME
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq ATL_1
+            iny
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq ATL_1
+            iny
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq ATL_1
+            iny
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq ATL_1
+ATL_X       rts         
+ATL_1       lda TRIG_HOLD_FRAMES_PER_LEVEL,y
+            tax
+
+            ; Consider if AI should randomly skip the jump decision
+            lda RANDOM
+            sta TMP
+            ldy CURRENT_GAME_LEVEL
+            lda AI_SKIP_JUMP_PROBABILITY_PER_LEVEL,y
+            sta TMP+1
+            #if .byte TMP+1 > TMP
+                jmp ATL_X
+            #end
+
+            ; Consider disrupting the time the AI is holding the jump button
+            lda RANDOM
+            sta TMP
+            ldy CURRENT_GAME_LEVEL
+            lda AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL,y
+            sta TMP+1
+            #if .byte TMP+1 > TMP
+                ; Let's dirupt the perfect AI jump a bit
+                lda TMP
+                and #%00000001
+                beq ATL_2
+:JUMP_HOLD_DISRUPTION dex
+                jmp ATL_3
+ATL_2           
+:JUMP_HOLD_DISRUPTION inx
+ATL_3
+            #end
+
+ATL_4       lda #0
+            sta STRIG0_CPU
+            #if STRIG0_CPU_HOLD = #0
+                stx STRIG0_CPU_HOLD
+            #end
+            rts
+
+AI_TICK_RIGHT
+            lda P2_CPU
+            beq ATR_X
+ATR_X       rts         
+
+JOIN_PLAYER_TICK
+            lda P1_CPU
+            beq JPT_1
+            lda STRIG0
+            bne JPT_1
+            dec P1_CPU
+            lda #<STRIG0
+            sta STRIG_0_SOURCE
+            lda #>STRIG0
+            sta STRIG_0_SOURCE+1
+            jsr PAINT_AI_INDICATORS
+            rts
+JPT_1       lda P2_CPU
+            beq JPT_2
+            lda STRIG1
+            bne JPT_2
+            dec P2_CPU
+            lda #<STRIG1
+            sta STRIG_1_SOURCE
+            lda #>STRIG1
+            sta STRIG_1_SOURCE+1
+            jsr PAINT_AI_INDICATORS
+JPT_2       rts
 
 RESTART_TICK
             #if .byte P1_STATE <> #PS_BURIED .or .byte P2_STATE <> #PS_BURIED
@@ -489,7 +626,21 @@ GAME_STATE_INIT
             lda #1
             sta P1_VISIBLE
             sta P2_VISIBLE
+            sta P1_CPU
+            sta P2_CPU
+            sta STRIG0_CPU
+            sta STRIG1_CPU
+            lda #<STRIG0_CPU
+            sta STRIG_0_SOURCE
+            lda #>STRIG0_CPU
+            sta STRIG_0_SOURCE+1
+            lda #<STRIG1_CPU
+            sta STRIG_1_SOURCE
+            lda #>STRIG1_CPU
+            sta STRIG_1_SOURCE+1
             lda #0
+            sta STRIG0_CPU_HOLD
+            sta STRIG1_CPU_HOLD
             sta P1_DRAWING_Y_OFFSET
             sta P2_DRAWING_Y_OFFSET
             sta SCORE_JUST_INCREASED
@@ -501,6 +652,11 @@ GAME_STATE_INIT
             sta P1_INVUL
             sta P2_INVUL
             tay
+
+            lda #3
+            sta CURRENT_GAME_LEVEL
+            tay
+
             lda FIRST_FRAME_PER_LEVEL,y
             sta FIRST_FRAME
             lda LAST_FRAME_PER_LEVEL,y
@@ -522,6 +678,7 @@ GAME_STATE_INIT
             mwa #JUMP_HEIGHT_TABLE P2_Y_TABLE
             jsr CLEAR_STATUS_BAR
             jsr PAINT_POINTS
+            jsr PAINT_AI_INDICATORS
             jsr INIT_PLAYERS
             jsr PAINT_PLAYERS
             rts           
@@ -535,7 +692,75 @@ CLEAR_STATUS_BAR
             sta STATUS_BAR_BUFFER,x
             rts
 
+PAINT_AI_INDICATORS
+            ldy #4
+            lda P1_CPU
+            beq PAI_1
+            jsr PRINT_CPU
+            jmp PAI_2
+PAI_1       PRINT_PL 1
+PAI_2       ldy #31
+            lda P2_CPU
+            beq PAI_3
+            jsr PRINT_CPU
+            jmp PAI_4
+PAI_3       PRINT_PL 2
+PAI_4       rts          
+
+PRINT_CPU
+            lda #"["*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"C"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"P"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"U"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"]"*
+            sta STATUS_BAR_BUFFER,y
+            rts
+
+PRINT_PL1
+            lda #"["*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"P"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #" "*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"1"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"]"*
+            sta STATUS_BAR_BUFFER,y
+            rts
+
+PRINT_PL2
+            lda #"["*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"P"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #" "*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"2"*
+            sta STATUS_BAR_BUFFER,y
+            iny
+            lda #"]"*
+            sta STATUS_BAR_BUFFER,y
+            rts
+
 PAINT_POINTS
+            ; Note: These two cannot be deduped, since the
+            ; implementation is different
             jsr PAINT_POINTS_LEFT
             jsr PAINT_POINTS_RIGHT
 

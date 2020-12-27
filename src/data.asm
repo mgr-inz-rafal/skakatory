@@ -48,7 +48,7 @@ JUMP_HEIGHT_TABLE
 
 ; Level difficulty parameters
 ROTATIONS_PER_LEVEL
-            dta b(2)
+            dta b(10)
             dta b(10)
             dta b(10)
             dta b(10)
@@ -129,7 +129,7 @@ HIT_FRAMES_1
             dta b(86)
             dta b(86)
             dta b(86)
-            dta b(86)
+            dta b(87)
 
 HIT_FRAMES_2
             dta b(01)
@@ -553,3 +553,91 @@ LEFT_KILL_Y_SPEED_3
             dta b(129)
             dta b(130)
             dta b(132)
+
+; This is the info for AI on which frames it
+; should consider initiating a jump.
+; Levels 0 - 3: first frame: 0   - last frame: 51
+; Levels 4 - 7: first frame: 52  - last frame: 85
+; Levels 8 -11: first frame: 86  - last frame: 103
+JUMP_FRAMES_PER_LEVEL
+            ; Level 0
+            dta b(46), b(47), b(48), b(49)
+            ; Level 1
+            dta b(46), b(47), b(48), b(49)
+            ; Level 2
+            dta b(44), b(45), b(46), b(47)
+            ; Level 3
+            dta b(38), b(43), b(44), b(45)
+            ; Level 4
+            dta b(80), b(81), b(82), b(83)
+            ; Level 5
+            dta b(80), b(81), b(82), b(83)
+            ; Level 6
+            dta b(80), b(81), b(82), b(83)
+            ; Level 7
+            dta b(75), b(76), b(77), b(78)
+            ; Level 8
+            dta b(97), b(98), b(99), b(100)
+            ; Level 9
+            dta b(97), b(98), b(99), b(100)
+            ; Level 10
+            dta b(95), b(96), b(97), b(98)
+            ; Level 11
+            dta b(94), b(95), b(96), b(97)
+
+;  ~7 - shortest jump
+; ~15 - mid jump
+; ~30 - full jump
+TRIG_HOLD_FRAMES_PER_LEVEL
+            ; Level 0
+            dta b(26), b(21), b(16), b(13)
+            ; Level 1
+            dta b(26), b(21), b(16), b(13)
+            ; Level 2
+            dta b(20), b(18), b(16), b(12)
+            ; Level 3
+            dta b(17), b(16), b(15), b(10)
+            ; Level 4
+            dta b(26), b(21), b(16), b(13)
+            ; Level 5
+            dta b(26), b(21), b(16), b(13)
+            ; Level 6
+            dta b(16), b(14), b(11), b(8)
+            ; Level 7
+            dta b(12), b(9), b(8), b(7)
+            ; Level 8
+            dta b(20), b(18), b(16), b(14)
+            ; Level 9
+            dta b(18), b(16), b(13), b(11)
+            ; Level 10
+            dta b(18), b(16), b(13), b(11)
+            ; Level 11
+            dta b(5), b(5), b(5), b(5)
+
+AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL
+            dta b(100)
+            dta b(40)
+            dta b(40)
+            dta b(30)
+            dta b(30)
+            dta b(20)
+            dta b(20)
+            dta b(10)
+            dta b(10)
+            dta b(5)
+            dta b(2)
+            dta b(2)
+
+AI_SKIP_JUMP_PROBABILITY_PER_LEVEL
+            dta b(29)
+            dta b(27)
+            dta b(25)
+            dta b(23)
+            dta b(21)
+            dta b(19)
+            dta b(17)
+            dta b(15)
+            dta b(13)
+            dta b(11)
+            dta b(9)
+            dta b(7)            
