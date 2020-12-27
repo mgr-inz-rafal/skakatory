@@ -583,7 +583,7 @@ JUMP_FRAMES_PER_LEVEL
             ; Level 10
             dta b(95), b(96), b(97), b(98)
             ; Level 11
-            dta b(95), b(255), b(255), b(255)
+            dta b(94), b(95), b(96), b(97)
 
 ;  ~7 - shortest jump
 ; ~15 - mid jump
