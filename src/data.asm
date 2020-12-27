@@ -627,3 +627,17 @@ AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL
             dta b(5)
             dta b(2)
             dta b(2)
+
+AI_SKIP_JUMP_PROBABILITY_PER_LEVEL
+            dta b(29)
+            dta b(27)
+            dta b(25)
+            dta b(23)
+            dta b(21)
+            dta b(19)
+            dta b(17)
+            dta b(15)
+            dta b(13)
+            dta b(11)
+            dta b(9)
+            dta b(7)            

@@ -334,6 +334,18 @@ AI_TICK_LEFT
 ATL_X       rts         
 ATL_1       lda TRIG_HOLD_FRAMES_PER_LEVEL,y
             tax
+
+            ; Consider if AI should randomly skip the jump decision
+            lda RANDOM
+            sta TMP
+            ldy CURRENT_GAME_LEVEL
+            lda AI_SKIP_JUMP_PROBABILITY_PER_LEVEL,y
+            sta TMP+1
+            #if .byte TMP+1 > TMP
+                jmp ATL_X
+            #end
+
+            ; Consider disrupting the time the AI is holding the jump button
             lda RANDOM
             sta TMP
             ldy CURRENT_GAME_LEVEL
@@ -350,7 +362,8 @@ ATL_2
 :JUMP_HOLD_DISRUPTION inx
 ATL_3
             #end
-            lda #0
+
+ATL_4       lda #0
             sta STRIG0_CPU
             #if STRIG0_CPU_HOLD = #0
                 stx STRIG0_CPU_HOLD
