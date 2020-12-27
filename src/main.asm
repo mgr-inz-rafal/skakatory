@@ -315,6 +315,8 @@ AI_TICK_LEFT
             lda P1_STATE
             cmp #PS_IDLE
             bne ATL_X
+            lda P1_INVUL
+            bne ATL_X
             lda CURRENT_GAME_LEVEL
             asl
             asl
