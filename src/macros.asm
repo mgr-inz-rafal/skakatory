@@ -338,3 +338,79 @@ CC%%1_X
             lda #"]"*
             sta STATUS_BAR_BUFFER,y
 .endm
+
+.macro AI_PLAYER_TICK P12 JOY
+            lda P%%1_CPU
+            beq AT%%1_X
+            lda P%%1_STATE
+            cmp #PS_IDLE
+            bne AT%%1_X
+            lda P%%1_INVUL
+            bne AT%%1_X
+            lda CURRENT_GAME_LEVEL
+            asl
+            asl
+            tay
+            lda CURRENT_FRAME
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq AT%%1_1
+            iny
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq AT%%1_1
+            iny
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq AT%%1_1
+            iny
+            cmp JUMP_FRAMES_PER_LEVEL,y
+            beq AT%%1_1
+AT%%1_X     jmp AT%%1_5         
+AT%%1_1     lda TRIG_HOLD_FRAMES_PER_LEVEL,y
+            tax
+
+            ; Consider if AI should randomly skip the jump decision
+            lda RANDOM
+            sta TMP
+            ldy CURRENT_GAME_LEVEL
+            lda AI_SKIP_JUMP_PROBABILITY_PER_LEVEL,y
+            sta TMP+1
+            #if .byte TMP+1 > TMP
+                jmp AT%%1_X
+            #end
+
+            ; Consider disrupting the time the AI is holding the jump button
+            lda RANDOM
+            sta TMP
+            ldy CURRENT_GAME_LEVEL
+            lda AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL,y
+            sta TMP+1
+            #if .byte TMP+1 > TMP
+                ; Let's dirupt the perfect AI jump a bit
+                lda TMP
+                and #%00000001
+                beq AT%%1_2
+:JUMP_HOLD_DISRUPTION dex
+                jmp AT%%1_3
+AT%%1_2           
+:JUMP_HOLD_DISRUPTION inx
+AT%%1_3
+            #end
+
+AT%%1_4     lda #0
+            sta STRIG%%2_CPU
+            #if STRIG%%2_CPU_HOLD = #0
+                stx STRIG%%2_CPU_HOLD
+            #end
+AT%%1_5
+.endm
+
+.macro RELEASE_AI_KEY P12 JOY
+            lda P%%1_CPU
+            beq RAK%%1_X
+            lda STRIG%%2_CPU_HOLD
+            bne RAK%%1_1
+            lda #1
+            sta STRIG%%2_CPU
+            jmp RAK%%1_X
+RAK%%1_1    dec STRIG%%2_CPU_HOLD
+RAK%%1_X    
+.endm
