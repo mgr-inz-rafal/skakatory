@@ -279,103 +279,11 @@ GAME_LOOP
             START_JUMP 2
 @           jmp GAME_LOOP
 
-AI_TICK     jsr AI_TICK_LEFT
-            jsr AI_TICK_RIGHT
-            jsr RELEASE_AI_KEY_LEFT
-            jsr RELEASE_AI_KEY_RIGHT
-
+AI_TICK     AI_PLAYER_TICK 1 0
+            AI_PLAYER_TICK 2 1
+            RELEASE_AI_KEY 1 0
+            RELEASE_AI_KEY 2 1
             rts
-
-; TODO: Dedup
-RELEASE_AI_KEY_LEFT
-            lda P1_CPU
-            beq RAKL_X
-            lda STRIG0_CPU_HOLD
-            bne RAKL_1
-            lda #1
-            sta STRIG0_CPU
-            rts
-RAKL_1      dec STRIG0_CPU_HOLD
-RAKL_X      rts
-
-RELEASE_AI_KEY_RIGHT
-            lda P2_CPU
-            beq RAKR_X
-            lda STRIG1_CPU_HOLD
-            bne RAKR_X
-            lda #1
-            sta STRIG1_CPU
-RAKR_X      dec STRIG1_CPU_HOLD
-            rts
-
-; TODO: Dedup
-AI_TICK_LEFT   
-            lda P1_CPU
-            beq ATL_X
-            lda P1_STATE
-            cmp #PS_IDLE
-            bne ATL_X
-            lda P1_INVUL
-            bne ATL_X
-            lda CURRENT_GAME_LEVEL
-            asl
-            asl
-            tay
-            lda CURRENT_FRAME
-            cmp JUMP_FRAMES_PER_LEVEL,y
-            beq ATL_1
-            iny
-            cmp JUMP_FRAMES_PER_LEVEL,y
-            beq ATL_1
-            iny
-            cmp JUMP_FRAMES_PER_LEVEL,y
-            beq ATL_1
-            iny
-            cmp JUMP_FRAMES_PER_LEVEL,y
-            beq ATL_1
-ATL_X       rts         
-ATL_1       lda TRIG_HOLD_FRAMES_PER_LEVEL,y
-            tax
-
-            ; Consider if AI should randomly skip the jump decision
-            lda RANDOM
-            sta TMP
-            ldy CURRENT_GAME_LEVEL
-            lda AI_SKIP_JUMP_PROBABILITY_PER_LEVEL,y
-            sta TMP+1
-            #if .byte TMP+1 > TMP
-                jmp ATL_X
-            #end
-
-            ; Consider disrupting the time the AI is holding the jump button
-            lda RANDOM
-            sta TMP
-            ldy CURRENT_GAME_LEVEL
-            lda AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL,y
-            sta TMP+1
-            #if .byte TMP+1 > TMP
-                ; Let's dirupt the perfect AI jump a bit
-                lda TMP
-                and #%00000001
-                beq ATL_2
-:JUMP_HOLD_DISRUPTION dex
-                jmp ATL_3
-ATL_2           
-:JUMP_HOLD_DISRUPTION inx
-ATL_3
-            #end
-
-ATL_4       lda #0
-            sta STRIG0_CPU
-            #if STRIG0_CPU_HOLD = #0
-                stx STRIG0_CPU_HOLD
-            #end
-            rts
-
-AI_TICK_RIGHT
-            lda P2_CPU
-            beq ATR_X
-ATR_X       rts         
 
 JOIN_PLAYER_TICK
             lda P1_CPU
