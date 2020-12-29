@@ -292,6 +292,11 @@ JOIN_PLAYER_TICK
             beq JPT_1
             lda STRIG0
             bne JPT_1
+            lda P1_STATE
+            cmp #PS_DYING
+            beq JPT_1
+            cmp #PS_BURIED
+            beq JPT_1
             dec P1_CPU
             lda #<STRIG0
             sta STRIG_0_SOURCE
@@ -303,6 +308,11 @@ JPT_1       lda P2_CPU
             beq JPT_2
             lda STRIG1
             bne JPT_2
+            lda P2_STATE
+            cmp #PS_DYING
+            beq JPT_2
+            cmp #PS_BURIED
+            beq JPT_2
             dec P2_CPU
             lda #<STRIG1
             sta STRIG_1_SOURCE
