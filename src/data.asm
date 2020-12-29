@@ -48,18 +48,18 @@ JUMP_HEIGHT_TABLE
 
 ; Level difficulty parameters
 ROTATIONS_PER_LEVEL
+            dta b(8)
             dta b(10)
-            dta b(10)
-            dta b(10)
-            dta b(10)
-            dta b(10)
-            dta b(10)
-            dta b(10)
-            dta b(10)
-            dta b(10)
-            dta b(10)
-            dta b(10)
-            dta b(10)
+            dta b(16)
+            dta b(40)
+            dta b(15)
+            dta b(27)
+            dta b(36)
+            dta b(55)
+            dta b(28)
+            dta b(48)
+            dta b(101)
+            dta b(255)
 
 ROTATION_COOLDOWN_TAB
             dta b(4)
@@ -579,7 +579,7 @@ JUMP_FRAMES_PER_LEVEL
             ; Level 8
             dta b(97), b(98), b(99), b(100)
             ; Level 9
-            dta b(97), b(98), b(99), b(100)
+            dta b(98), b(99), b(100), b(101)
             ; Level 10
             dta b(95), b(96), b(97), b(98)
             ; Level 11
@@ -641,3 +641,16 @@ AI_SKIP_JUMP_PROBABILITY_PER_LEVEL
             dta b(11)
             dta b(9)
             dta b(7)            
+
+INVUL_ROTATIONS_PER_LEVEL
+            dta b(5)
+            dta b(7)
+            dta b(10)
+            dta b(7)
+            dta b(10)
+            dta b(13)
+            dta b(16)
+            dta b(10)
+            dta b(15)
+            dta b(19)
+            dta b(25)

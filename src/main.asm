@@ -360,7 +360,8 @@ ENABLE_INVUL
             lda #INVUL_COOLDOWN
             sta P1_INVUL_COUNTER
             sta P2_INVUL_COUNTER
-            lda #INVUL_ROTATIONS
+            ldx CURRENT_GAME_LEVEL
+            lda INVUL_ROTATIONS_PER_LEVEL,x
             sta P1_INVUL_DISABLE_COUNTER
             sta P2_INVUL_DISABLE_COUNTER
             rts
@@ -412,8 +413,8 @@ BACKGROUND_TICK
 BT_X        rts
 
 ADVANCE_LEVEL
-            inc CURRENT_GAME_LEVEL
             jsr ENABLE_INVUL
+            inc CURRENT_GAME_LEVEL
             jsr INIT_LEVEL_PARAMS
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
