@@ -333,7 +333,8 @@ RESTART_TICK
             cmp #6
             bne RT_X
 
-RT_1        jsr GAME_STATE_INIT
+RT_1        jsr CLEAR_PLAYERS
+            jsr GAME_STATE_INIT
 
 RT_X        rts
 
