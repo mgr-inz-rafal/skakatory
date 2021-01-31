@@ -788,7 +788,6 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
 STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
-            icl 'src\names.asm'
 
 DATA_END
 
@@ -811,6 +810,16 @@ INIT_:1
             org SCR_MEM_2
             ins "frames/f:3.bin"
 .endr
+
+; More data into bank #52
+INIT_52
+            ldy #52
+	        lda @TAB_MEM_BANKS,y
+	        sta PORTB
+            rts
+		    ini INIT_52
+            org $4000	
+            ins "data/names.bin"
 
             run PROGRAM_START_FIRST_PART
            

@@ -1,3 +1,5 @@
+    opt h-
+
 NAMES_MEN
     dta d'Piotr       '    ; 1
     dta d'Krzysztof   '    ; 2
