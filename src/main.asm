@@ -788,6 +788,7 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
 STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
+            icl 'src\names.asm'
 
 DATA_END
 
