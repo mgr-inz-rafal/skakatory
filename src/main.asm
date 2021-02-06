@@ -13,6 +13,9 @@ SCR_MEM_1_P2        equ $5000
 SCR_MEM_2           equ $6150
 SCR_MEM_2_P2        equ $7000
 @TAB_MEM_BANKS      equ $0600
+MAX_NAME_LEN        equ 12
+NAMES_BANK          equ 52
+NAMES_PER_SEX       equ 500
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -39,6 +42,7 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          STRIG0_CPU_HOLD        .byte
 .zpvar          STRIG1_CPU_HOLD        .byte
 .zpvar          TMP                    .word
+.zpvar          TMP2                   .word
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
@@ -192,7 +196,7 @@ dSAFE	.ds MAX_BANKS
 
             org $2000
 
-; --------- DLI & PMG data --------------------------
+; --------- DLIST & PMG data --------------------------
 .align $1000
 PMG_BASE
 SCENE_DISPLAY_LIST
@@ -235,6 +239,14 @@ DL_MAIN_AREA
             dta b(%00000010)
             dta b(%00000010)
             dta b($41), a(SCENE_DISPLAY_LIST)
+
+DLIST_TITLE_SCREEN
+:6          dta b($70)
+            dta b($47)
+            dta a($4000)
+:24         dta b($0f)
+            dta b($07)
+            dta b($41), a(DLIST_TITLE_SCREEN)
 
 :$800       dta b(0)
 PMG_M0      equ PMG_BASE+$300
@@ -778,6 +790,9 @@ SF_X        rts
 VBI_ROUTINE
             jsr BACKGROUND_TICK
             jmp XITVBV
+
+TITLE_SCREEN
+            icl 'src\title.asm'
             
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
@@ -788,6 +803,9 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
 STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
+.align $400
+NAMES_FONT
+            ins 'data\names.fnt'
 
 DATA_END
 
@@ -821,5 +839,6 @@ INIT_52
             org $4000	
             ins "data/names.bin"
 
-            run PROGRAM_START_FIRST_PART
+;            run PROGRAM_START_FIRST_PART
+            run TITLE_SCREEN
            
