@@ -17,12 +17,12 @@
 CHUJ        jmp CHUJ
 
 SETUP_RANDOM_NAME
-            mwa #$4000+12 TMP  ; This need to point to random name, for now, it's the first one
+            mwa #$4000+(12*5) TMP  ; This need to point to random name, for now, it's the first one
             mwa #$4000 TMP2
             rts
 
 SETUP_RANDOM_NAME_BABSKIE
-            mwa #$4000+(NAMES_PER_SEX*MAX_NAME_LEN) TMP  ; This need to point to random name, for now, it's the first one
+            mwa #$4000+(NAMES_PER_SEX*MAX_NAME_LEN)+(12*8) TMP  ; This need to point to random name, for now, it's the first one
             mwa #$4000+(24*(320/8)+20) TMP2
             rts
 
