@@ -27,8 +27,8 @@ PICK_NUMBER_FROM_1_TO_250
             rts
 
 ; Output:
-; X = 0: Names from   0 to 250
-; X = 1: Names from 251 to 500
+; X = 1: Names from   0 to 250
+; X = 0: Names from 251 to 500
 ; Y = Name offset
 ; For example:
 ; X=0, Y=15 - Pick 15th name from first part (15)
@@ -42,7 +42,10 @@ PICK_RANDOM_NAME_INDEX
 
 SETUP_RANDOM_NAME
             jsr PICK_RANDOM_NAME_INDEX
-            mwa #$4000 TMP  ; This need to point to random name, for now, it's the first one
+            mwa #$4000 TMP
+            cpx #0
+            bne SRN_2
+            adw TMP #MAX_NAME_LEN*250
 SRN_2       dey
             cpy #0
             beq SRN_1
@@ -52,8 +55,17 @@ SRN_1       mwa #$4000 TMP2
             rts
 
 SETUP_RANDOM_NAME_BABSKIE
-            mwa #$4000+(NAMES_PER_SEX*MAX_NAME_LEN)+(12*8) TMP  ; This need to point to random name, for now, it's the first one
-            mwa #$4000+(24*(320/8)+20) TMP2
+            jsr PICK_RANDOM_NAME_INDEX
+            mwa #$4000+(NAMES_PER_SEX*MAX_NAME_LEN) TMP
+            cpx #0
+            bne SRNB_2
+            adw TMP #MAX_NAME_LEN*250
+SRNB_2      dey
+            cpy #0
+            beq SRNB_1
+            adw TMP #MAX_NAME_LEN
+            jmp SRNB_2
+SRNB_1      mwa #$4000+(24*(320/8)+20) TMP2
             rts
 
 PRINT_NAME
