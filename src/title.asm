@@ -19,11 +19,23 @@
             jsr PUT_PIXEL
 
             ldy #4
-            ldx #0
+            ldx #8
+            jsr PUT_PIXEL
+
+            ldy #8
+            ldx #16
+            jsr PUT_PIXEL
+
+            ldy #12
+            ldx #24
             jsr PUT_PIXEL
 
             ldy #46
             ldx #0
+            jsr PUT_PIXEL
+
+            ldy #46
+            ldx #31
             jsr PUT_PIXEL
 
 @           lda STRIG0
@@ -107,6 +119,15 @@ PN_X        rts
 
 PUT_PIXEL
             mwa PIXEL_Y_TABLE,y TMP
+
+            clc
+            lda TMP
+            adc PIXEL_X_TABLE_OFFSET,x
+            sta TMP
+            lda TMP+1
+            adc #0
+            sta TMP+1
+
             lda #$ff
             ldy #0
             sta (TMP),y
