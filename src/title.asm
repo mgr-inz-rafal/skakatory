@@ -29,7 +29,7 @@ MENU_0      ldy TMP2+1
             jsr SYNCHRO
             inc TMP2+1
             lda TMP2+1
-            cmp #90
+            cmp #AMPERSAND_PIXEL_COUNT
             bne MENU_0
 
 
