@@ -53,7 +53,7 @@ SRN_2       dey
             beq SRN_1
             adw TMP #MAX_NAME_LEN
             jmp SRN_2
-SRN_1       mwa #$4000 TMP2
+SRN_1       mwa #SCR_MEM_MENU TMP2
             rts
 
 SETUP_RANDOM_NAME_BABSKIE
@@ -67,25 +67,17 @@ SRNB_2      dey
             beq SRNB_1
             adw TMP #MAX_NAME_LEN
             jmp SRNB_2
-SRNB_1      mwa #$4000+(24*(320/8)+20) TMP2
+SRNB_1      mwa #SCR_MEM_MENU+(24*(320/8)+20) TMP2
             rts
 
 PRINT_NAME
             ldx #MAX_NAME_LEN
-
-PN_1        ldy #NAMES_BANK
+            ldy #NAMES_BANK
             lda @TAB_MEM_BANKS,y
             sta PORTB
 
             ldy #0
-            lda (TMP),y
-            pha
-
-            ldy #0
-            lda @TAB_MEM_BANKS,y
-            sta PORTB
-
-            pla
+PN_1        lda (TMP),y
             #if .byte @ > #90
                 sec
                 sbc #32

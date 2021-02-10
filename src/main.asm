@@ -243,7 +243,7 @@ DL_MAIN_AREA
 DLIST_TITLE_SCREEN
 :6          dta b($70)
             dta b($47)
-            dta a($4000)
+            dta a(SCR_MEM_MENU)
 :24         dta b($0f)
             dta b($07)
             dta b($41), a(DLIST_TITLE_SCREEN)
@@ -803,6 +803,11 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
 STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
+
+.align $400
+SCR_MEM_MENU
+:1000       dta b(1)            
+
 .align $400
 NAMES_FONT
             ins 'data\names.fnt'
@@ -830,6 +835,7 @@ INIT_:1
 .endr
 
 ; More data into bank #52
+            org $6A0
 INIT_52
             ldy #52
 	        lda @TAB_MEM_BANKS,y
