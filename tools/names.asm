@@ -1,3 +1,12 @@
+; Pliterki translation table
+; 'ł' - b(17)
+; 'ę' - b(32)
+; 'ó' - b(49)
+; 'ś' - b(27)
+; 'ż' - b(59)
+; 'Ł' - b(28)
+; 'Ż' - b(60)
+
     opt h-
 
 NAMES_MEN
@@ -6,14 +15,14 @@ NAMES_MEN
     dta d'Andrzej     '    ; 3
     dta d'Tomasz      '    ; 4
     dta d'Jan         '    ; 5
-    dta d'Paweł       '    ; 6
-    dta d'Michał      '    ; 7
+    dta d'Pawe', b(17), d'       '    ; 6
+    dta d'Micha', b(17), d'      '    ; 7
     dta d'Marcin      '    ; 8
-    dta d'Stanisław   '    ; 9
+    dta d'Stanis', b(17), d'aw   '    ; 9
     dta d'Jakub       '    ; 10
     dta d'Adam        '    ; 11
     dta d'Marek       '    ; 12
-    dta d'Łukasz      '    ; 13
+    dta b(28), d'ukasz      '    ; 13
     dta d'Grzegorz    '    ; 14
     dta d'Mateusz     '    ; 15
     dta d'Wojciech    '    ; 16
@@ -22,10 +31,10 @@ NAMES_MEN
     dta d'Zbigniew    '    ; 19
     dta d'Jerzy       '    ; 20
     dta d'Maciej      '    ; 21
-    dta d'Rafał       '    ; 22
+    dta d'Rafa', b(17), d'       '    ; 22
     dta d'Robert      '    ; 23
     dta d'Kamil       '    ; 24
-    dta d'Józef       '    ; 25
+    dta d'J', b(49), d'zef       '    ; 25
     dta d'Jacek       '    ; 26
     dta d'Dawid       '    ; 27
     dta d'Tadeusz     '    ; 28
@@ -34,56 +43,56 @@ NAMES_MEN
     dta d'Kacper      '    ; 31
     dta d'Bartosz     '    ; 32
     dta d'Janusz      '    ; 33
-    dta d'Jarosław    '    ; 34
-    dta d'Sławomir    '    ; 35
-    dta d'Mirosław    '    ; 36
+    dta d'Jaros', b(17), d'aw    '    ; 34
+    dta d'S', b(17), d'awomir    '    ; 35
+    dta d'Miros', b(17), d'aw    '    ; 36
     dta d'Artur       '    ; 37
     dta d'Henryk      '    ; 38
     dta d'Sebastian   '    ; 39
     dta d'Damian      '    ; 40
     dta d'Patryk      '    ; 41
     dta d'Kazimierz   '    ; 42
-    dta d'Przemysław  '    ; 43
+    dta d'Przemys', b(17), d'aw  '    ; 43
     dta d'Daniel      '    ; 44
     dta d'Karol       '    ; 45
     dta d'Roman       '    ; 46
     dta d'Marian      '    ; 47
-    dta d'Wiesław     '    ; 48
+    dta d'Wies', b(17), d'aw     '    ; 48
     dta d'Filip       '    ; 49
     dta d'Antoni      '    ; 50
     dta d'Adrian      '    ; 51
     dta d'Arkadiusz   '    ; 52
     dta d'Aleksander  '    ; 53
     dta d'Dominik     '    ; 54
-    dta d'Bartłomiej  '    ; 55
+    dta d'Bart', b(17), d'omiej  '    ; 55
     dta d'Franciszek  '    ; 56
     dta d'Leszek      '    ; 57
-    dta d'Mikołaj     '    ; 58
+    dta d'Miko', b(17), d'aj     '    ; 58
     dta d'Waldemar    '    ; 59
     dta d'Krystian    '    ; 60
-    dta d'Zdzisław    '    ; 61
+    dta d'Zdzis', b(17), d'aw    '    ; 61
     dta d'Wiktor      '    ; 62
-    dta d'Radosław    '    ; 63
+    dta d'Rados', b(17), d'aw    '    ; 63
     dta d'Bogdan      '    ; 64
     dta d'Edward      '    ; 65
-    dta d'Mieczysław  '    ; 66
+    dta d'Mieczys', b(17), d'aw  '    ; 66
     dta d'Konrad      '    ; 67
-    dta d'Władysław   '    ; 68
+    dta d'W', b(17), d'adys', b(17), d'aw   '    ; 68
     dta d'Hubert      '    ; 69
-    dta d'Czesław     '    ; 70
+    dta d'Czes', b(17), d'aw     '    ; 70
     dta d'Igor        '    ; 71
     dta d'Eugeniusz   '    ; 72
     dta d'Oskar       '    ; 73
     dta d'Stefan      '    ; 74
-    dta d'Bogusław    '    ; 75
+    dta d'Bogus', b(17), d'aw    '    ; 75
     dta d'Marcel      '    ; 76
     dta d'Ireneusz    '    ; 77
     dta d'Zygmunt     '    ; 78
     dta d'Maksymilian '    ; 79
     dta d'Witold      '    ; 80
-    dta d'Miłosz      '    ; 81
+    dta d'Mi', b(17), d'osz      '    ; 81
     dta d'Sylwester   '    ; 82
-    dta d'Włodzimierz '    ; 83
+    dta d'W', b(17), d'odzimierz '    ; 83
     dta d'Zenon       '    ; 84
     dta d'Oliwier     '    ; 85
     dta d'Alan        '    ; 86
@@ -94,20 +103,20 @@ NAMES_MEN
     dta d'Oleksandr   '    ; 91
     dta d'Gabriel     '    ; 92
     dta d'Julian      '    ; 93
-    dta d'Błażej      '    ; 94
+    dta d'B', b(17), d'a', b(59), d'ej      '    ; 94
     dta d'Fabian      '    ; 95
     dta d'Ignacy      '    ; 96
     dta d'Tymoteusz   '    ; 97
     dta d'Eryk        '    ; 98
     dta d'Emil        '    ; 99
-    dta d'Bronisław   '    ; 100
-    dta d'Wacław      '    ; 101
+    dta d'Bronis', b(17), d'aw   '    ; 100
+    dta d'Wac', b(17), d'aw      '    ; 101
     dta d'Lech        '    ; 102
     dta d'Serhii      '    ; 103
     dta d'Tymon       '    ; 104
     dta d'Andrii      '    ; 105
     dta d'Volodymyr   '    ; 106
-    dta d'Bolesław    '    ; 107
+    dta d'Boles', b(17), d'aw    '    ; 107
     dta d'Bernard     '    ; 108
     dta d'Edmund      '    ; 109
     dta d'Remigiusz   '    ; 110
@@ -137,8 +146,8 @@ NAMES_MEN
     dta d'Oleh        '    ; 134
     dta d'Joachim     '    ; 135
     dta d'Viktor      '    ; 136
-    dta d'Lesław      '    ; 137
-    dta d'Bogumił     '    ; 138
+    dta d'Les', b(17), d'aw      '    ; 137
+    dta d'Bogumi', b(17), d'     '    ; 138
     dta d'Mykhailo    '    ; 139
     dta d'Ernest      '    ; 140
     dta d'Gerard      '    ; 141
@@ -147,7 +156,7 @@ NAMES_MEN
     dta d'Olivier     '    ; 144
     dta d'Feliks      '    ; 145
     dta d'Bohdan      '    ; 146
-    dta d'Jędrzej     '    ; 147
+    dta d'J', b(32), d'drzej     '    ; 147
     dta d'Alexander   '    ; 148
     dta d'Alojzy      '    ; 149
     dta d'Alex        '    ; 150
@@ -266,7 +275,7 @@ NAMES_MEN
     dta d'Pavel       '    ; 263
     dta d'Benjamin    '    ; 264
     dta d'Ziemowit    '    ; 265
-    dta d'Lechosław   '    ; 266
+    dta d'Lechos', b(17), d'aw   '    ; 266
     dta d'Leonid      '    ; 267
     dta d'Xavier      '    ; 268
     dta d'Nikolas     '    ; 269
@@ -298,7 +307,7 @@ NAMES_MEN
     dta d'John        '    ; 295
     dta d'Anthony     '    ; 296
     dta d'Marco       '    ; 297
-    dta d'Łucjan      '    ; 298
+    dta b(28), d'ucjan      '    ; 298
     dta d'Mykhaylo    '    ; 299
     dta d'Yury        '    ; 300
     dta d'Vitali      '    ; 301
@@ -331,7 +340,7 @@ NAMES_MEN
     dta d'Serhiy      '    ; 328
     dta d'Mikhail     '    ; 329
     dta d'Bazyli      '    ; 330
-    dta d'Zbysław     '    ; 331
+    dta d'Zbys', b(17), d'aw     '    ; 331
     dta d'Viktar      '    ; 332
     dta d'Ion         '    ; 333
     dta d'Antonio     '    ; 334
@@ -506,12 +515,12 @@ NAMES_BABSKIE
     dta d'Anna        '    ; 1
     dta d'Maria       '    ; 2
     dta d'Katarzyna   '    ; 3
-    dta d'Małgorzata  '    ; 4
+    dta d'Ma', b(17), d'gorzata  '    ; 4
     dta d'Agnieszka   '    ; 5
     dta d'Barbara     '    ; 6
     dta d'Ewa         '    ; 7
     dta d'Krystyna    '    ; 8
-    dta d'Elżbieta    '    ; 9
+    dta d'El', b(59), d'bieta    '    ; 9
     dta d'Magdalena   '    ; 10
     dta d'Joanna      '    ; 11
     dta d'Zofia       '    ; 12
@@ -531,11 +540,11 @@ NAMES_BABSKIE
     dta d'Jolanta     '    ; 26
     dta d'Alicja      '    ; 27
     dta d'Irena       '    ; 28
-    dta d'Grażyna     '    ; 29
+    dta d'Gra', b(59), d'yna     '    ; 29
     dta d'Iwona       '    ; 30
     dta d'Paulina     '    ; 31
     dta d'Justyna     '    ; 32
-    dta d'Bożena      '    ; 33
+    dta d'Bo', b(59), d'ena      '    ; 33
     dta d'Zuzanna     '    ; 34
     dta d'Wiktoria    '    ; 35
     dta d'Urszula     '    ; 36
@@ -555,13 +564,13 @@ NAMES_BABSKIE
     dta d'Oliwia      '    ; 50
     dta d'Martyna     '    ; 51
     dta d'Klaudia     '    ; 52
-    dta d'Stanisława  '    ; 53
+    dta d'Stanis', b(17), d'awa  '    ; 53
     dta d'Marzena     '    ; 54
     dta d'Gabriela    '    ; 55
     dta d'Dominika    '    ; 56
     dta d'Kinga       '    ; 57
     dta d'Edyta       '    ; 58
-    dta d'Wiesława    '    ; 59
+    dta d'Wies', b(17), d'awa    '    ; 59
     dta d'Lena        '    ; 60
     dta d'Amelia      '    ; 61
     dta d'Kamila      '    ; 62
@@ -570,7 +579,7 @@ NAMES_BABSKIE
     dta d'Lucyna      '    ; 65
     dta d'Lidia       '    ; 66
     dta d'Mariola     '    ; 67
-    dta d'Mirosława   '    ; 68
+    dta d'Miros', b(17), d'awa   '    ; 68
     dta d'Wioletta    '    ; 69
     dta d'Nikola      '    ; 70
     dta d'Daria       '    ; 71
@@ -578,8 +587,8 @@ NAMES_BABSKIE
     dta d'Kazimiera   '    ; 73
     dta d'Angelika    '    ; 74
     dta d'Genowefa    '    ; 75
-    dta d'Bogumiła    '    ; 76
-    dta d'Józefa      '    ; 77
+    dta d'Bogumi', b(17), d'a    '    ; 76
+    dta d'J', b(49), d'zefa      '    ; 77
     dta d'Antonina    '    ; 78
     dta d'Olga        '    ; 79
     dta d'Henryka     '    ; 80
@@ -588,13 +597,13 @@ NAMES_BABSKIE
     dta d'Laura       '    ; 83
     dta d'Ilona       '    ; 84
     dta d'Sabina      '    ; 85
-    dta d'Bogusława   '    ; 86
+    dta d'Bogus', b(17), d'awa   '    ; 86
     dta d'Regina      '    ; 87
     dta d'Marlena     '    ; 88
     dta d'Michalina   '    ; 89
-    dta d'Władysława  '    ; 90
-    dta d'Czesława    '    ; 91
-    dta d'Łucja       '    ; 92
+    dta d'W', b(17), d'adys', b(17), d'awa  '    ; 90
+    dta d'Czes', b(17), d'awa    '    ; 91
+    dta b(28), d'ucja       '    ; 92
     dta d'Anita       '    ; 93
     dta d'Nadia       '    ; 94
     dta d'Kornelia    '    ; 95
@@ -613,14 +622,14 @@ NAMES_BABSKIE
     dta d'Pola        '    ; 108
     dta d'Leokadia    '    ; 109
     dta d'Malwina     '    ; 110
-    dta d'Zdzisława   '    ; 111
-    dta d'Bronisława  '    ; 112
+    dta d'Zdzis', b(17), d'awa   '    ; 111
+    dta d'Bronis', b(17), d'awa  '    ; 112
     dta d'Sara        '    ; 113
-    dta d'Żaneta      '    ; 114
+    dta b(60), d'aneta      '    ; 114
     dta d'Eugenia     '    ; 115
     dta d'Eliza       '    ; 116
     dta d'Bernadeta   '    ; 117
-    dta d'Róża        '    ; 118
+    dta d'R', b(49), b(59), d'a        '    ; 118
     dta d'Daniela     '    ; 119
     dta d'Julita      '    ; 120
     dta d'Aldona      '    ; 121
@@ -644,10 +653,10 @@ NAMES_BABSKIE
     dta d'Brygida     '    ; 139
     dta d'Lilianna    '    ; 140
     dta d'Paula       '    ; 141
-    dta d'Mieczysława '    ; 142
+    dta d'Mieczys', b(17), d'awa '    ; 142
     dta d'Izabella    '    ; 143
     dta d'Matylda     '    ; 144
-    dta d'Bożenna     '    ; 145
+    dta d'Bo', b(59), d'enna     '    ; 145
     dta d'Svitlana    '    ; 146
     dta d'Aurelia     '    ; 147
     dta d'Elwira      '    ; 148
@@ -656,7 +665,7 @@ NAMES_BABSKIE
     dta d'Marika      '    ; 151
     dta d'Sonia       '    ; 152
     dta d'Kalina      '    ; 153
-    dta d'Andżelika   '    ; 154
+    dta d'And', b(59), d'elika   '    ; 154
     dta d'Arleta      '    ; 155
     dta d'Franciszka  '    ; 156
     dta d'Mariia      '    ; 157
@@ -681,7 +690,7 @@ NAMES_BABSKIE
     dta d'Victoria    '    ; 176
     dta d'Apolonia    '    ; 177
     dta d'Eleonora    '    ; 178
-    dta d'Wacława     '    ; 179
+    dta d'Wac', b(17), d'awa     '    ; 179
     dta d'Julianna    '    ; 180
     dta d'Vanessa     '    ; 181
     dta d'Marzenna    '    ; 182
@@ -701,7 +710,7 @@ NAMES_BABSKIE
     dta d'Felicja     '    ; 196
     dta d'Maryna      '    ; 197
     dta d'Donata      '    ; 198
-    dta d'Ludmiła     '    ; 199
+    dta d'Ludmi', b(17), d'a     '    ; 199
     dta d'Romualda    '    ; 200
     dta d'Anetta      '    ; 201
     dta d'Valentyna   '    ; 202
@@ -718,7 +727,7 @@ NAMES_BABSKIE
     dta d'Inna        '    ; 213
     dta d'Larysa      '    ; 214
     dta d'Waleria     '    ; 215
-    dta d'Sławomira   '    ; 216
+    dta d'S', b(17), d'awomira   '    ; 216
     dta d'Bernarda    '    ; 217
     dta d'Rita        '    ; 218
     dta d'Teodozja    '    ; 219
@@ -757,7 +766,7 @@ NAMES_BABSKIE
     dta d'Sofia       '    ; 252
     dta d'Pamela      '    ; 253
     dta d'Konstancja  '    ; 254
-    dta d'Bolesława   '    ; 255
+    dta d'Boles', b(17), d'awa   '    ; 255
     dta d'Wanessa     '    ; 256
     dta d'Alona       '    ; 257
     dta d'Salomea     '    ; 258
@@ -812,7 +821,7 @@ NAMES_BABSKIE
     dta d'Natalie     '    ; 307
     dta d'Marietta    '    ; 308
     dta d'Lea         '    ; 309
-    dta d'Jaśmina     '    ; 310
+    dta d'Ja', b(27), d'mina     '    ; 310
     dta d'Antonia     '    ; 311
     dta d'Yuliya      '    ; 312
     dta d'Teofila     '    ; 313
@@ -825,8 +834,8 @@ NAMES_BABSKIE
     dta d'Bernardyna  '    ; 320
     dta d'Raisa       '    ; 321
     dta d'Yelyzaveta  '    ; 322
-    dta d'Jarosława   '    ; 323
-    dta d'Dobrosława  '    ; 324
+    dta d'Jaros', b(17), d'awa   '    ; 323
+    dta d'Dobros', b(17), d'awa  '    ; 324
     dta d'Florentyna  '    ; 325
     dta d'Erna        '    ; 326
     dta d'Ruslana     '    ; 327
@@ -847,7 +856,7 @@ NAMES_BABSKIE
     dta d'Tatsiana    '    ; 342
     dta d'Sophia      '    ; 343
     dta d'Veronica    '    ; 344
-    dta d'Dżesika     '    ; 345
+    dta d'D', b(59), d'esika     '    ; 345
     dta d'Iuliia      '    ; 346
     dta d'Linda       '    ; 347
     dta d'Lidiia      '    ; 348
@@ -903,7 +912,7 @@ NAMES_BABSKIE
     dta d'Caroline    '    ; 398
     dta d'Bogdana     '    ; 399
     dta d'Carmen      '    ; 400
-    dta d'Żaklina     '    ; 401
+    dta b(60), d'aklina     '    ; 401
     dta d'Gabryela    '    ; 402
     dta d'Hannah      '    ; 403
     dta d'Gabriella   '    ; 404
@@ -919,7 +928,7 @@ NAMES_BABSKIE
     dta d'Dalia       '    ; 414
     dta d'Nadiya      '    ; 415
     dta d'Sybilla     '    ; 416
-    dta d'Swietłana   '    ; 417
+    dta d'Swiet', b(17), d'ana   '    ; 417
     dta d'Anhelina    '    ; 418
     dta d'Michaela    '    ; 419
     dta d'Naomi       '    ; 420
@@ -934,13 +943,13 @@ NAMES_BABSKIE
     dta d'Gracjana    '    ; 429
     dta d'Leonia      '    ; 430
     dta d'Valentina   '    ; 431
-    dta d'Sława       '    ; 432
+    dta d'S', b(17), d'awa       '    ; 432
     dta d'Roxana      '    ; 433
     dta d'Bernardeta  '    ; 434
     dta d'Bianca      '    ; 435
-    dta d'Żanetta     '    ; 436
+    dta b(60), d'anetta     '    ; 436
     dta d'Ina         '    ; 437
-    dta d'Józefina    '    ; 438
+    dta d'J', b(49), d'zefina    '    ; 438
     dta d'Margarita   '    ; 439
     dta d'Hana        '    ; 440
     dta d'Berta       '    ; 441
@@ -981,7 +990,7 @@ NAMES_BABSKIE
     dta d'Nelia       '    ; 476
     dta d'Viktoriya   '    ; 477
     dta d'Wilhelmina  '    ; 478
-    dta d'Lesława     '    ; 479
+    dta d'Les', b(17), d'awa     '    ; 479
     dta d'Eufemia     '    ; 480
     dta d'Ekaterina   '    ; 481
     dta d'Viktoryia   '    ; 482

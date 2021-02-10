@@ -13,6 +13,10 @@ SCR_MEM_1_P2        equ $5000
 SCR_MEM_2           equ $6150
 SCR_MEM_2_P2        equ $7000
 @TAB_MEM_BANKS      equ $0600
+MAX_NAME_LEN        equ 12
+NAMES_BANK          equ 52
+NAMES_PER_SEX       equ 500
+ZERO_DIGIT_OFFSET   equ 66
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -39,6 +43,7 @@ SCR_MEM_2_P2        equ $7000
 .zpvar          STRIG0_CPU_HOLD        .byte
 .zpvar          STRIG1_CPU_HOLD        .byte
 .zpvar          TMP                    .word
+.zpvar          TMP2                   .word
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
@@ -192,7 +197,7 @@ dSAFE	.ds MAX_BANKS
 
             org $2000
 
-; --------- DLI & PMG data --------------------------
+; --------- DLIST & PMG data --------------------------
 .align $1000
 PMG_BASE
 SCENE_DISPLAY_LIST
@@ -235,6 +240,14 @@ DL_MAIN_AREA
             dta b(%00000010)
             dta b(%00000010)
             dta b($41), a(SCENE_DISPLAY_LIST)
+
+DLIST_TITLE_SCREEN
+:6          dta b($70)
+            dta b($47)
+            dta a(SCR_MEM_MENU)
+:24         dta b($0f)
+            dta b($07)
+            dta b($41), a(DLIST_TITLE_SCREEN)
 
 :$800       dta b(0)
 PMG_M0      equ PMG_BASE+$300
@@ -619,63 +632,29 @@ PAINT_AI_INDICATORS
             beq PAI_1
             jsr PRINT_CPU
             jmp PAI_2
-PAI_1       PRINT_PL 1
+PAI_1       PRINT_PL 67
 PAI_2       ldy #31
             lda P2_CPU
             beq PAI_3
             jsr PRINT_CPU
             jmp PAI_4
-PAI_3       PRINT_PL 2
+PAI_3       PRINT_PL 68
 PAI_4       rts          
 
 PRINT_CPU
-            lda #"["*
+            lda #64+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"C"*
+            lda #78+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"P"*
+            lda #77+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"U"*
+            lda #76+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"]"*
-            sta STATUS_BAR_BUFFER,y
-            rts
-
-PRINT_PL1
-            lda #"["*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"P"*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #" "*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"1"*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"]"*
-            sta STATUS_BAR_BUFFER,y
-            rts
-
-PRINT_PL2
-            lda #"["*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"P"*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #" "*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"2"*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"]"*
+            lda #65+128
             sta STATUS_BAR_BUFFER,y
             rts
 
@@ -693,7 +672,7 @@ PAINT_POINTS_LEFT
             beq PP_1
             inc P1_H_PAINTED
             clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             sta STATUS_BAR_BUFFER,y
             iny
 PP_1        lda P1_SCORE
@@ -708,13 +687,13 @@ PP_1        lda P1_SCORE
             cmp #0
             beq PP_2
 PP_3        clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             sta STATUS_BAR_BUFFER,y
             iny
 PP_2        lda P1_SCORE
             and #%00001111
             clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             sta STATUS_BAR_BUFFER,y
             rts
 
@@ -725,12 +704,12 @@ PAINT_POINTS_RIGHT
             lda P2_SCORE
             and #%00001111
             clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             sta STATUS_BAR_BUFFER,y
             lda P2_SCORE_H
             beq PPR_1
             clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             dey
             dey
             sta STATUS_BAR_BUFFER,y
@@ -743,7 +722,7 @@ PPR_1       lda P2_SCORE
             lsr
             beq PPR_2
 PPR_3       clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             ldy #38
             sta STATUS_BAR_BUFFER,y
             rts
@@ -778,6 +757,9 @@ SF_X        rts
 VBI_ROUTINE
             jsr BACKGROUND_TICK
             jmp XITVBV
+
+TITLE_SCREEN
+            icl 'src\title.asm'
             
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
@@ -788,6 +770,14 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
 STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
+
+.align $400
+SCR_MEM_MENU
+:1000       dta b(1)            
+
+.align $400
+NAMES_FONT
+            ins 'data\names.fnt'
 
 DATA_END
 
@@ -812,6 +802,7 @@ INIT_:1
 .endr
 
 ; More data into bank #52
+            org $6A0
 INIT_52
             ldy #52
 	        lda @TAB_MEM_BANKS,y
@@ -821,5 +812,6 @@ INIT_52
             org $4000	
             ins "data/names.bin"
 
-            run PROGRAM_START_FIRST_PART
+;            run PROGRAM_START_FIRST_PART
+            run TITLE_SCREEN
            
