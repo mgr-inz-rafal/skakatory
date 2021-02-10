@@ -14,6 +14,25 @@
             jsr SETUP_RANDOM_NAME_BABSKIE
             jsr PRINT_NAME
 
+            lda #0
+            sta TMP2+1
+
+MENU_0      ldy TMP2+1
+            lda AMPERSAND_PIXELS_X,y
+            tax
+            lda AMPERSAND_PIXELS_Y,y
+            tay
+            jsr PUT_PIXEL
+            jsr SYNCHRO
+            jsr SYNCHRO
+            jsr SYNCHRO
+            jsr SYNCHRO
+            inc TMP2+1
+            lda TMP2+1
+            cmp #AMPERSAND_PIXEL_COUNT
+            bne MENU_0
+
+
 @           lda STRIG0
             bne @-
             jmp PROGRAM_START_FIRST_PART
@@ -92,3 +111,45 @@ PN_1        lda (TMP),y
             jmp PN_1
 
 PN_X        rts
+
+PUT_PIXEL
+            txa
+            pha
+
+            lda PIXEL_X_TABLE_OFFSET,x
+            tax
+
+            pla
+            pha
+
+PPX_2       cpx #0
+            beq PPX_1
+            sec
+            sbc #8
+            dex
+            jmp PPX_2
+
+PPX_1       sta TMP2 ; Which bit
+
+            pla
+            tax
+
+            mwa PIXEL_Y_TABLE,y TMP
+
+            clc
+            lda TMP
+            adc PIXEL_X_TABLE_OFFSET,x
+            sta TMP
+            lda TMP+1
+            adc #0
+            sta TMP+1
+
+            lda #$ff
+            ldy #0
+            lda (TMP),y
+            ldy TMP2
+            ora PIXEL_X_BIT_TABLE,y
+            ldy #0
+            sta (TMP),y
+
+            rts

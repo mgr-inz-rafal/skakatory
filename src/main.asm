@@ -7,16 +7,17 @@
             icl 'src\atari.inc'
             icl 'src\macros.asm'
 
-FRAME_COUNT         equ 104
-SCR_MEM_1           equ $4150
-SCR_MEM_1_P2        equ $5000
-SCR_MEM_2           equ $6150
-SCR_MEM_2_P2        equ $7000
-@TAB_MEM_BANKS      equ $0600
-MAX_NAME_LEN        equ 12
-NAMES_BANK          equ 52
-NAMES_PER_SEX       equ 500
-ZERO_DIGIT_OFFSET   equ 66
+FRAME_COUNT             equ 104
+SCR_MEM_1               equ $4150
+SCR_MEM_1_P2            equ $5000
+SCR_MEM_2               equ $6150
+SCR_MEM_2_P2            equ $7000
+@TAB_MEM_BANKS          equ $0600
+MAX_NAME_LEN            equ 12
+NAMES_BANK              equ 52
+NAMES_PER_SEX           equ 500
+ZERO_DIGIT_OFFSET       equ 66
+AMPERSAND_PIXEL_COUNT   equ 176
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -773,7 +774,7 @@ STATUS_BAR_BUFFER
 
 .align $400
 SCR_MEM_MENU
-:1000       dta b(1)            
+:1000       dta b(0)            
 
 .align $400
 NAMES_FONT
