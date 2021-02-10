@@ -14,7 +14,9 @@
             jsr SETUP_RANDOM_NAME_BABSKIE
             jsr PRINT_NAME
 
-CHUJ        jmp CHUJ
+@           lda STRIG0
+            bne @-
+            jmp PROGRAM_START_FIRST_PART
 
 PICK_NUMBER_FROM_1_TO_250
             lda RANDOM
