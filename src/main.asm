@@ -16,6 +16,7 @@ SCR_MEM_2_P2        equ $7000
 MAX_NAME_LEN        equ 12
 NAMES_BANK          equ 52
 NAMES_PER_SEX       equ 500
+ZERO_DIGIT_OFFSET   equ 66
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -671,7 +672,7 @@ PAINT_POINTS_LEFT
             beq PP_1
             inc P1_H_PAINTED
             clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             sta STATUS_BAR_BUFFER,y
             iny
 PP_1        lda P1_SCORE
@@ -686,13 +687,13 @@ PP_1        lda P1_SCORE
             cmp #0
             beq PP_2
 PP_3        clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             sta STATUS_BAR_BUFFER,y
             iny
 PP_2        lda P1_SCORE
             and #%00001111
             clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             sta STATUS_BAR_BUFFER,y
             rts
 
@@ -703,12 +704,12 @@ PAINT_POINTS_RIGHT
             lda P2_SCORE
             and #%00001111
             clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             sta STATUS_BAR_BUFFER,y
             lda P2_SCORE_H
             beq PPR_1
             clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             dey
             dey
             sta STATUS_BAR_BUFFER,y
@@ -721,7 +722,7 @@ PPR_1       lda P2_SCORE
             lsr
             beq PPR_2
 PPR_3       clc
-            adc #16
+            adc #ZERO_DIGIT_OFFSET
             ldy #38
             sta STATUS_BAR_BUFFER,y
             rts
