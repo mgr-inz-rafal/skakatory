@@ -323,19 +323,19 @@ CC%%1_X
 .endm
 
 .macro PRINT_PL P12
-            lda #"["*
+            lda #64+128
             sta STATUS_BAR_BUFFER,y
             iny
             lda #"%%1"*
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"U"*
+            lda #76+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"P"*
+            lda #77+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"]"*
+            lda #65+128
             sta STATUS_BAR_BUFFER,y
 .endm
 

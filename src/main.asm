@@ -641,53 +641,19 @@ PAI_3       PRINT_PL 2
 PAI_4       rts          
 
 PRINT_CPU
-            lda #"["*
+            lda #64+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"C"*
+            lda #78+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"P"*
+            lda #77+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"U"*
+            lda #76+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"]"*
-            sta STATUS_BAR_BUFFER,y
-            rts
-
-PRINT_PL1
-            lda #"["*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"P"*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #" "*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"1"*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"]"*
-            sta STATUS_BAR_BUFFER,y
-            rts
-
-PRINT_PL2
-            lda #"["*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"P"*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #" "*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"2"*
-            sta STATUS_BAR_BUFFER,y
-            iny
-            lda #"]"*
+            lda #65+128
             sta STATUS_BAR_BUFFER,y
             rts
 
