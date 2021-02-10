@@ -14,6 +14,18 @@
             jsr SETUP_RANDOM_NAME_BABSKIE
             jsr PRINT_NAME
 
+            ldy #0
+            ldx #0
+            jsr PUT_PIXEL
+
+            ldy #4
+            ldx #0
+            jsr PUT_PIXEL
+
+            ldy #46
+            ldx #0
+            jsr PUT_PIXEL
+
 @           lda STRIG0
             bne @-
             jmp PROGRAM_START_FIRST_PART
@@ -92,3 +104,11 @@ PN_1        lda (TMP),y
             jmp PN_1
 
 PN_X        rts
+
+PUT_PIXEL
+            mwa PIXEL_Y_TABLE,y TMP
+            lda #$ff
+            ldy #0
+            sta (TMP),y
+
+            rts

@@ -773,7 +773,7 @@ STATUS_BAR_BUFFER
 
 .align $400
 SCR_MEM_MENU
-:1000       dta b(1)            
+:1000       dta b(0)            
 
 .align $400
 NAMES_FONT
