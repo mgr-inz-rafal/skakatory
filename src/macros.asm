@@ -326,7 +326,7 @@ CC%%1_X
             lda #64+128
             sta STATUS_BAR_BUFFER,y
             iny
-            lda #"%%1"*
+            lda #%%1+128
             sta STATUS_BAR_BUFFER,y
             iny
             lda #76+128
