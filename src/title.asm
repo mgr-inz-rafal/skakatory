@@ -41,7 +41,6 @@ PA_0        ldy TMP2+1
             lda TMP2+1
             cmp #AMPERSAND_PIXEL_COUNT
             bne PA_0
-
             rts
 
 PICK_NUMBER_FROM_1_TO_250
