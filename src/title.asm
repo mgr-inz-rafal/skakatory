@@ -9,15 +9,26 @@
 	        lda >NAMES_FONT
             sta CHBAS
 
+            lda #0
+            sta CLR2
+            lda #$f
+            sta CLR1
+            sta CLR0
+
             jsr SETUP_RANDOM_NAME
             jsr PRINT_NAME
             jsr SETUP_RANDOM_NAME_BABSKIE
             jsr PRINT_NAME
+            jsr PRINT_AMPERSAND
 
+@           lda STRIG0
+            bne @-
+            jmp PROGRAM_START_FIRST_PART
+
+PRINT_AMPERSAND
             lda #0
             sta TMP2+1
-
-MENU_0      ldy TMP2+1
+PA_0        ldy TMP2+1
             lda AMPERSAND_PIXELS_X,y
             tax
             lda AMPERSAND_PIXELS_Y,y
@@ -26,16 +37,12 @@ MENU_0      ldy TMP2+1
             jsr SYNCHRO
             jsr SYNCHRO
             jsr SYNCHRO
-            jsr SYNCHRO
             inc TMP2+1
             lda TMP2+1
             cmp #AMPERSAND_PIXEL_COUNT
-            bne MENU_0
+            bne PA_0
 
-
-@           lda STRIG0
-            bne @-
-            jmp PROGRAM_START_FIRST_PART
+            rts
 
 PICK_NUMBER_FROM_1_TO_250
             lda RANDOM
@@ -144,7 +151,8 @@ PPX_1       sta TMP2 ; Which bit
             adc #0
             sta TMP+1
 
-            lda #$ff
+            inw TMP
+            inw TMP
             ldy #0
             lda (TMP),y
             ldy TMP2

@@ -246,7 +246,9 @@ DLIST_TITLE_SCREEN
 :6          dta b($70)
             dta b($47)
             dta a(SCR_MEM_MENU)
+            dta b($70)
 :24         dta b($0f)
+            dta b($70)
             dta b($07)
             dta b($41), a(DLIST_TITLE_SCREEN)
 
