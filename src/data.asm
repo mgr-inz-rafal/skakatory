@@ -1091,7 +1091,7 @@ QUOTATION_2
             dta d'         "Celem kaXdej gry jest wygrana.'
             dta d'        JeXli nie zaleXy ci na wygranej,'
             dta d'                bez sensu jest walczyX."'
-            dta d'                   - Rachel Hawthorne   '
+            dta d'                   - ',b(16),b(8),b(17),b(18),b(5),b(4),d' ',b(19),b(8),b(9),b(20),b(18),b(3),b(11),b(21),b(5),'   '
 
 QUOTATION_3
             dta d'      "PXeX, wiek, rasa - takie gXwniane'
