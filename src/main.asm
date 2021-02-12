@@ -243,13 +243,28 @@ DL_MAIN_AREA
             dta b($41), a(SCENE_DISPLAY_LIST)
 
 DLIST_TITLE_SCREEN
-:6          dta b($70)
+:4          dta b($70)
+            dta b($f0)  ; DLI - top
+            dta b($70)
             dta b($47)
             dta a(SCR_MEM_MENU)
             dta b($70)
 :24         dta b($0f)
             dta b($70)
             dta b($07)
+            dta b($70)
+            dta b($70)
+            dta b($70)
+            dta b($f0)  ; DLI - quotation font
+            dta b($70)
+            dta b($40)
+            dta b($02)
+            dta b($10)
+            dta b($02)
+            dta b($10)
+            dta b($02)
+            dta b($40)
+            dta b($02)
             dta b($41), a(DLIST_TITLE_SCREEN)
 
 :$800       dta b(0)
@@ -776,11 +791,13 @@ STATUS_BAR_BUFFER
 
 .align $400
 SCR_MEM_MENU
-:1000       dta b(0)            
+:1160       dta b(0)
 
 .align $400
 NAMES_FONT
             ins 'data\names.fnt'
+QUOTE_FONT
+            ins 'data\quote.fnt'
 
 DATA_END
 

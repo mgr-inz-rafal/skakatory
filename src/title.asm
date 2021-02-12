@@ -1,3 +1,35 @@
+            jsr TITLE_INTRO
+            jsr TITLE_MAIN
+
+@           lda STRIG0
+            bne @-
+            jmp PROGRAM_START_FIRST_PART
+
+TITLE_INTRO
+            rts
+
+DLI_ROUTINE_TITLE
+            pha
+            lda VCOUNT
+            cmp #$17
+            bne @+
+            lda >NAMES_FONT
+            sta CHBASE
+            pla
+            rti
+@           lda >QUOTE_FONT
+            sta CHBASE
+            pla
+            rti
+
+TITLE_MAIN
+			lda <DLI_ROUTINE_TITLE
+			sta VDSLST
+			lda >DLI_ROUTINE_TITLE
+			sta VDSLST+1
+			lda #192
+			sta NMIEN
+
             ldy #0
             lda @TAB_MEM_BANKS,y
             sta PORTB
@@ -19,11 +51,41 @@
             jsr PRINT_NAME
             jsr SETUP_RANDOM_NAME_BABSKIE
             jsr PRINT_NAME
+            jsr PRINT_QUOTATION
             jsr PRINT_AMPERSAND
+            rts        
 
-@           lda STRIG0
-            bne @-
-            jmp PROGRAM_START_FIRST_PART
+PRINT_QUOTATION
+            lda RANDOM
+            and #%00000011
+
+            cmp #0
+            bne PQ_2
+            mwa #QUOTATION_1 TMP
+            jmp PQ_5
+
+PQ_2        cmp #1
+            bne PQ_3
+            mwa #QUOTATION_2 TMP
+            jmp PQ_5
+
+PQ_3        cmp #2
+            bne PQ_4
+            mwa #QUOTATION_3 TMP
+            jmp PQ_5
+
+PQ_4        mwa #QUOTATION_4 TMP
+
+PQ_5        ldx #40*4
+            mwa #SCR_MEM_MENU+1000 TMP2
+            ldy #0
+PQ_1        lda (TMP),y
+            sta (TMP2),y
+            inw TMP
+            inw TMP2
+            dex
+            bne PQ_1
+            rts
 
 PRINT_AMPERSAND
             lda #0
@@ -34,7 +96,6 @@ PA_0        ldy TMP2+1
             lda AMPERSAND_PIXELS_Y,y
             tay
             jsr PUT_PIXEL
-            jsr SYNCHRO
             jsr SYNCHRO
             jsr SYNCHRO
             inc TMP2+1
