@@ -1103,4 +1103,4 @@ QUOTATION_4
             dta d' "PeXna miXoSci i zwrotXw akcji historia'
             dta d'walki o wolnoXX i szacunek dla bliskich.'
             dta d'     Fenomen twXrczy i programistyczny!"'
-            dta d'                    - mgr inz. Rafal    '                        
+            dta d'                    - ',b(24),b(25),b(11),d' ',b(23),b(21),b(26),d'. ',b(27),b(8),b(28),b(8),b(7),'    '                        
