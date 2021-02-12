@@ -1097,7 +1097,7 @@ QUOTATION_3
             dta d'      "PXeX, wiek, rasa - takie gXwniane'
             dta d'     rzeczy dzielX ludzi. Jedyne, co nas'
             dta d'      XXczy, to walka o to, kto lepszy."'
-            dta d'                   - William Wharton    '
+            dta d'                   - ',b(22),b(23),b(4),b(4),b(23),b(8),b(24),d' ',b(22),b(18),b(8),b(11),b(20),b(3),b(21),'    '
 
 QUOTATION_4
             dta d' "PeXna miXoSci i zwrotXw akcji historia'
