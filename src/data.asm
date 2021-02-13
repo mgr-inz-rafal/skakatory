@@ -1100,7 +1100,7 @@ QUOTATION_3
             dta d'                   - ',b(22),b(23),b(4),b(4),b(23),b(8),b(24),d' ',b(22),b(18),b(8),b(11),b(20),b(3),b(21),d'    '
 
 QUOTATION_4
-            dta d' "PeXna miXoSci i zwrotXw akcji historia'
-            dta d'walki o wolnoXX i szacunek dla bliskich.'
-            dta d'     Fenomen twXrczy i programistyczny!"'
-            dta d'                    - ',b(24),b(25),b(11),d' ',b(23),b(21),b(26),d'. ',b(27),b(8),b(28),b(8),b(7),'    '                        
+            dta d' "Pe',b(29),d'na mi',b(29),d'o',b(59),d'ci i zwrot',b(32),d'w akcji historia'
+            dta d'walki o wolno',b(59),b(62),d' i szacunek dla bliskich.'
+            dta d'     Fenomen tw',b(32),d'rczy i programistyczny',b(63),d'"'
+            dta d'                    - ',b(24),b(25),b(11),d' ',b(23),b(21),b(26),d'. ',b(27),b(8),b(28),b(8),b(7),d'    '                        
