@@ -1,7 +1,17 @@
             jsr TITLE_INTRO
             jsr TITLE_MAIN
 
-@           lda STRIG0
+@           jsr SYNCHRO
+            dec QUOTE_COLOR_COUNTER
+            lda QUOTE_COLOR_COUNTER
+            bne TIT_1
+            #if .byte QUOTE_COLOR < #10
+                inc QUOTE_COLOR
+            #end
+            lda #QUOTE_COLOR_COOLDOWN
+            sta QUOTE_COLOR_COUNTER
+
+TIT_1       lda STRIG0
             bne @-
             jmp PROGRAM_START_FIRST_PART
 
@@ -19,12 +29,16 @@ DLI_ROUTINE_TITLE
             rti
 @           lda >QUOTE_FONT
             sta CHBASE
-            lda #$08
+            lda QUOTE_COLOR
             sta COLPF1
             pla
             rti
 
 TITLE_MAIN
+            lda #QUOTE_COLOR_COOLDOWN
+            sta QUOTE_COLOR_COUNTER
+            lda #0
+            sta QUOTE_COLOR
 			lda <DLI_ROUTINE_TITLE
 			sta VDSLST
 			lda >DLI_ROUTINE_TITLE
@@ -53,8 +67,8 @@ TITLE_MAIN
             jsr PRINT_NAME
             jsr SETUP_RANDOM_NAME_BABSKIE
             jsr PRINT_NAME
-            jsr PRINT_QUOTATION
             jsr PRINT_AMPERSAND
+            jsr PRINT_QUOTATION
             rts        
 
 PRINT_QUOTATION

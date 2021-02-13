@@ -45,6 +45,10 @@ AMPERSAND_PIXEL_COUNT   equ 176
 .zpvar          STRIG1_CPU_HOLD        .byte
 .zpvar          TMP                    .word
 .zpvar          TMP2                   .word
+.zpvar          QUOTE_COLOR            .byte
+
+.zpvar          QUOTE_COLOR_COUNTER    .byte
+QUOTE_COLOR_COOLDOWN        equ 11
 
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
