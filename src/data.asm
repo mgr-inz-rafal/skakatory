@@ -1088,10 +1088,10 @@ QUOTATION_1
             dta d'                   - ',b(1),b(3),b(4),b(5),b(6),b(7),b(8),b(9),d' ',b(10),b(11),b(15),b(6),d'      '
 
 QUOTATION_2
-            dta d'         "Celem kaXdej gry jest wygrana.'
-            dta d'        JeXli nie zaleXy ci na wygranej,'
-            dta d'                bez sensu jest walczyX."'
-            dta d'                   - ',b(16),b(8),b(17),b(18),b(5),b(4),d' ',b(19),b(8),b(9),b(20),b(18),b(3),b(11),b(21),b(5),'   '
+            dta d'         "Celem ka',b(61),d'dej gry jest wygrana.'
+            dta d'        Je',b(59),d'li nie zale',b(61),d'y Ci na wygranej,'
+            dta d'                bez sensu jest walczy',b(62),d'."'
+            dta d'                   - ',b(16),b(8),b(17),b(18),b(5),b(4),d' ',b(19),b(8),b(9),b(20),b(18),b(3),b(11),b(21),b(5),d'   '
 
 QUOTATION_3
             dta d'      "PXeX, wiek, rasa - takie gXwniane'
