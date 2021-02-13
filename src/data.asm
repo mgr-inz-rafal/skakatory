@@ -1083,8 +1083,8 @@ AMPERSAND_PIXELS_Y
 
 QUOTATION_1
             dta d'                "We mnie jest dwu ludzi,'
-            dta d'  jeden zupeXnie rozsXdny, drugi wariat.'
-            dta d'                    KtXry zaX zwyciXXy?"'
+            dta d'  jeden zupe',b(29),d'nie rozs',b(30),d'dny, drugi wariat.'
+            dta d'                    Kt',b(32),d'ry za',b(59),d' zwyci',b(60),b(61),d'y?"'
             dta d'                   - ',b(1),b(3),b(4),b(5),b(6),b(7),b(8),b(9),d' ',b(10),b(11),b(15),b(6),d'      '
 
 QUOTATION_2
