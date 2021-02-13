@@ -19,6 +19,8 @@ DLI_ROUTINE_TITLE
             rti
 @           lda >QUOTE_FONT
             sta CHBASE
+            lda #$08
+            sta COLPF1
             pla
             rti
 
