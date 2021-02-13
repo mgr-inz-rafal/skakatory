@@ -1094,10 +1094,10 @@ QUOTATION_2
             dta d'                   - ',b(16),b(8),b(17),b(18),b(5),b(4),d' ',b(19),b(8),b(9),b(20),b(18),b(3),b(11),b(21),b(5),d'   '
 
 QUOTATION_3
-            dta d'      "PXeX, wiek, rasa - takie gXwniane'
-            dta d'     rzeczy dzielX ludzi. Jedyne, co nas'
-            dta d'      XXczy, to walka o to, kto lepszy."'
-            dta d'                   - ',b(22),b(23),b(4),b(4),b(23),b(8),b(24),d' ',b(22),b(18),b(8),b(11),b(20),b(3),b(21),'    '
+            dta d'      "P',b(29),d'e',b(62),d', wiek, rasa - takie g',b(32),d'wniane'
+            dta d'     rzeczy dziel',b(30),d' ludzi. Jedyne, co nas'
+            dta d'      ',b(29),b(30),d'czy, to walka o to, kto lepszy."'
+            dta d'                   - ',b(22),b(23),b(4),b(4),b(23),b(8),b(24),d' ',b(22),b(18),b(8),b(11),b(20),b(3),b(21),d'    '
 
 QUOTATION_4
             dta d' "PeXna miXoSci i zwrotXw akcji historia'
