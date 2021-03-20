@@ -3,3 +3,5 @@ mads.exe
 build
 data/names.bin
 tools/.~lock.ampersand_pixels.ods#
+.~lock*#
+tools/convert_pixels
