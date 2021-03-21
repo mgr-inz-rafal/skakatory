@@ -777,7 +777,7 @@ SF_FIRST
 SF_X        rts             
 
 VBI_ROUTINE
-            jsr BACKGROUND_TICK
+            //jsr BACKGROUND_TICK
             jmp XITVBV
 
 TITLE_SCREEN
