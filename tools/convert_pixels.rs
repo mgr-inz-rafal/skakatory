@@ -4,7 +4,7 @@ use std::io::{self, BufRead};
 use std::path::Path;
 
 fn main() {
-    for i in 52..=85 {
+    for i in 86..=103 {
         let mut file = File::create(format!("decimal_pixel_data/frame_{}_bytes.bin", i)).unwrap();
         if let Ok(lines) = read_lines(format!("decimal_pixel_data/frame_{}_bytes.txt", i)) {
             for line in lines {
