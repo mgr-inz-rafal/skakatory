@@ -209,15 +209,15 @@ SCENE_DISPLAY_LIST
 DLIST_GAME
 :3          dta b($70)
 DLIST_MEM_TOP
-            dta b($4e)
+            dta b($4f)
 DLIST_ADDR_TOP
             dta a($0000)
-:93         dta b($0e)
+:93         dta b($0f)
 DLIST_MEM_BOTTOM
-            dta b($4e)
+            dta b($4f)
 DLIST_ADDR_BOTTOM
             dta a($0000)
-:97         dta b($0e)
+:97         dta b($0f)
             dta b($42),a(STATUS_BAR_BUFFER)
             dta b($41),a(DLIST_GAME)
 DL_MAIN_AREA
@@ -515,13 +515,15 @@ GAME_ENGINE_INIT
             ; Enable sprites
             lda #>PMG_BASE
             sta PMBASE
-            lda #%00100001
+            lda #%01100001
             sta GPRIOR
             lda #%00000011
             sta GRACTL
             lda SDMCTL
             ora #%00011100
             sta SDMCTL
+            lda #$b0
+            sta 712  ; TODO: Setup proper color here
 
             ; Init VBI
             ldy <VBI_ROUTINE

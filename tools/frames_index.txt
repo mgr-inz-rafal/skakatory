@@ -1,0 +1,3 @@
+52 frames (F0  - F51)  - stage 1
+34 frames (F52 - F85)  - stage 2
+18 frames (F86 - F103) - stage 3
