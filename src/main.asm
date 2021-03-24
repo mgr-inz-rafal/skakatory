@@ -207,7 +207,10 @@ dSAFE	.ds MAX_BANKS
 PMG_BASE
 SCENE_DISPLAY_LIST
 DLIST_GAME
-:3          dta b($70)
+:2          dta b($70)
+            dta b($50)
+            dta b(%10000000)  ; DLI - top of the screen
+            dta b($00) 
 DLIST_MEM_TOP
             dta b($4f)
 DLIST_ADDR_TOP
@@ -217,7 +220,9 @@ DLIST_MEM_BOTTOM
             dta b($4f)
 DLIST_ADDR_BOTTOM
             dta a($0000)
-:97         dta b($0f)
+:92         dta b($0f)
+            dta b(%10001111) ; DLI - before status bar
+:4          dta b($0f)
             dta b($42),a(STATUS_BAR_BUFFER)
             dta b($41),a(DLIST_GAME)
 DL_MAIN_AREA
@@ -283,6 +288,11 @@ PMG_END     equ PMG_BASE+$800
 // Main program start
 //------------------------------------------------
 PROGRAM_START_FIRST_PART
+			lda <DLI_ROUTINE_GAME
+			sta VDSLST
+			lda >DLI_ROUTINE_GAME
+			sta VDSLST+1
+
             jsr GAME_ENGINE_INIT
             jsr GAME_STATE_INIT
 
@@ -784,7 +794,10 @@ VBI_ROUTINE
 
 TITLE_SCREEN
             icl 'src\title.asm'
-            
+
+DLI_ROUTINE_GAME
+            rti
+
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
 ; Call mem detect proc
