@@ -18,6 +18,7 @@ NAMES_BANK              equ 52
 NAMES_PER_SEX           equ 500
 ZERO_DIGIT_OFFSET       equ 66
 AMPERSAND_PIXEL_COUNT   equ 176
+SHADE_COLOR             equ $b0
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -221,8 +222,10 @@ DLIST_MEM_BOTTOM
 DLIST_ADDR_BOTTOM
             dta a($0000)
 :92         dta b($0f)
+:3          dta b($0f)
             dta b(%10001111) ; DLI - before status bar
-:4          dta b($0f)
+            dta b($0f)
+            dta b($20)
             dta b($42),a(STATUS_BAR_BUFFER)
             dta b($41),a(DLIST_GAME)
 DL_MAIN_AREA
@@ -532,8 +535,6 @@ GAME_ENGINE_INIT
             lda SDMCTL
             ora #%00011100
             sta SDMCTL
-            lda #$b0
-            sta 712  ; TODO: Setup proper color here
 
             ; Init VBI
             ldy <VBI_ROUTINE
@@ -796,6 +797,32 @@ TITLE_SCREEN
             icl 'src\title.asm'
 
 DLI_ROUTINE_GAME
+            pha
+            txa
+            pha
+            lda VCOUNT
+            cmp #$0f
+            bne @+
+            lda #%01100001
+            ldx #SHADE_COLOR
+            sta WSYNC
+            sta WSYNC
+            sta PRIOR
+            stx COLBK
+            pla
+            tax
+            pla
+            rti
+@           cmp #$6f
+            bne @+
+            lda #%00100001
+            ldx #$00
+            sta WSYNC
+            sta PRIOR
+            stx COLBK
+@           pla
+            tax
+            pla
             rti
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
