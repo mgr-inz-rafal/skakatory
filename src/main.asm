@@ -109,6 +109,7 @@ LAST_GAME_LEVEL     equ 12
 .zpvar          CURRENT_ROTATIONS           .byte
 .zpvar          FIRST_FRAME                 .byte
 .zpvar          LAST_FRAME                  .byte
+.zpvar	        ANTIC_TMP                   .byte
 
 //------------------------------------------------
 // Memory detection
@@ -291,18 +292,20 @@ PMG_END     equ PMG_BASE+$800
 // Main program start
 //------------------------------------------------
 PROGRAM_START_FIRST_PART
+            jsr DISABLE_ANTIC
 			lda <DLI_ROUTINE_GAME
 			sta VDSLST
 			lda >DLI_ROUTINE_GAME
 			sta VDSLST+1
 
-            jsr GAME_ENGINE_INIT
             jsr GAME_STATE_INIT
 
             ldx <DLIST_GAME
             ldy >DLIST_GAME
             stx SDLSTL
             sty SDLSTL+1
+            jsr ENABLE_ANTIC
+            jsr GAME_ENGINE_INIT
 
 GAME_LOOP
             jsr SYNCHRO
@@ -796,6 +799,7 @@ VBI_ROUTINE
             jmp XITVBV
 
 TITLE_SCREEN
+            jsr DISABLE_ANTIC
             icl 'src\title.asm'
 
 DLI_ROUTINE_GAME
@@ -826,6 +830,26 @@ DLI_ROUTINE_GAME
             tax
             pla
             rti
+
+DISABLE_ANTIC
+            lda SDMCTL
+            sta ANTIC_TMP
+            lda #$00
+            sta SDMCTL
+            lda 20
+@           cmp 20
+            beq @-
+            lda #%01000000
+            sta NMIEN
+            rts
+
+
+ENABLE_ANTIC
+            lda ANTIC_TMP
+            sta SDMCTL
+            lda #%11000000
+            sta NMIEN
+            rts
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
@@ -880,6 +904,5 @@ INIT_52
             org $4000	
             ins "data/names.bin"
 
-;            run PROGRAM_START_FIRST_PART
             run TITLE_SCREEN
            

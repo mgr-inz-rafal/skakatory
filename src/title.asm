@@ -77,6 +77,7 @@ TITLE_MAIN
             jsr PRINT_NAME
             jsr SETUP_RANDOM_NAME_BABSKIE
             jsr PRINT_NAME
+            jsr ENABLE_ANTIC
             jsr PRINT_AMPERSAND
             jsr PRINT_QUOTATION
             lda #$ff
