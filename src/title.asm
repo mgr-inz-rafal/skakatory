@@ -1,4 +1,3 @@
-            jsr TITLE_INTRO
             jsr TITLE_MAIN
 
 @           jsr SYNCHRO
@@ -14,9 +13,6 @@
 TIT_1       lda STRIG0
             bne @-
             jmp PROGRAM_START_FIRST_PART
-
-TITLE_INTRO
-            rts
 
 DLI_ROUTINE_TITLE
             pha
@@ -34,7 +30,20 @@ DLI_ROUTINE_TITLE
             pla
             rti
 
+CLEAR_TITLE_SCREEN
+            ldy #0
+            mwa #SCR_MEM_MENU tmp
+CTS_0       tya
+            sta (tmp),y
+            inw tmp
+            #if .word tmp = #SCR_MEM_MENU+1160
+                rts
+            #end
+            jmp CTS_0
+
 TITLE_MAIN
+            lda #%00100001
+            sta GPRIOR
             lda #QUOTE_COLOR_COOLDOWN
             sta QUOTE_COLOR_COUNTER
             lda #0
@@ -63,12 +72,15 @@ TITLE_MAIN
             sta CLR1
             sta CLR0
 
+            jsr CLEAR_TITLE_SCREEN
             jsr SETUP_RANDOM_NAME
             jsr PRINT_NAME
             jsr SETUP_RANDOM_NAME_BABSKIE
             jsr PRINT_NAME
             jsr PRINT_AMPERSAND
             jsr PRINT_QUOTATION
+            lda #$ff
+            sta CH
             rts        
 
 PRINT_QUOTATION

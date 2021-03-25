@@ -382,7 +382,9 @@ RESTART_TICK
             bne RT_X
 
 RT_1        jsr CLEAR_PLAYERS
-            jsr GAME_STATE_INIT
+            pla
+            pla
+            jmp TITLE_SCREEN
 
 RT_X        rts
 
