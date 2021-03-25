@@ -11,6 +11,7 @@
             sta QUOTE_COLOR_COUNTER
 
 TIT_1       lda STRIG0
+            sta ATRACT
             bne @-
             jmp PROGRAM_START_FIRST_PART
 

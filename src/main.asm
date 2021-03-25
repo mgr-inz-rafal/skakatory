@@ -323,6 +323,7 @@ GAME_LOOP
             jsr CHECK_COLLISIONS
 
             ldy #0
+            sty ATRACT
             lda (STRIG_0_SOURCE),y
             bne @+
             START_JUMP 1
