@@ -161,6 +161,7 @@ IJ%%1_X
             lda (P%%1_X_TABLE),y
             inc DYING_POS_X_P%%1
             .if :1 = 1
+                sta P1_X
                 sta HPOSP0
                 sta HPOSP1
             .endif
@@ -172,6 +173,7 @@ IJ%%1_X
             jmp DT%%1_X
 DT%%1_0     lda #0
             .if :1 = 1
+                sta P1_X
                 sta HPOSP0
                 sta HPOSP1
             .endif

@@ -922,7 +922,7 @@ DLI_ROUTINE_GAME
             bne @+
             lda #%01100001
             ldx #SHADE_COLOR
-            ldy #P1_X_POSITION
+            ldy P1_X
             sta WSYNC
             sta WSYNC
             sta PRIOR
@@ -967,7 +967,6 @@ DISABLE_ANTIC
             lda #%01000000
             sta NMIEN
             rts
-
 
 ENABLE_ANTIC
             lda ANTIC_TMP
