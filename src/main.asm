@@ -557,6 +557,8 @@ ADVANCE_LEVEL
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
             sta CURRENT_ROTATIONS
+            jsr PAINT_TIMER
+            jsr INIT_TIMER
             rts
 
 PAINT_PLAYERS
