@@ -212,10 +212,13 @@ IDC%%1_X
                 sta PMG_P2,y
                 sta PMG_P3,y
             .endif
+            cpy #PLAYER_DRAW_LIMIT
+            beq CP_X
             iny
             inx
             cpx #20
             bne @-
+CP_X
 .endm
 
 .macro START_JUMP P12

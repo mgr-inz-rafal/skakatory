@@ -22,6 +22,7 @@ SHADE_COLOR             equ $b0
 TIMER_LENGTH            equ 14
 TIMER_SHADOW_COLOR      equ $0b
 TIMER_COLOR             equ $ee
+PLAYER_DRAW_LIMIT       equ 224
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -582,10 +583,13 @@ PAINT_PLAYERS
             sbc P1_DRAWING_Y_OFFSET
             tay
             ldx #0
-@           lda PLAYER_DATA_00,x
-            sta PMG_P0,y
-            lda PLAYER_DATA_01,x
-            sta PMG_P1,y
+@           tya
+            #if .byte @ < #PLAYER_DRAW_LIMIT
+                lda PLAYER_DATA_00,x
+                sta PMG_P0,y
+                lda PLAYER_DATA_01,x
+                sta PMG_P1,y
+            #end
             iny
             inx
             cpx #20
@@ -597,10 +601,13 @@ PAINT_PLAYERS
             sbc P2_DRAWING_Y_OFFSET
             tay
             ldx #0
-@           lda PLAYER_DATA_02,x
-            sta PMG_P2,y
-            lda PLAYER_DATA_03,x
-            sta PMG_P3,y
+@           tya
+            #if .byte @ < #PLAYER_DRAW_LIMIT
+                lda PLAYER_DATA_02,x
+                sta PMG_P2,y
+                lda PLAYER_DATA_03,x
+                sta PMG_P3,y
+            #end
             iny
             inx
             cpx #20
