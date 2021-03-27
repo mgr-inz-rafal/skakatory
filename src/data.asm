@@ -46,7 +46,6 @@ JUMP_HEIGHT_TABLE
             dta b(152)
             dta b(156)
 
-; Level difficulty parameters
 ROTATIONS_PER_LEVEL
             dta b(8)
             dta b(10)
@@ -74,6 +73,19 @@ ROTATION_COOLDOWN_TAB
             dta b(3)
             dta b(2)
             dta b(1)
+
+TIMER_DECREASE_TICS
+            dta b(15)
+            dta b(14)
+            dta b(15)
+            dta b(19)
+            dta b(20)
+            dta b(25)
+            dta b(22)
+            dta b(17)
+            dta b(20)
+            dta b(23)
+            dta b(33)
 
 FIRST_FRAME_PER_LEVEL
             dta b(0)

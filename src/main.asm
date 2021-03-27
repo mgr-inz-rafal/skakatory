@@ -19,6 +19,7 @@ NAMES_PER_SEX           equ 500
 ZERO_DIGIT_OFFSET       equ 66
 AMPERSAND_PIXEL_COUNT   equ 176
 SHADE_COLOR             equ $b0
+TIMER_LENGTH            equ 14
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -47,6 +48,10 @@ SHADE_COLOR             equ $b0
 .zpvar          TMP                    .word
 .zpvar          TMP2                   .word
 .zpvar          QUOTE_COLOR            .byte
+.zpvar          TIMER_PTR              .word
+.zpvar          TIMER_COUNTER          .byte
+.zpvar          IN_GAME                .byte
+.zpvar          REDUCE_TIMER           .byte
 
 .zpvar          QUOTE_COLOR_COUNTER    .byte
 QUOTE_COLOR_COOLDOWN        equ 11
@@ -305,9 +310,14 @@ PROGRAM_START_FIRST_PART
             stx SDLSTL
             sty SDLSTL+1
             jsr ENABLE_ANTIC
+            inc IN_GAME
             jsr GAME_ENGINE_INIT
 
+            jsr PAINT_TIMER
+            jsr INIT_TIMER
+
 GAME_LOOP
+            jsr TIMER_TICK
             jsr SYNCHRO
             jsr RESTART_TICK
             lda #$ff
@@ -337,6 +347,69 @@ AI_TICK     AI_PLAYER_TICK 1 0
             AI_PLAYER_TICK 2 1
             RELEASE_AI_KEY 1 0
             RELEASE_AI_KEY 2 1
+            rts
+
+PAINT_TIMER
+            lda #29
+            ldy #TIMER_LENGTH
+            ldx #(40/2)+(TIMER_LENGTH/2)-1
+@           sta STATUS_BAR_BUFFER,x
+            dex
+            dey
+            bne @-
+            mwa #((40/2)+(TIMER_LENGTH/2)-1)+STATUS_BAR_BUFFER TIMER_PTR
+            rts
+
+INIT_TIMER
+            lda #0
+            sta TIMER_COUNTER
+            sta REDUCE_TIMER
+            rts
+
+TIMER_TICK
+            lda REDUCE_TIMER
+            beq TT_X
+            ldy #0
+            lda (TIMER_PTR),y
+            jsr GET_NEXT_TIMER_CHAR
+            sta (TIMER_PTR),y
+            ldx #0
+            stx REDUCE_TIMER
+            cmp #29+128
+            bne TT_X
+            dew TIMER_PTR 
+TT_X        rts
+
+GET_NEXT_TIMER_CHAR
+            cmp #29
+            bne @+
+            lda #30
+            rts
+@           cmp #30
+            bne @+
+            lda #31
+            rts
+@           cmp #31
+            bne @+
+            lda #61
+            rts
+@           cmp #61
+            bne @+
+            lda #62
+            rts
+@           cmp #62
+            bne @+
+            lda #63
+            rts
+@           cmp #63
+            bne @+
+            lda #79
+            rts
+@           cmp #79
+            bne @+
+            lda #80
+            rts
+@           lda #29+128
             rts
 
 JOIN_PLAYER_TICK
@@ -484,6 +557,8 @@ ADVANCE_LEVEL
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
             sta CURRENT_ROTATIONS
+            jsr PAINT_TIMER
+            jsr INIT_TIMER
             rts
 
 PAINT_PLAYERS
@@ -796,8 +871,17 @@ SF_FIRST
 SF_X        rts             
 
 VBI_ROUTINE
+            lda IN_GAME
+            beq @+
             jsr BACKGROUND_TICK
-            jmp XITVBV
+            inc TIMER_COUNTER
+            ldy CURRENT_GAME_LEVEL
+            #if .byte TIMER_COUNTER == TIMER_DECREASE_TICS,y
+                inc REDUCE_TIMER
+                lda #0
+                sta TIMER_COUNTER
+            #end
+@           jmp XITVBV
 
 TITLE_SCREEN
             jsr DISABLE_ANTIC
