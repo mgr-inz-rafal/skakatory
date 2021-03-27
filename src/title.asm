@@ -1,3 +1,4 @@
+            mva #0 IN_GAME
             jsr TITLE_MAIN
 
 @           jsr SYNCHRO
