@@ -19,6 +19,7 @@ NAMES_PER_SEX           equ 500
 ZERO_DIGIT_OFFSET       equ 66
 AMPERSAND_PIXEL_COUNT   equ 176
 SHADE_COLOR             equ $b0
+TIMER_LENGTH            equ 14
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -307,6 +308,8 @@ PROGRAM_START_FIRST_PART
             jsr ENABLE_ANTIC
             jsr GAME_ENGINE_INIT
 
+            jsr PAINT_TIMER
+
 GAME_LOOP
             jsr SYNCHRO
             jsr RESTART_TICK
@@ -337,6 +340,17 @@ AI_TICK     AI_PLAYER_TICK 1 0
             AI_PLAYER_TICK 2 1
             RELEASE_AI_KEY 1 0
             RELEASE_AI_KEY 2 1
+            rts
+
+PAINT_TIMER
+            lda #29
+            ldy #TIMER_LENGTH-1
+            ldx #(40/2)+(TIMER_LENGTH/2)-1
+@           sta STATUS_BAR_BUFFER,x
+            dex
+            dey
+            bne @-
+            sta STATUS_BAR_BUFFER,x
             rts
 
 JOIN_PLAYER_TICK
