@@ -472,7 +472,7 @@ RESTART_TICK
             cmp #6
             bne RT_X
 
-RT_1        jsr CLEAR_PLAYERS
+RT_1        jsr CLEAR_SPRITES
             pla
             pla
             jmp TITLE_SCREEN
@@ -489,6 +489,14 @@ SHOULD_UPDATE_SCORE
             lda #0
             rts
 SUS_0       lda #1
+            rts
+
+CLEAR_SPRITES
+            lda #0
+            sta HPOSP0
+            sta HPOSP1
+            sta HPOSP2
+            sta HPOSP3
             rts
 
 CHECK_SCORE
