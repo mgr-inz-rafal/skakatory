@@ -20,8 +20,8 @@ ZERO_DIGIT_OFFSET       equ 66
 AMPERSAND_PIXEL_COUNT   equ 176
 SHADE_COLOR             equ $b0
 TIMER_LENGTH            equ 14
-TIMER_SHADOW_COLOR      equ $0b
-TIMER_COLOR             equ $ee
+TIMER_SHADOW_COLOR      equ $0f
+TIMER_COLOR             equ $e4
 PLAYER_DRAW_LIMIT       equ 224
 
 .zpvar          P1_Y_TABLE             .word
