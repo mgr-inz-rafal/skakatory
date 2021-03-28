@@ -315,10 +315,6 @@ LEFT_KILL_X_SPEED_2
             dta b(165)
             dta b(166)
             dta b(168)
-            dta b(170)
-            dta b(171)
-            dta b(173)
-            dta b(175)
             dta b($ff)
  
 RIGHT_KILL_X_SPEED_2
@@ -374,10 +370,6 @@ RIGHT_KILL_X_SPEED_2
             dta b($aa-165+81)
             dta b($aa-166+81)
             dta b($aa-168+81)
-            dta b($aa-170+81)
-            dta b($aa-171+81)
-            dta b($aa-173+81)
-            dta b($aa-175+81)
             dta b($ff)
 
 LEFT_KILL_Y_SPEED_2
@@ -434,9 +426,6 @@ LEFT_KILL_Y_SPEED_2
             dta b(215)
             dta b(219)
             dta b(223)
-            dta b(228)
-            dta b(232)
-            dta b(236)
             
 LEFT_KILL_X_SPEED_3
             dta b(083)
