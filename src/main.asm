@@ -355,9 +355,9 @@ AI_TICK     AI_PLAYER_TICK 1 0
 
 PAINT_TIMER_SHADOW
             lda #$ff
-            ldy #9
-@           sta PMG_P0+226,y
-            sta PMG_P1+226,y
+            ldy #7
+@           sta PMG_P0+227,y
+            sta PMG_P1+227,y
             dey
             cpy #$ff
             bne @-
