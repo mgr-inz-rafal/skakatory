@@ -1,4 +1,5 @@
             mva #0 IN_GAME
+            jsr CLEAR_PLAYERS_PMG
             jsr TITLE_MAIN
 
 @           jsr SYNCHRO
@@ -15,6 +16,17 @@ TIT_1       lda STRIG0
             sta ATRACT
             bne @-
             jmp PROGRAM_START_FIRST_PART
+
+CLEAR_PLAYERS_PMG
+            ldy #0
+            lda #0
+@           sta PMG_P0,y
+            sta PMG_P1,y
+            sta PMG_P2,y
+            sta PMG_P3,y
+            iny
+            bne @-
+            rts            
 
 DLI_ROUTINE_TITLE
             pha

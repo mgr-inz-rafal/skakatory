@@ -20,6 +20,9 @@ ZERO_DIGIT_OFFSET       equ 66
 AMPERSAND_PIXEL_COUNT   equ 176
 SHADE_COLOR             equ $b0
 TIMER_LENGTH            equ 14
+TIMER_SHADOW_COLOR      equ $0f
+TIMER_COLOR             equ $e4
+PLAYER_DRAW_LIMIT       equ 224
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -314,6 +317,7 @@ PROGRAM_START_FIRST_PART
             jsr GAME_ENGINE_INIT
 
             jsr PAINT_TIMER
+            jsr PAINT_TIMER_SHADOW
             jsr INIT_TIMER
 
 GAME_LOOP
@@ -348,6 +352,16 @@ AI_TICK     AI_PLAYER_TICK 1 0
             RELEASE_AI_KEY 1 0
             RELEASE_AI_KEY 2 1
             rts
+
+PAINT_TIMER_SHADOW
+            lda #$ff
+            ldy #7
+@           sta PMG_P0+227,y
+            sta PMG_P1+227,y
+            dey
+            cpy #$ff
+            bne @-
+            rts            
 
 PAINT_TIMER
             lda #29
@@ -458,7 +472,7 @@ RESTART_TICK
             cmp #6
             bne RT_X
 
-RT_1        jsr CLEAR_PLAYERS
+RT_1        jsr CLEAR_SPRITES
             pla
             pla
             jmp TITLE_SCREEN
@@ -475,6 +489,14 @@ SHOULD_UPDATE_SCORE
             lda #0
             rts
 SUS_0       lda #1
+            rts
+
+CLEAR_SPRITES
+            lda #0
+            sta HPOSP0
+            sta HPOSP1
+            sta HPOSP2
+            sta HPOSP3
             rts
 
 CHECK_SCORE
@@ -569,10 +591,13 @@ PAINT_PLAYERS
             sbc P1_DRAWING_Y_OFFSET
             tay
             ldx #0
-@           lda PLAYER_DATA_00,x
-            sta PMG_P0,y
-            lda PLAYER_DATA_01,x
-            sta PMG_P1,y
+@           tya
+            #if .byte @ < #PLAYER_DRAW_LIMIT
+                lda PLAYER_DATA_00,x
+                sta PMG_P0,y
+                lda PLAYER_DATA_01,x
+                sta PMG_P1,y
+            #end
             iny
             inx
             cpx #20
@@ -584,10 +609,13 @@ PAINT_PLAYERS
             sbc P2_DRAWING_Y_OFFSET
             tay
             ldx #0
-@           lda PLAYER_DATA_02,x
-            sta PMG_P2,y
-            lda PLAYER_DATA_03,x
-            sta PMG_P3,y
+@           tya
+            #if .byte @ < #PLAYER_DRAW_LIMIT
+                lda PLAYER_DATA_02,x
+                sta PMG_P2,y
+                lda PLAYER_DATA_03,x
+                sta PMG_P3,y
+            #end
             iny
             inx
             cpx #20
@@ -888,32 +916,44 @@ TITLE_SCREEN
             icl 'src\title.asm'
 
 DLI_ROUTINE_GAME
-            pha
-            txa
-            pha
+            phr
             lda VCOUNT
             cmp #$0f
             bne @+
             lda #%01100001
             ldx #SHADE_COLOR
+            ldy P1_X
             sta WSYNC
             sta WSYNC
             sta PRIOR
             stx COLBK
-            pla
-            tax
-            pla
+            sty HPOSP0
+            sty HPOSP1
+            ldy #0
+            sty SIZEP0
+            sty SIZEP1
+            plr
             rti
 @           cmp #$6f
             bne @+
-            lda #%00100001
+            lda #%00100000
             ldx #$00
+            ldy #TIMER_SHADOW_COLOR
             sta WSYNC
             sta PRIOR
             stx COLBK
-@           pla
-            tax
-            pla
+            lda #100
+            sta HPOSP0
+            lda #124
+            sta HPOSP1
+            lda #3
+            sta SIZEP0
+            sta SIZEP1
+            sty CLR1
+            ldy #TIMER_COLOR
+            sty COLPM0
+            sty COLPM1
+@           plr
             rti
 
 DISABLE_ANTIC
@@ -927,7 +967,6 @@ DISABLE_ANTIC
             lda #%01000000
             sta NMIEN
             rts
-
 
 ENABLE_ANTIC
             lda ANTIC_TMP
