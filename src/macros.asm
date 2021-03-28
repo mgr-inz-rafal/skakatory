@@ -7,6 +7,8 @@
             beq DI%%1_X
             lda #0
             sta P%%1_INVUL
+            lda #1
+            sta P%%1_VISIBLE
             lda #P%%1_X_POSITION
             .if :1 = 1
                 sta HPOSP0
@@ -83,7 +85,7 @@ PT%%1_INVUL lda P%%1_INVUL
                 sta HPOSP3
             .endif
             jmp PT%%1_X
-PT%%1_2        inc P%%1_VISIBLE
+PT%%1_2     inc P%%1_VISIBLE
             lda #P%%1_X_POSITION
             .if :1 = 1
                 sta HPOSP0

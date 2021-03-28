@@ -918,11 +918,16 @@ TITLE_SCREEN
 DLI_ROUTINE_GAME
             phr
             lda VCOUNT
+
+            ; Top of the game area
             cmp #$0f
             bne @+
-            lda #%01100001
             ldx #SHADE_COLOR
+            ldy #$ff
+            lda P1_VISIBLE
+            beq DRG_1
             ldy P1_X
+DRG_1       lda #%01100001
             sta WSYNC
             sta WSYNC
             sta PRIOR
@@ -934,6 +939,8 @@ DLI_ROUTINE_GAME
             sty SIZEP1
             plr
             rti
+
+            ; Status bar
 @           cmp #$6f
             bne @+
             lda #%00100000
