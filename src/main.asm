@@ -301,6 +301,10 @@ PMG_END     equ PMG_BASE+$800
 // Main program start
 //------------------------------------------------
 PROGRAM_START_FIRST_PART
+            lda #00
+            ldx #<MODUL
+            ldy #>MODUL
+            jsr RASTERMUSICTRACKER
             jsr DISABLE_ANTIC
             lda <DLI_ROUTINE_GAME
             sta VDSLST
@@ -900,6 +904,7 @@ SF_FIRST
 SF_X        rts             
 
 VBI_ROUTINE
+            jsr RASTERMUSICTRACKER+3
             lda IN_GAME
             beq @+
             jsr BACKGROUND_TICK
