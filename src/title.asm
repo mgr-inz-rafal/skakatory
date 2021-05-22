@@ -46,11 +46,11 @@ DLI_ROUTINE_TITLE
 
 CLEAR_TITLE_SCREEN
             ldy #0
-            mwa #SCR_MEM_MENU tmp
+            mwa #SCR_MEM_MENU XTMP
 CTS_0       tya
-            sta (tmp),y
-            inw tmp
-            #if .word tmp = #SCR_MEM_MENU+1160
+            sta (XTMP),y
+            inw XTMP
+            #if .word XTMP = #SCR_MEM_MENU+1160
                 rts
             #end
             jmp CTS_0
@@ -104,36 +104,36 @@ PRINT_QUOTATION
 
             cmp #0
             bne PQ_2
-            mwa #QUOTATION_1 TMP
+            mwa #QUOTATION_1 XTMP
             jmp PQ_5
 
 PQ_2        cmp #1
             bne PQ_3
-            mwa #QUOTATION_2 TMP
+            mwa #QUOTATION_2 XTMP
             jmp PQ_5
 
 PQ_3        cmp #2
             bne PQ_4
-            mwa #QUOTATION_3 TMP
+            mwa #QUOTATION_3 XTMP
             jmp PQ_5
 
-PQ_4        mwa #QUOTATION_4 TMP
+PQ_4        mwa #QUOTATION_4 XTMP
 
 PQ_5        ldx #40*4
-            mwa #SCR_MEM_MENU+1000 TMP2
+            mwa #SCR_MEM_MENU+1000 XTMP2
             ldy #0
-PQ_1        lda (TMP),y
-            sta (TMP2),y
-            inw TMP
-            inw TMP2
+PQ_1        lda (XTMP),y
+            sta (XTMP2),y
+            inw XTMP
+            inw XTMP2
             dex
             bne PQ_1
             rts
 
 PRINT_AMPERSAND
             lda #0
-            sta TMP2+1
-PA_0        ldy TMP2+1
+            sta XTMP2+1
+PA_0        ldy XTMP2+1
             lda AMPERSAND_PIXELS_X,y
             tax
             lda AMPERSAND_PIXELS_Y,y
@@ -141,19 +141,19 @@ PA_0        ldy TMP2+1
             jsr PUT_PIXEL
             jsr SYNCHRO
             jsr SYNCHRO
-            inc TMP2+1
-            lda TMP2+1
+            inc XTMP2+1
+            lda XTMP2+1
             cmp #AMPERSAND_PIXEL_COUNT
             bne PA_0
             rts
 
 PICK_NUMBER_FROM_1_TO_250
             lda RANDOM
-            sta TMP
-            #if .byte TMP < #1 .or .byte TMP > #250
+            sta XTMP
+            #if .byte XTMP < #1 .or .byte XTMP > #250
                 jmp PICK_NUMBER_FROM_1_TO_250
             #end
-            lda TMP
+            lda XTMP
             tay
             rts
 
@@ -173,30 +173,30 @@ PICK_RANDOM_NAME_INDEX
 
 SETUP_RANDOM_NAME
             jsr PICK_RANDOM_NAME_INDEX
-            mwa #$4000 TMP
+            mwa #$4000 XTMP
             cpx #0
             bne SRN_2
-            adw TMP #MAX_NAME_LEN*250
+            adw XTMP #MAX_NAME_LEN*250
 SRN_2       dey
             cpy #0
             beq SRN_1
-            adw TMP #MAX_NAME_LEN
+            adw XTMP #MAX_NAME_LEN
             jmp SRN_2
-SRN_1       mwa #SCR_MEM_MENU TMP2
+SRN_1       mwa #SCR_MEM_MENU XTMP2
             rts
 
 SETUP_RANDOM_NAME_BABSKIE
             jsr PICK_RANDOM_NAME_INDEX
-            mwa #$4000+(NAMES_PER_SEX*MAX_NAME_LEN) TMP
+            mwa #$4000+(NAMES_PER_SEX*MAX_NAME_LEN) XTMP
             cpx #0
             bne SRNB_2
-            adw TMP #MAX_NAME_LEN*250
+            adw XTMP #MAX_NAME_LEN*250
 SRNB_2      dey
             cpy #0
             beq SRNB_1
-            adw TMP #MAX_NAME_LEN
+            adw XTMP #MAX_NAME_LEN
             jmp SRNB_2
-SRNB_1      mwa #SCR_MEM_MENU+(24*(320/8)+20) TMP2
+SRNB_1      mwa #SCR_MEM_MENU+(24*(320/8)+20) XTMP2
             rts
 
 PRINT_NAME
@@ -206,18 +206,18 @@ PRINT_NAME
             sta PORTB
 
             ldy #0
-PN_1        lda (TMP),y
+PN_1        lda (XTMP),y
             #if .byte @ > #90
                 sec
                 sbc #32
             #end
-            sta (TMP2),y
+            sta (XTMP2),y
 
             dex
             beq PN_X
 
-            inw TMP
-            inw TMP2
+            inw XTMP
+            inw XTMP2
             jmp PN_1
 
 PN_X        rts
@@ -239,28 +239,28 @@ PPX_2       cpx #0
             dex
             jmp PPX_2
 
-PPX_1       sta TMP2 ; Which bit
+PPX_1       sta XTMP2 ; Which bit
 
             pla
             tax
 
-            mwa PIXEL_Y_TABLE,y TMP
+            mwa PIXEL_Y_TABLE,y XTMP
 
             clc
-            lda TMP
+            lda XTMP
             adc PIXEL_X_TABLE_OFFSET,x
-            sta TMP
-            lda TMP+1
+            sta XTMP
+            lda XTMP+1
             adc #0
-            sta TMP+1
+            sta XTMP+1
 
-            inw TMP
-            inw TMP
+            inw XTMP
+            inw XTMP
             ldy #0
-            lda (TMP),y
-            ldy TMP2
+            lda (XTMP),y
+            ldy XTMP2
             ora PIXEL_X_BIT_TABLE,y
             ldy #0
-            sta (TMP),y
+            sta (XTMP),y
 
             rts

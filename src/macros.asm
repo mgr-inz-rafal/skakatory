@@ -376,23 +376,23 @@ AT%%1_1     lda TRIG_HOLD_FRAMES_PER_LEVEL,y
 
             ; Consider if AI should randomly skip the jump decision
             lda RANDOM
-            sta TMP
+            sta XTMP
             ldy CURRENT_GAME_LEVEL
             lda AI_SKIP_JUMP_PROBABILITY_PER_LEVEL,y
-            sta TMP+1
-            #if .byte TMP+1 > TMP
+            sta XTMP+1
+            #if .byte XTMP+1 > XTMP
                 jmp AT%%1_X
             #end
 
             ; Consider disrupting the time the AI is holding the jump button
             lda RANDOM
-            sta TMP
+            sta XTMP
             ldy CURRENT_GAME_LEVEL
             lda AI_HOLD_DISRUPTION_PROBABILITY_PER_LEVEL,y
-            sta TMP+1
-            #if .byte TMP+1 > TMP
+            sta XTMP+1
+            #if .byte XTMP+1 > XTMP
                 ; Let's dirupt the perfect AI jump a bit
-                lda TMP
+                lda XTMP
                 and #%00000001
                 beq AT%%1_2
 :JUMP_HOLD_DISRUPTION dex

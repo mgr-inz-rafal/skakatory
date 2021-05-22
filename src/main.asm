@@ -23,6 +23,7 @@ TIMER_LENGTH            equ 14
 TIMER_SHADOW_COLOR      equ $0f
 TIMER_COLOR             equ $e4
 PLAYER_DRAW_LIMIT       equ 224
+MODUL                   equ $9600
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -48,8 +49,8 @@ PLAYER_DRAW_LIMIT       equ 224
 .zpvar          STRIG1_CPU             .word
 .zpvar          STRIG0_CPU_HOLD        .byte
 .zpvar          STRIG1_CPU_HOLD        .byte
-.zpvar          TMP                    .word
-.zpvar          TMP2                   .word
+.zpvar          XTMP                    .word
+.zpvar          XTMP2                   .word
 .zpvar          QUOTE_COLOR            .byte
 .zpvar          TIMER_PTR              .word
 .zpvar          TIMER_COUNTER          .byte
@@ -117,7 +118,7 @@ LAST_GAME_LEVEL     equ 12
 .zpvar          CURRENT_ROTATIONS           .byte
 .zpvar          FIRST_FRAME                 .byte
 .zpvar          LAST_FRAME                  .byte
-.zpvar	        ANTIC_TMP                   .byte
+.zpvar	        ANTIC_XTMP                  .byte
 
 //------------------------------------------------
 // Memory detection
@@ -125,8 +126,8 @@ LAST_GAME_LEVEL     equ 12
             org $600
 INIT_00
 MAX_BANKS = 64		; maksymalna liczba banków pamięci
-	LDA $7FFF	; bajt z pamięci podstawowej
-	STA TEMP
+    LDA $7FFF	; bajt z pamięci podstawowej
+    STA TEMP
 
         LDX #MAX_BANKS-1
 
@@ -151,14 +152,14 @@ _s2     LDA dBANK,X
         BPL _s2
 
 
-	LDA #$FF
-	STA PORTB
+    LDA #$FF
+    STA PORTB
 
-	STA $7FFF
+    STA $7FFF
 
-	STA @TAB_MEM_BANKS		; pierwszy wpis w @TAB_MEM_BANKS = $FF
+    STA @TAB_MEM_BANKS		; pierwszy wpis w @TAB_MEM_BANKS = $FF
 
-	LDY #0
+    LDY #0
 
         LDX #MAX_BANKS-1
 
@@ -168,7 +169,7 @@ LOP	LDA dBANK,X
         CMP $7FFF
         BNE SKP
 
-	STA @TAB_MEM_BANKS+1,Y
+    STA @TAB_MEM_BANKS+1,Y
         INY
 SKP
         DEX
@@ -190,13 +191,13 @@ _r3     LDA dBANK,X
         LDA #$FF
         STA PORTB
 
-	LDA #0		; przywracamy starą zawartość komórki pamięci spod adresu $7FFF w pamięci podstawowej
+    LDA #0		; przywracamy starą zawartość komórki pamięci spod adresu $7FFF w pamięci podstawowej
 TEMP	EQU *-1
-	STA $7FFF
+    STA $7FFF
 
-	TYA		; w regA liczba odnalezionych banków dodatkowej pamięci
+    TYA		; w regA liczba odnalezionych banków dodatkowej pamięci
 
-	rts
+    rts
 
 dBANK   DTA B($E3),B($C3),B($A3),B($83),B($63),B($43),B($23),B($03)
         DTA B($E7),B($C7),B($A7),B($87),B($67),B($47),B($27),B($07)
@@ -301,10 +302,10 @@ PMG_END     equ PMG_BASE+$800
 //------------------------------------------------
 PROGRAM_START_FIRST_PART
             jsr DISABLE_ANTIC
-			lda <DLI_ROUTINE_GAME
-			sta VDSLST
-			lda >DLI_ROUTINE_GAME
-			sta VDSLST+1
+            lda <DLI_ROUTINE_GAME
+            sta VDSLST
+            lda >DLI_ROUTINE_GAME
+            sta VDSLST+1
 
             jsr GAME_STATE_INIT
 
@@ -890,12 +891,12 @@ SHOW_FRAME
             txa
             and %00000001
             bne SF_FIRST
-		    mwa #SCR_MEM_1      DLIST_ADDR_TOP
-		    mwa #SCR_MEM_1_P2   DLIST_ADDR_BOTTOM
+            mwa #SCR_MEM_1      DLIST_ADDR_TOP
+            mwa #SCR_MEM_1_P2   DLIST_ADDR_BOTTOM
             jmp SF_X
 SF_FIRST
-		    mwa #SCR_MEM_2      DLIST_ADDR_TOP
-		    mwa #SCR_MEM_2_P2   DLIST_ADDR_BOTTOM
+            mwa #SCR_MEM_2      DLIST_ADDR_TOP
+            mwa #SCR_MEM_2_P2   DLIST_ADDR_BOTTOM
 SF_X        rts             
 
 VBI_ROUTINE
@@ -965,7 +966,7 @@ DRG_1       lda #%01100001
 
 DISABLE_ANTIC
             lda SDMCTL
-            sta ANTIC_TMP
+            sta ANTIC_XTMP
             lda #$00
             sta SDMCTL
             lda 20
@@ -976,7 +977,7 @@ DISABLE_ANTIC
             rts
 
 ENABLE_ANTIC
-            lda ANTIC_TMP
+            lda ANTIC_XTMP
             sta SDMCTL
             lda #%11000000
             sta NMIEN
@@ -991,6 +992,14 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
 STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
+
+MUSICPLAYER
+            icl "music\rmtplayr.a65"
+
+            org MODUL
+            opt h-
+            ins "music\binary_end.rmt"
+            opt h+            
 
 .align $400
 SCR_MEM_MENU
@@ -1028,10 +1037,10 @@ INIT_:1
             org $6A0
 INIT_52
             ldy #52
-	        lda @TAB_MEM_BANKS,y
-	        sta PORTB
+            lda @TAB_MEM_BANKS,y
+            sta PORTB
             rts
-		    ini INIT_52
+            ini INIT_52
             org $4000	
             ins "data/names.bin"
 
