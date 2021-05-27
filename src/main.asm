@@ -305,6 +305,7 @@ PROGRAM_START_FIRST_PART
             ldx #<MODUL
             ldy #>MODUL
             jsr RASTERMUSICTRACKER
+
             jsr DISABLE_ANTIC
             lda <DLI_ROUTINE_GAME
             sta VDSLST
@@ -650,12 +651,6 @@ GAME_ENGINE_INIT
             ora #%00011100
             sta SDMCTL
 
-            ; Init VBI
-            ldy <VBI_ROUTINE
-            ldx >VBI_ROUTINE
-            lda #7
-            jsr SETVBV
-
             rts
         
 INIT_PLAYERS
@@ -918,6 +913,17 @@ VBI_ROUTINE
 @           jmp XITVBV
 
 TITLE_SCREEN
+            lda #00
+            ldx #<MODUL
+            ldy #>MODUL
+            jsr RASTERMUSICTRACKER
+
+            ; Init VBI
+            ldy <VBI_ROUTINE
+            ldx >VBI_ROUTINE
+            lda #7
+            jsr SETVBV
+
             jsr DISABLE_ANTIC
             icl 'src\title.asm'
 
