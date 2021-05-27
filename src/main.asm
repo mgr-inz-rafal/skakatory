@@ -23,7 +23,7 @@ TIMER_LENGTH            equ 14
 TIMER_SHADOW_COLOR      equ $0f
 TIMER_COLOR             equ $e4
 PLAYER_DRAW_LIMIT       equ 224
-MODUL                   equ $9600
+MODUL                   equ $8800
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -301,7 +301,7 @@ PMG_END     equ PMG_BASE+$800
 // Main program start
 //------------------------------------------------
 PROGRAM_START_FIRST_PART
-            lda #00
+            lda #05
             ldx #<MODUL
             ldy #>MODUL
             jsr RASTERMUSICTRACKER
@@ -998,13 +998,14 @@ STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
 
-MUSICPLAYER
-            icl "music\rmtplayr.a65"
-
             org MODUL
             opt h-
             ins "music\binary_end.rmt"
-            opt h+            
+            opt h+
+MUSIC_ENDS_HERE
+
+            icl "music\rmtplayr.a65"
+PLAYER_ENDS_HERE
 
 .align $400
 SCR_MEM_MENU
