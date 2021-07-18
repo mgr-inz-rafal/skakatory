@@ -130,6 +130,7 @@ FADE_OUT_TITLE_SCREEN
             jsr FADE_NAME_ROW
             mwa #SCR_MEM_MENU+(24*(320/8)+20) XTMP2
             jsr FADE_NAME_ROW
+            jsr PRINT_AMPERSAND
             rts
 
 IS_NAME_FADED
@@ -370,7 +371,7 @@ PPX_1       sta XTMP2 ; Which bit
             ldy #0
             lda (XTMP),y
             ldy XTMP2
-            ora PIXEL_X_BIT_TABLE,y
+            eor PIXEL_X_BIT_TABLE,y
             ldy #0
             sta (XTMP),y
 
