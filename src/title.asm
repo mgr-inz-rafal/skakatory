@@ -130,7 +130,7 @@ FADE_OUT_TITLE_SCREEN
             jsr FADE_NAME_ROW
             mwa #SCR_MEM_MENU+(24*(320/8)+20) XTMP2
             jsr FADE_NAME_ROW
-            jsr PRINT_AMPERSAND
+            jsr DELETE_AMPERSAND
             rts
 
 IS_NAME_FADED
@@ -257,6 +257,22 @@ PA_0        ldy XTMP2+1
             lda XTMP2+1
             cmp #AMPERSAND_PIXEL_COUNT
             bne PA_0
+            rts
+
+DELETE_AMPERSAND
+            lda #AMPERSAND_PIXEL_COUNT-1
+            sta XTMP2+1
+DA_0        ldy XTMP2+1
+            lda AMPERSAND_PIXELS_X,y
+            tax
+            lda AMPERSAND_PIXELS_Y,y
+            tay
+            jsr PUT_PIXEL
+            jsr SYNCHRO
+            dec XTMP2+1
+            lda XTMP2+1
+            cmp #0
+            bne DA_0
             rts
 
 PICK_NUMBER_FROM_1_TO_250
