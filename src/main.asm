@@ -23,6 +23,22 @@ TIMER_LENGTH            equ 14
 TIMER_SHADOW_COLOR      equ $0f
 TIMER_COLOR             equ $e4
 PLAYER_DRAW_LIMIT       equ 224
+TIMER_START_CHAR        equ 29
+TIMER_NEXT_CHAR_1       equ 82
+TIMER_NEXT_CHAR_2       equ 83
+TIMER_NEXT_CHAR_3       equ 84
+TIMER_NEXT_CHAR_4       equ 85
+TIMER_NEXT_CHAR_5       equ 86
+TIMER_NEXT_CHAR_6       equ 79
+TIMER_NEXT_CHAR_7       equ 80
+FADE_START_CHAR         equ 29
+FADE_NEXT_CHAR_1        equ 30
+FADE_NEXT_CHAR_2        equ 31
+FADE_NEXT_CHAR_3        equ 61
+FADE_NEXT_CHAR_4        equ 62
+FADE_NEXT_CHAR_5        equ 63
+FADE_SPEED              equ 47
+
 MODUL                   equ $8800
 
 .zpvar          P1_Y_TABLE             .word
@@ -49,8 +65,8 @@ MODUL                   equ $8800
 .zpvar          STRIG1_CPU             .word
 .zpvar          STRIG0_CPU_HOLD        .byte
 .zpvar          STRIG1_CPU_HOLD        .byte
-.zpvar          XTMP                    .word
-.zpvar          XTMP2                   .word
+.zpvar          XTMP                   .word
+.zpvar          XTMP2                  .word
 .zpvar          QUOTE_COLOR            .byte
 .zpvar          TIMER_PTR              .word
 .zpvar          TIMER_COUNTER          .byte
@@ -370,7 +386,7 @@ PAINT_TIMER_SHADOW
             rts            
 
 PAINT_TIMER
-            lda #29
+            lda #TIMER_START_CHAR
             ldy #TIMER_LENGTH
             ldx #(40/2)+(TIMER_LENGTH/2)-1
 @           sta STATUS_BAR_BUFFER,x
@@ -395,41 +411,41 @@ TIMER_TICK
             sta (TIMER_PTR),y
             ldx #0
             stx REDUCE_TIMER
-            cmp #29+128
+            cmp #TIMER_START_CHAR+128
             bne TT_X
             dew TIMER_PTR 
 TT_X        rts
 
 GET_NEXT_TIMER_CHAR
-            cmp #29
+            cmp #TIMER_START_CHAR
             bne @+
-            lda #30
+            lda #TIMER_NEXT_CHAR_1
             rts
-@           cmp #30
+@           cmp #TIMER_NEXT_CHAR_1
             bne @+
-            lda #31
+            lda #TIMER_NEXT_CHAR_2
             rts
-@           cmp #31
+@           cmp #TIMER_NEXT_CHAR_2
             bne @+
-            lda #61
+            lda #TIMER_NEXT_CHAR_3
             rts
-@           cmp #61
+@           cmp #TIMER_NEXT_CHAR_3
             bne @+
-            lda #62
+            lda #TIMER_NEXT_CHAR_4
             rts
-@           cmp #62
+@           cmp #TIMER_NEXT_CHAR_4
             bne @+
-            lda #63
+            lda #TIMER_NEXT_CHAR_5
             rts
-@           cmp #63
+@           cmp #TIMER_NEXT_CHAR_5
             bne @+
-            lda #79
+            lda #TIMER_NEXT_CHAR_6
             rts
-@           cmp #79
+@           cmp #TIMER_NEXT_CHAR_6
             bne @+
-            lda #80
+            lda #TIMER_NEXT_CHAR_7
             rts
-@           lda #29+128
+@           lda #TIMER_START_CHAR+128
             rts
 
 JOIN_PLAYER_TICK
@@ -1016,6 +1032,8 @@ PLAYER_ENDS_HERE
 .align $400
 SCR_MEM_MENU
 :1160       dta b(0)
+MENU_FADE_TABLE
+:20         dta b(0)
 
 .align $400
 NAMES_FONT

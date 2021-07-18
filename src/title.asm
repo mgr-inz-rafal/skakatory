@@ -15,6 +15,7 @@
 TIT_1       lda STRIG0
             sta ATRACT
             bne @-
+            jsr FADE_OUT_TITLE_SCREEN
             jmp PROGRAM_START_FIRST_PART
 
 CLEAR_PLAYERS_PMG
@@ -97,6 +98,93 @@ TITLE_MAIN
             lda #$ff
             sta CH
             rts        
+
+FADE_OUT_TITLE_SCREEN
+            lda #0
+            ldy #0
+
+            mwa #MENU_FADE_TABLE XTMP
+FOTS_2      lda RANDOM
+            sta (XTMP),y
+            iny
+            cpy #20
+            bne FOTS_2 
+
+FOTS_3      mwa #SCR_MEM_MENU XTMP
+            ldy #0
+            ;lda #FADE_START_CHAR+128+64
+FOTS_1      jsr ADVANCE_FADE_CHARACTER
+            sta (XTMP),y
+            iny
+            cpy #20
+            bne FOTS_1
+
+            jmp FOTS_3
+
+CHUJ        jmp CHUJ
+            rts
+
+ADVANCE_FADE_CHARACTER
+            jsr DECREASE_FADE_TIMER
+            beq LFC_8
+            mwa #SCR_MEM_MENU XTMP
+            lda (XTMP),y
+            rts
+
+LFC_8       mwa #SCR_MEM_MENU XTMP
+            lda (XTMP),y
+
+            cmp #FADE_START_CHAR
+            bne LFC_1
+            lda #FADE_NEXT_CHAR_1
+            rts
+
+LFC_1       cmp #FADE_NEXT_CHAR_1
+            bne LFC_2
+            lda #FADE_NEXT_CHAR_2
+            rts
+
+LFC_2       cmp #FADE_NEXT_CHAR_2
+            bne LFC_3
+            lda #FADE_NEXT_CHAR_3
+            rts
+
+LFC_3       cmp #FADE_NEXT_CHAR_3
+            bne LFC_4
+            lda #FADE_NEXT_CHAR_4
+            rts
+
+LFC_4       cmp #FADE_NEXT_CHAR_4
+            bne LFC_5
+            lda #FADE_NEXT_CHAR_5
+            rts
+
+LFC_5       cmp #FADE_NEXT_CHAR_5
+            bne LFC_6
+            lda #0
+            rts
+
+LFC_6       cmp #0
+            bne LFC_7
+            rts
+
+LFC_7       lda #FADE_START_CHAR
+            rts
+
+DECREASE_FADE_TIMER
+            mwa #MENU_FADE_TABLE XTMP
+            lda (XTMP),y
+            tax
+            dex
+            txa
+            sta (XTMP),y
+            cmp #0
+            bne DFT_1
+            mwa #MENU_FADE_TABLE XTMP
+            lda #FADE_SPEED
+            sta (XTMP),y
+            lda #0
+DFT_1       rts
 
 PRINT_QUOTATION
             lda RANDOM
