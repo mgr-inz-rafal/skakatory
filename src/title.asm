@@ -132,7 +132,9 @@ FADE_OUT_TITLE_SCREEN
             jsr FADE_NAME_ROW
             jsr DELETE_AMPERSAND
             jsr HIDE_QUOTE
-            ldx #66
+            ldx #255
+            jsr WAIT_FRAMES
+            ldx #60
             jsr WAIT_FRAMES
             rts
 
