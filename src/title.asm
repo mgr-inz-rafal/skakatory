@@ -119,10 +119,27 @@ FOTS_1      jsr ADVANCE_FADE_CHARACTER
             cpy #20
             bne FOTS_1
 
-            jmp FOTS_3
+            jsr IS_NAME_FADED
+            cmp #1
+            bne FOTS_3
 
-CHUJ        jmp CHUJ
+;CHUJ        jmp CHUJ
             rts
+
+IS_NAME_FADED
+            mwa #SCR_MEM_MENU XTMP
+            lda #0
+            ldy #0
+INF_1       lda (XTMP),y
+            cmp #0
+            bne INF_2
+            iny
+            cpy #20
+            bne INF_1
+            lda #1
+            rts      
+INF_2       lda #0
+            rts      
 
 ADVANCE_FADE_CHARACTER
             jsr DECREASE_FADE_TIMER
