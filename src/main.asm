@@ -38,6 +38,7 @@ FADE_NEXT_CHAR_3        equ 61
 FADE_NEXT_CHAR_4        equ 62
 FADE_NEXT_CHAR_5        equ 63
 FADE_SPEED              equ 47
+QUOTE_TARGET_COLOR      equ 10
 
 MODUL                   equ $8800
 

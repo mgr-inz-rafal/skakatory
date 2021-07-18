@@ -6,7 +6,7 @@
             dec QUOTE_COLOR_COUNTER
             lda QUOTE_COLOR_COUNTER
             bne TIT_1
-            #if .byte QUOTE_COLOR < #10
+            #if .byte QUOTE_COLOR < #QUOTE_TARGET_COLOR
                 inc QUOTE_COLOR
             #end
             lda #QUOTE_COLOR_COOLDOWN
@@ -131,6 +131,19 @@ FADE_OUT_TITLE_SCREEN
             mwa #SCR_MEM_MENU+(24*(320/8)+20) XTMP2
             jsr FADE_NAME_ROW
             jsr DELETE_AMPERSAND
+            jsr HIDE_QUOTE
+            ldx #66
+            jsr WAIT_FRAMES
+            rts
+
+HIDE_QUOTE
+            ldy #QUOTE_TARGET_COLOR
+HQ_1        dec QUOTE_COLOR
+            ldx #12
+            jsr WAIT_FRAMES
+            dey
+            cpy #0
+            bne HQ_1
             rts
 
 IS_NAME_FADED
