@@ -284,7 +284,7 @@ DA_0        ldy XTMP2+1
             jsr SYNCHRO
             dec XTMP2+1
             lda XTMP2+1
-            cmp #0
+            cmp #$ff
             bne DA_0
             rts
 
