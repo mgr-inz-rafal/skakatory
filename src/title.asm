@@ -99,7 +99,7 @@ TITLE_MAIN
             sta CH
             rts        
 
-FADE_OUT_TITLE_SCREEN
+FADE_NAME_ROW
             lda #0
             ldy #0
 
@@ -110,9 +110,8 @@ FOTS_2      lda RANDOM
             cpy #20
             bne FOTS_2 
 
-FOTS_3      mwa #SCR_MEM_MENU XTMP
+FOTS_3      mwa XTMP2 XTMP
             ldy #0
-            ;lda #FADE_START_CHAR+128+64
 FOTS_1      jsr ADVANCE_FADE_CHARACTER
             sta (XTMP),y
             iny
@@ -126,8 +125,15 @@ FOTS_1      jsr ADVANCE_FADE_CHARACTER
 ;CHUJ        jmp CHUJ
             rts
 
+FADE_OUT_TITLE_SCREEN
+            mwa #SCR_MEM_MENU XTMP2
+            jsr FADE_NAME_ROW
+            mwa #SCR_MEM_MENU+(24*(320/8)+20) XTMP2
+            jsr FADE_NAME_ROW
+            rts
+
 IS_NAME_FADED
-            mwa #SCR_MEM_MENU XTMP
+            mwa XTMP2 XTMP
             lda #0
             ldy #0
 INF_1       lda (XTMP),y
@@ -144,11 +150,11 @@ INF_2       lda #0
 ADVANCE_FADE_CHARACTER
             jsr DECREASE_FADE_TIMER
             beq LFC_8
-            mwa #SCR_MEM_MENU XTMP
+            mwa XTMP2 XTMP
             lda (XTMP),y
             rts
 
-LFC_8       mwa #SCR_MEM_MENU XTMP
+LFC_8       mwa XTMP2 XTMP
             lda (XTMP),y
 
             cmp #FADE_START_CHAR
