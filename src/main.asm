@@ -67,6 +67,7 @@ MODUL                   equ $8800
 .zpvar          STRIG0_CPU_HOLD        .byte
 .zpvar          STRIG1_CPU_HOLD        .byte
 .zpvar          XTMP                   .word
+.zpvar          XTMP1                  .word
 .zpvar          XTMP2                  .word
 .zpvar          QUOTE_COLOR            .byte
 .zpvar          TIMER_PTR              .word
@@ -608,6 +609,8 @@ ADVANCE_LEVEL
 
 PAINT_PLAYERS
 ; Paint left player
+            mwa #PLAYER_DATA_00 XTMP
+            mwa #PLAYER_DATA_01 XTMP2
             ldy P1_Y
             lda (P1_Y_TABLE),y
             sec
@@ -616,9 +619,19 @@ PAINT_PLAYERS
             ldx #0
 @           tya
             #if .byte @ < #PLAYER_DRAW_LIMIT
-                lda PLAYER_DATA_00,x
+                tya
+                pha
+                txa
+                tay
+                lda (XTMP),y
+                sta XTMP1
+                lda (XTMP2),y
+                sta XTMP1+1
+                pla
+                tay
+                lda XTMP1
                 sta PMG_P0,y
-                lda PLAYER_DATA_01,x
+                lda XTMP1+1
                 sta PMG_P1,y
             #end
             iny
