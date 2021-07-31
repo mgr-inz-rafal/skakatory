@@ -639,6 +639,8 @@ PAINT_PLAYERS
             cpx #20
             bne @-
 ; Paint right player
+            mwa #PLAYER_DATA_02 XTMP
+            mwa #PLAYER_DATA_03 XTMP2
             ldy P2_Y
             lda (P2_Y_TABLE),y
             sec
@@ -647,9 +649,19 @@ PAINT_PLAYERS
             ldx #0
 @           tya
             #if .byte @ < #PLAYER_DRAW_LIMIT
-                lda PLAYER_DATA_02,x
+                tya
+                pha
+                txa
+                tay
+                lda (XTMP),y
+                sta XTMP1
+                lda (XTMP2),y
+                sta XTMP1+1
+                pla
+                tay
+                lda XTMP1
                 sta PMG_P2,y
-                lda PLAYER_DATA_03,x
+                lda XTMP1+1
                 sta PMG_P3,y
             #end
             iny
