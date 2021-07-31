@@ -607,6 +607,20 @@ ADVANCE_LEVEL
             jsr INIT_TIMER
             rts
 
+PAINT_PLAYERS_PRECALC        
+            tya
+            pha
+            txa
+            tay
+            lda (XTMP),y
+            sta XTMP1
+            lda (XTMP2),y
+            sta XTMP1+1
+            pla
+            tay
+            lda XTMP1
+            rts
+
 PAINT_PLAYERS
 ; Paint left player
             mwa #PLAYER_DATA_00 XTMP
@@ -619,17 +633,7 @@ PAINT_PLAYERS
             ldx #0
 @           tya
             #if .byte @ < #PLAYER_DRAW_LIMIT
-                tya
-                pha
-                txa
-                tay
-                lda (XTMP),y
-                sta XTMP1
-                lda (XTMP2),y
-                sta XTMP1+1
-                pla
-                tay
-                lda XTMP1
+                jsr PAINT_PLAYERS_PRECALC
                 sta PMG_P0,y
                 lda XTMP1+1
                 sta PMG_P1,y
@@ -649,17 +653,7 @@ PAINT_PLAYERS
             ldx #0
 @           tya
             #if .byte @ < #PLAYER_DRAW_LIMIT
-                tya
-                pha
-                txa
-                tay
-                lda (XTMP),y
-                sta XTMP1
-                lda (XTMP2),y
-                sta XTMP1+1
-                pla
-                tay
-                lda XTMP1
+                jsr PAINT_PLAYERS_PRECALC
                 sta PMG_P2,y
                 lda XTMP1+1
                 sta PMG_P3,y
