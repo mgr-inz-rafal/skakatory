@@ -314,6 +314,12 @@ PMG_P1      equ PMG_BASE+$500
 PMG_P2      equ PMG_BASE+$600
 PMG_P3      equ PMG_BASE+$700
 PMG_END     equ PMG_BASE+$800
+PMG_S_M0    equ PMG_BASE+$180
+PMG_S_P0    equ PMG_BASE+$200
+PMG_S_P1    equ PMG_BASE+$280
+PMG_S_P2    equ PMG_BASE+$300
+PMG_S_P3    equ PMG_BASE+$380
+PMG_S_END   equ PMG_BASE+$400
 
 //------------------------------------------------
 // Main program start
@@ -346,7 +352,7 @@ PROGRAM_START_FIRST_PART
 
 GAME_LOOP
             #if .byte P1_STATE = #PS_BURIED .and .byte P2_STATE = #PS_BURIED
-                jsr PAINT_GAME_OVER
+                jsr ENTER_GAMEOVER
 CHUJ        jmp CHUJ                
             #end
             jsr TIMER_TICK
@@ -991,6 +997,8 @@ DRG_1       lda #%01100001
             ldy #0
             sty SIZEP0
             sty SIZEP1
+            sty SIZEP2
+            sty SIZEP3
             plr
             rti
 
@@ -1016,6 +1024,45 @@ DRG_1       lda #%01100001
             sty COLPM1
 @           plr
             rti
+
+DLI_ROUTINE_GAMEOVER
+            phr
+            lda VCOUNT
+
+            ; Top of the game area
+            cmp #$0f
+            bne @+
+            lda #0
+            sta SIZEP0
+            sta SIZEP1
+            sta SIZEP2
+            ldx #SHADE_COLOR
+            stx COLBK
+            plr
+            rti
+
+            ; Status bar
+@           cmp #$6f
+            bne @+
+            lda #%00100000
+            ldx #$00
+            ldy #TIMER_SHADOW_COLOR
+            sta WSYNC
+            sta PRIOR
+            stx COLBK
+            lda #100
+            sta HPOSP0
+            lda #124
+            sta HPOSP1
+            lda #3
+            sta SIZEP0
+            sta SIZEP1
+            sty CLR1
+            ldy #TIMER_COLOR
+            sty COLPM0
+            sty COLPM1
+@           plr
+            rti            
 
 DISABLE_ANTIC
             lda SDMCTL
