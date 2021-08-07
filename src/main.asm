@@ -232,7 +232,6 @@ dSAFE	.ds MAX_BANKS
             org $2000
 
 ; --------- DLIST & PMG data --------------------------
-.align $1000
 PMG_BASE
 SCENE_DISPLAY_LIST
 DLIST_GAME
@@ -326,9 +325,9 @@ PMG_S_END   equ PMG_BASE+$400
 //------------------------------------------------
 PROGRAM_START_FIRST_PART
             lda #05
-            ldx #<MODUL
-            ldy #>MODUL
-            jsr RASTERMUSICTRACKER
+;            ldx #<MODUL
+;            ldy #>MODUL
+;            jsr RASTERMUSICTRACKER
 
             jsr DISABLE_ANTIC
             lda <DLI_ROUTINE_GAME
@@ -715,8 +714,8 @@ INIT_PLAYERS
             sta PCOLR2
             lda #$a6
             sta PCOLR3
-            ;lda #PS_IDLE
-            lda #PS_BURIED
+            lda #PS_IDLE
+            ;lda #PS_BURIED
 
             sta P1_STATE
             sta P2_STATE
@@ -947,7 +946,7 @@ SF_FIRST
 SF_X        rts             
 
 VBI_ROUTINE
-            jsr RASTERMUSICTRACKER+3
+;            jsr RASTERMUSICTRACKER+3
             lda IN_GAME
             beq @+
             jsr BACKGROUND_TICK
@@ -962,9 +961,9 @@ VBI_ROUTINE
 
 TITLE_SCREEN
             lda #00
-            ldx #<MODUL
-            ldy #>MODUL
-            jsr RASTERMUSICTRACKER
+;            ldx #<MODUL
+;            ldy #>MODUL
+;            jsr RASTERMUSICTRACKER
 
             ; Init VBI
             ldy <VBI_ROUTINE
@@ -1032,12 +1031,89 @@ DLI_ROUTINE_GAMEOVER
             ; Top of the game area
             cmp #$0f
             bne @+
+            lda #50
+            sta HPOSP0
             lda #0
             sta SIZEP0
             sta SIZEP1
-            sta SIZEP2
             ldx #SHADE_COLOR
             stx COLBK
+            plr
+            rti
+
+            ; Top of gameover text
+@           cmp #$1e
+            jne @+
+            lda #FIRST_CHAR_XPOS
+            sta HPOSP0
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+8
+            sta HPOSP1
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+16
+            sta HPOSP2
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+24
+            sta HPOSP3
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+32
+            sta HPOSP0
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+40
+            sta HPOSP1
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+56
+            sta HPOSP2
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+64
+            sta HPOSP3
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+72
+            sta HPOSP0
+
             plr
             rti
 
@@ -1091,20 +1167,64 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
             ini INIT_00
 
             org $8000
+
+DLIST_GAMEOVER
+:2          dta b($70)
+            dta b($50)
+            dta b(%10000000)  ; DLI - top of the screen
+            dta b($00) 
+            dta b($4f)
+            dta a($0000)
+:27         dta b($0f)
+            dta b(%10001111) ; DLI - top of the gameover screen
+:65         dta b($0f)
+            dta b($4f)
+            dta a($0000)
+:92         dta b($0f)
+:3          dta b($0f)
+            dta b(%10001111) ; DLI - before status bar
+            dta b($0f)
+            dta b($20)
+            dta b($42),a(STATUS_BAR_BUFFER)
+            dta b($41),a(DLIST_GAMEOVER)
+            dta b('J')
+            dta b('E')
+            dta b('B')
+            dta b('A')
+            dta b('C')
+            dta b(' ')
+            dta b('P')
+            dta b('I')
+            dta b('S')
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b(%00000100)
+            dta b($40)
+            dta b(%00000010)
+            dta b(%00000010)
+            dta b(%00000010)
+            dta b(%00000010)
+            dta b($41), a(DLIST_GAMEOVER)
+
 STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
 
-            org MODUL
-            opt h-
-            ins "music\binary_end.rmt"
-            opt h+
-MUSIC_ENDS_HERE
+;            org MODUL
+;            opt h-
+;            ins "music\binary_end.rmt"
+;            opt h+
+;MUSIC_ENDS_HERE
 
-            icl "music\rmtplayr.a65"
-PLAYER_ENDS_HERE
+ ;           icl "music\rmtplayr.a65"
+;PLAYER_ENDS_HERE
 
-.align $400
 SCR_MEM_MENU
 :1160       dta b(0)
 MENU_FADE_TABLE
