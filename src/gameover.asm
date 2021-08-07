@@ -1,26 +1,17 @@
 FIRST_CHAR_XPOS     equ 60
 
 ENTER_GAMEOVER
-            ldx <DLIST_GAMEOVER
-            ldy >DLIST_GAMEOVER
-            stx SDLSTL
-            sty SDLSTL+1
+            lda #1
+            sta GAME_OVER
             lda #0
             sta SIZEP0
             sta SIZEP1
             sta SIZEP2
             sta SIZEP3
-            lda <DLI_ROUTINE_GAMEOVER
-            sta VDSLST
-            lda >DLI_ROUTINE_GAMEOVER
-            sta VDSLST+1
             jsr PAINT_GAME_OVER
             rts
 
 PAINT_GAME_OVER
-            lda SDMCTL
-            and #%11101111  ; Enable tall sprites
-            sta SDMCTL
             jsr CLEAR_SPRITE_DATA
             jsr WRITE_GAMEOVER_LETTERS
             rts

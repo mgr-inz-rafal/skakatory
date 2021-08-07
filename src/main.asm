@@ -74,6 +74,7 @@ MODUL                   equ $8800
 .zpvar          TIMER_COUNTER          .byte
 .zpvar          IN_GAME                .byte
 .zpvar          REDUCE_TIMER           .byte
+.zpvar          GAME_OVER              .byte
 
 .zpvar          QUOTE_COLOR_COUNTER    .byte
 QUOTE_COLOR_COOLDOWN        equ 11
@@ -243,7 +244,9 @@ DLIST_MEM_TOP
             dta b($4f)
 DLIST_ADDR_TOP
             dta a($0000)
-:93         dta b($0f)
+:27         dta b($0f)
+            dta b(%10001111)
+:65         dta b($0f)
 DLIST_MEM_BOTTOM
             dta b($4f)
 DLIST_ADDR_BOTTOM
@@ -769,6 +772,7 @@ GAME_STATE_INIT
             lda #>STRIG1_CPU
             sta STRIG_1_SOURCE+1
             lda #0
+            sta GAME_OVER
             sta STRIG0_CPU_HOLD
             sta STRIG1_CPU_HOLD
             sta P1_DRAWING_Y_OFFSET
@@ -981,6 +985,11 @@ DLI_ROUTINE_GAME
             ; Top of the game area
             cmp #$0f
             bne @+
+            ldy #0
+            sty SIZEP0
+            sty SIZEP1
+            sty SIZEP2
+            sty SIZEP3
             ldx #SHADE_COLOR
             ldy #$ff
             lda P1_VISIBLE
@@ -991,59 +1000,23 @@ DRG_1       lda #%01100001
             sta WSYNC
             sta PRIOR
             stx COLBK
+            lda GAME_OVER
+            cmp #1
+            beq @+
             sty HPOSP0
             sty HPOSP1
-            ldy #0
-            sty SIZEP0
-            sty SIZEP1
-            sty SIZEP2
-            sty SIZEP3
-            plr
-            rti
-
-            ; Status bar
-@           cmp #$6f
-            bne @+
-            lda #%00100000
-            ldx #$00
-            ldy #TIMER_SHADOW_COLOR
-            sta WSYNC
-            sta PRIOR
-            stx COLBK
-            lda #100
-            sta HPOSP0
-            lda #124
-            sta HPOSP1
-            lda #3
-            sta SIZEP0
-            sta SIZEP1
-            sty CLR1
-            ldy #TIMER_COLOR
-            sty COLPM0
-            sty COLPM1
-@           plr
-            rti
-
-DLI_ROUTINE_GAMEOVER
-            phr
-            lda VCOUNT
-
-            ; Top of the game area
-            cmp #$0f
-            bne @+
-            lda #50
-            sta HPOSP0
-            lda #0
-            sta SIZEP0
-            sta SIZEP1
-            ldx #SHADE_COLOR
-            stx COLBK
             plr
             rti
 
             ; Top of gameover text
 @           cmp #$1e
             jne @+
+            lda GAME_OVER
+            cmp #1
+            jne @+
+            lda SDMCTL
+            and #%11101111
+            sta DMACTL
             lda #FIRST_CHAR_XPOS
             sta HPOSP0
             sta WSYNC
@@ -1120,6 +1093,9 @@ DLI_ROUTINE_GAMEOVER
             ; Status bar
 @           cmp #$6f
             bne @+
+            lda SDMCTL
+            ora #%00010000
+            sta DMACTL
             lda #%00100000
             ldx #$00
             ldy #TIMER_SHADOW_COLOR
@@ -1138,7 +1114,7 @@ DLI_ROUTINE_GAMEOVER
             sty COLPM0
             sty COLPM1
 @           plr
-            rti            
+            rti
 
 DISABLE_ANTIC
             lda SDMCTL
@@ -1167,51 +1143,6 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
             ini INIT_00
 
             org $8000
-
-DLIST_GAMEOVER
-:2          dta b($70)
-            dta b($50)
-            dta b(%10000000)  ; DLI - top of the screen
-            dta b($00) 
-            dta b($4f)
-            dta a($0000)
-:27         dta b($0f)
-            dta b(%10001111) ; DLI - top of the gameover screen
-:65         dta b($0f)
-            dta b($4f)
-            dta a($0000)
-:92         dta b($0f)
-:3          dta b($0f)
-            dta b(%10001111) ; DLI - before status bar
-            dta b($0f)
-            dta b($20)
-            dta b($42),a(STATUS_BAR_BUFFER)
-            dta b($41),a(DLIST_GAMEOVER)
-            dta b('J')
-            dta b('E')
-            dta b('B')
-            dta b('A')
-            dta b('C')
-            dta b(' ')
-            dta b('P')
-            dta b('I')
-            dta b('S')
-            dta b(%00000100)
-            dta b(%00000100)
-            dta b(%00000100)
-            dta b(%00000100)
-            dta b(%00000100)
-            dta b(%00000100)
-            dta b(%00000100)
-            dta b(%00000100)
-            dta b(%00000100)
-            dta b($40)
-            dta b(%00000010)
-            dta b(%00000010)
-            dta b(%00000010)
-            dta b(%00000010)
-            dta b($41), a(DLIST_GAMEOVER)
-
 STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
