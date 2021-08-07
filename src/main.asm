@@ -345,6 +345,10 @@ PROGRAM_START_FIRST_PART
             jsr INIT_TIMER
 
 GAME_LOOP
+            #if .byte P1_STATE = #PS_BURIED .and .byte P2_STATE = #PS_BURIED
+                jsr PAINT_GAME_OVER
+CHUJ        jmp CHUJ                
+            #end
             jsr TIMER_TICK
             jsr SYNCHRO
             jsr RESTART_TICK
@@ -496,7 +500,7 @@ RESTART_TICK
             cmp #6
             bne RT_X
 
-RT_1        jsr CLEAR_SPRITES
+RT_1        jsr HIDE_SPRITES
             pla
             pla
             jmp TITLE_SCREEN
@@ -515,7 +519,7 @@ SHOULD_UPDATE_SCORE
 SUS_0       lda #1
             rts
 
-CLEAR_SPRITES
+HIDE_SPRITES
             lda #0
             sta HPOSP0
             sta HPOSP1
@@ -705,7 +709,9 @@ INIT_PLAYERS
             sta PCOLR2
             lda #$a6
             sta PCOLR3
-            lda #PS_IDLE
+            ;lda #PS_IDLE
+            lda #PS_BURIED
+
             sta P1_STATE
             sta P2_STATE
             lda P1_X
@@ -1029,6 +1035,8 @@ ENABLE_ANTIC
             lda #%11000000
             sta NMIEN
             rts
+
+            icl "src\gameover.asm"            
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
