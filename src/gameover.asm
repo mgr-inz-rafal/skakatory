@@ -36,11 +36,11 @@ ENTER_GAMEOVER
 EG_1        rts
 
 PAINT_GAME_OVER
-            jsr CLEAR_SPRITE_DATA
+            jsr CLEAR_TALL_SPRITE_DATA
             jsr WRITE_GAMEOVER_LETTERS
             rts
 
-CLEAR_SPRITE_DATA
+CLEAR_TALL_SPRITE_DATA
             ldy #0
             mwa #PMG_S_M0 XTMP
 CSD_0       lda #0

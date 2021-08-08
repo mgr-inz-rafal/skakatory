@@ -633,45 +633,49 @@ PAINT_PLAYERS_PRECALC
 
 PAINT_PLAYERS
 ; Paint left player
-            mwa #PLAYER_DATA_00 XTMP
-            mwa #PLAYER_DATA_01 XTMP2
-            ldy P1_Y
-            lda (P1_Y_TABLE),y
-            sec
-            sbc P1_DRAWING_Y_OFFSET
-            tay
-            ldx #0
-@           tya
-            #if .byte @ < #PLAYER_DRAW_LIMIT
-                jsr PAINT_PLAYERS_PRECALC
-                sta PMG_P0,y
-                lda XTMP1+1
-                sta PMG_P1,y
+            #if .byte P1_STATE <> #PS_BURIED
+                mwa #PLAYER_DATA_00 XTMP
+                mwa #PLAYER_DATA_01 XTMP2
+                ldy P1_Y
+                lda (P1_Y_TABLE),y
+                sec
+                sbc P1_DRAWING_Y_OFFSET
+                tay
+                ldx #0
+@               tya
+                #if .byte @ < #PLAYER_DRAW_LIMIT
+                    jsr PAINT_PLAYERS_PRECALC
+                    sta PMG_P0,y
+                    lda XTMP1+1
+                    sta PMG_P1,y
+                #end
+                iny
+                inx
+                cpx #20
+                bne @-
             #end
-            iny
-            inx
-            cpx #20
-            bne @-
 ; Paint right player
-            mwa #PLAYER_DATA_02 XTMP
-            mwa #PLAYER_DATA_03 XTMP2
-            ldy P2_Y
-            lda (P2_Y_TABLE),y
-            sec
-            sbc P2_DRAWING_Y_OFFSET
-            tay
-            ldx #0
-@           tya
-            #if .byte @ < #PLAYER_DRAW_LIMIT
-                jsr PAINT_PLAYERS_PRECALC
-                sta PMG_P2,y
-                lda XTMP1+1
-                sta PMG_P3,y
+            #if .byte P2_STATE <> #PS_BURIED
+                mwa #PLAYER_DATA_02 XTMP
+                mwa #PLAYER_DATA_03 XTMP2
+                ldy P2_Y
+                lda (P2_Y_TABLE),y
+                sec
+                sbc P2_DRAWING_Y_OFFSET
+                tay
+                ldx #0
+@               tya
+                #if .byte @ < #PLAYER_DRAW_LIMIT
+                    jsr PAINT_PLAYERS_PRECALC
+                    sta PMG_P2,y
+                    lda XTMP1+1
+                    sta PMG_P3,y
+                #end
+                iny
+                inx
+                cpx #20
+                bne @-
             #end
-            iny
-            inx
-            cpx #20
-            bne @-
             rts
 
 ; Left player sprites
