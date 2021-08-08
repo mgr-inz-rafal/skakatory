@@ -74,6 +74,7 @@ MODUL                   equ $8800
 .zpvar          TIMER_COUNTER          .byte
 .zpvar          IN_GAME                .byte
 .zpvar          REDUCE_TIMER           .byte
+.zpvar          GAME_OVER              .byte
 
 .zpvar          QUOTE_COLOR_COUNTER    .byte
 QUOTE_COLOR_COOLDOWN        equ 11
@@ -232,7 +233,6 @@ dSAFE	.ds MAX_BANKS
             org $2000
 
 ; --------- DLIST & PMG data --------------------------
-.align $1000
 PMG_BASE
 SCENE_DISPLAY_LIST
 DLIST_GAME
@@ -244,7 +244,9 @@ DLIST_MEM_TOP
             dta b($4f)
 DLIST_ADDR_TOP
             dta a($0000)
-:93         dta b($0f)
+:26         dta b($0f)
+            dta b(%10001111) ; DLI - before gameover text
+:66         dta b($0f)
 DLIST_MEM_BOTTOM
             dta b($4f)
 DLIST_ADDR_BOTTOM
@@ -326,9 +328,9 @@ PMG_S_END   equ PMG_BASE+$400
 //------------------------------------------------
 PROGRAM_START_FIRST_PART
             lda #05
-            ldx #<MODUL
-            ldy #>MODUL
-            jsr RASTERMUSICTRACKER
+;            ldx #<MODUL
+;            ldy #>MODUL
+;            jsr RASTERMUSICTRACKER
 
             jsr DISABLE_ANTIC
             lda <DLI_ROUTINE_GAME
@@ -353,18 +355,20 @@ PROGRAM_START_FIRST_PART
 GAME_LOOP
             #if .byte P1_STATE = #PS_BURIED .and .byte P2_STATE = #PS_BURIED
                 jsr ENTER_GAMEOVER
-CHUJ        jmp CHUJ                
             #end
             jsr TIMER_TICK
             jsr SYNCHRO
             jsr RESTART_TICK
             lda #$ff
             sta CH
+
+            lda GAME_OVER
+            bne GL_1
             jsr AI_TICK
             jsr PLAYER_TICK
             jsr JOIN_PLAYER_TICK
 
-            ldx CURRENT_FRAME
+GL_1        ldx CURRENT_FRAME
             jsr SHOW_FRAME
 
             jsr CHECK_SCORE
@@ -715,8 +719,8 @@ INIT_PLAYERS
             sta PCOLR2
             lda #$a6
             sta PCOLR3
-            ;lda #PS_IDLE
-            lda #PS_BURIED
+            lda #PS_IDLE
+            ;lda #PS_BURIED
 
             sta P1_STATE
             sta P2_STATE
@@ -770,6 +774,7 @@ GAME_STATE_INIT
             lda #>STRIG1_CPU
             sta STRIG_1_SOURCE+1
             lda #0
+            sta GAME_OVER
             sta STRIG0_CPU_HOLD
             sta STRIG1_CPU_HOLD
             sta P1_DRAWING_Y_OFFSET
@@ -947,7 +952,7 @@ SF_FIRST
 SF_X        rts             
 
 VBI_ROUTINE
-            jsr RASTERMUSICTRACKER+3
+;            jsr RASTERMUSICTRACKER+3
             lda IN_GAME
             beq @+
             jsr BACKGROUND_TICK
@@ -962,9 +967,9 @@ VBI_ROUTINE
 
 TITLE_SCREEN
             lda #00
-            ldx #<MODUL
-            ldy #>MODUL
-            jsr RASTERMUSICTRACKER
+;            ldx #<MODUL
+;            ldy #>MODUL
+;            jsr RASTERMUSICTRACKER
 
             ; Init VBI
             ldy <VBI_ROUTINE
@@ -982,6 +987,11 @@ DLI_ROUTINE_GAME
             ; Top of the game area
             cmp #$0f
             bne @+
+            ldy #0
+            sty SIZEP0
+            sty SIZEP1
+            sty SIZEP2
+            sty SIZEP3
             ldx #SHADE_COLOR
             ldy #$ff
             lda P1_VISIBLE
@@ -992,19 +1002,102 @@ DRG_1       lda #%01100001
             sta WSYNC
             sta PRIOR
             stx COLBK
+            lda GAME_OVER
+            cmp #1
+            beq @+
             sty HPOSP0
             sty HPOSP1
-            ldy #0
-            sty SIZEP0
-            sty SIZEP1
-            sty SIZEP2
-            sty SIZEP3
+            plr
+            rti
+
+            ; Top of gameover text
+@           cmp #$1e-1
+            jne @+
+            lda GAME_OVER
+            cmp #1
+            jne @+
+            lda SDMCTL
+            and #%11101111
+            sta DMACTL
+            lda #FIRST_CHAR_XPOS
+            sta HPOSP0
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+8
+            sta HPOSP1
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+16
+            sta HPOSP2
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+24
+            sta HPOSP3
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+32
+            sta HPOSP0
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+40
+            sta HPOSP1
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+56
+            sta HPOSP2
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+64
+            sta HPOSP3
+
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+            sta WSYNC
+
+            lda #FIRST_CHAR_XPOS+72
+            sta HPOSP0
+
             plr
             rti
 
             ; Status bar
 @           cmp #$6f
             bne @+
+            lda SDMCTL
+            ora #%00010000
+            sta DMACTL
             lda #%00100000
             ldx #$00
             ldy #TIMER_SHADOW_COLOR
@@ -1024,45 +1117,6 @@ DRG_1       lda #%01100001
             sty COLPM1
 @           plr
             rti
-
-DLI_ROUTINE_GAMEOVER
-            phr
-            lda VCOUNT
-
-            ; Top of the game area
-            cmp #$0f
-            bne @+
-            lda #0
-            sta SIZEP0
-            sta SIZEP1
-            sta SIZEP2
-            ldx #SHADE_COLOR
-            stx COLBK
-            plr
-            rti
-
-            ; Status bar
-@           cmp #$6f
-            bne @+
-            lda #%00100000
-            ldx #$00
-            ldy #TIMER_SHADOW_COLOR
-            sta WSYNC
-            sta PRIOR
-            stx COLBK
-            lda #100
-            sta HPOSP0
-            lda #124
-            sta HPOSP1
-            lda #3
-            sta SIZEP0
-            sta SIZEP1
-            sty CLR1
-            ldy #TIMER_COLOR
-            sty COLPM0
-            sty COLPM1
-@           plr
-            rti            
 
 DISABLE_ANTIC
             lda SDMCTL
@@ -1095,16 +1149,15 @@ STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
 
-            org MODUL
-            opt h-
-            ins "music\binary_end.rmt"
-            opt h+
-MUSIC_ENDS_HERE
+;            org MODUL
+;            opt h-
+;            ins "music\binary_end.rmt"
+;            opt h+
+;MUSIC_ENDS_HERE
 
-            icl "music\rmtplayr.a65"
-PLAYER_ENDS_HERE
+ ;           icl "music\rmtplayr.a65"
+;PLAYER_ENDS_HERE
 
-.align $400
 SCR_MEM_MENU
 :1160       dta b(0)
 MENU_FADE_TABLE
