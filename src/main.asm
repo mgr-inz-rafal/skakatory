@@ -415,9 +415,11 @@ TIMER_TICK
             lda REDUCE_TIMER
             beq TT_X
             ldy #0
-            lda (TIMER_PTR),y
-            jsr GET_NEXT_TIMER_CHAR
-            sta (TIMER_PTR),y
+            #if .word TIMER_PTR > #$800C
+                lda (TIMER_PTR),y
+                jsr GET_NEXT_TIMER_CHAR
+                sta (TIMER_PTR),y
+            #end
             ldx #0
             stx REDUCE_TIMER
             cmp #TIMER_START_CHAR+128
