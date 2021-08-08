@@ -827,13 +827,13 @@ PAINT_AI_INDICATORS
             beq PAI_1
             jsr PRINT_CPU
             jmp PAI_2
-PAI_1       PRINT_PL 67
+PAI_1       PRINT_PL 87
 PAI_2       ldy #31
             lda P2_CPU
             beq PAI_3
             jsr PRINT_CPU
             jmp PAI_4
-PAI_3       PRINT_PL 68
+PAI_3       PRINT_PL 88
 PAI_4       rts          
 
 PRINT_CPU
