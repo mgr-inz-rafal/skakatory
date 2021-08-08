@@ -40,8 +40,6 @@ FADE_NEXT_CHAR_5        equ 63
 FADE_SPEED              equ 47
 QUOTE_TARGET_COLOR      equ 10
 
-MODUL                   equ $8800
-
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
 .zpvar          P2_Y_TABLE             .word
@@ -327,11 +325,6 @@ PMG_S_END   equ PMG_BASE+$400
 // Main program start
 //------------------------------------------------
 PROGRAM_START_FIRST_PART
-            lda #05
-;            ldx #<MODUL
-;            ldy #>MODUL
-;            jsr RASTERMUSICTRACKER
-
             jsr DISABLE_ANTIC
             lda <DLI_ROUTINE_GAME
             sta VDSLST
@@ -952,7 +945,6 @@ SF_FIRST
 SF_X        rts             
 
 VBI_ROUTINE
-;            jsr RASTERMUSICTRACKER+3
             lda IN_GAME
             beq @+
             jsr BACKGROUND_TICK
@@ -966,11 +958,6 @@ VBI_ROUTINE
 @           jmp XITVBV
 
 TITLE_SCREEN
-            lda #00
-;            ldx #<MODUL
-;            ldy #>MODUL
-;            jsr RASTERMUSICTRACKER
-
             ; Init VBI
             ldy <VBI_ROUTINE
             ldx >VBI_ROUTINE
@@ -1148,15 +1135,6 @@ PROGRAM_END_FIRST_PART      ; Can't cross $4000
 STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
-
-;            org MODUL
-;            opt h-
-;            ins "music\binary_end.rmt"
-;            opt h+
-;MUSIC_ENDS_HERE
-
- ;           icl "music\rmtplayr.a65"
-;PLAYER_ENDS_HERE
 
 SCR_MEM_MENU
 :1160       dta b(0)
