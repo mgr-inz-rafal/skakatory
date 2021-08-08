@@ -39,6 +39,7 @@ FADE_NEXT_CHAR_4        equ 62
 FADE_NEXT_CHAR_5        equ 63
 FADE_SPEED              equ 47
 QUOTE_TARGET_COLOR      equ 10
+LEVEL_TIMER_ADDRESS     equ STATUS_BAR_BUFFER+$0c
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -415,7 +416,7 @@ TIMER_TICK
             lda REDUCE_TIMER
             beq TT_X
             ldy #0
-            #if .word TIMER_PTR > #$800C
+            #if .word TIMER_PTR > #LEVEL_TIMER_ADDRESS
                 lda (TIMER_PTR),y
                 jsr GET_NEXT_TIMER_CHAR
                 sta (TIMER_PTR),y
