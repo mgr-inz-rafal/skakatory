@@ -244,9 +244,9 @@ DLIST_MEM_TOP
             dta b($4f)
 DLIST_ADDR_TOP
             dta a($0000)
-:27         dta b($0f)
-            dta b(%10001111)
-:65         dta b($0f)
+:26         dta b($0f)
+            dta b(%10001111) ; DLI - before gameover text
+:66         dta b($0f)
 DLIST_MEM_BOTTOM
             dta b($4f)
 DLIST_ADDR_BOTTOM
@@ -355,18 +355,20 @@ PROGRAM_START_FIRST_PART
 GAME_LOOP
             #if .byte P1_STATE = #PS_BURIED .and .byte P2_STATE = #PS_BURIED
                 jsr ENTER_GAMEOVER
-CHUJ        jmp CHUJ                
             #end
             jsr TIMER_TICK
             jsr SYNCHRO
             jsr RESTART_TICK
             lda #$ff
             sta CH
+
+            lda GAME_OVER
+            bne GL_1
             jsr AI_TICK
             jsr PLAYER_TICK
             jsr JOIN_PLAYER_TICK
 
-            ldx CURRENT_FRAME
+GL_1        ldx CURRENT_FRAME
             jsr SHOW_FRAME
 
             jsr CHECK_SCORE
@@ -1009,7 +1011,7 @@ DRG_1       lda #%01100001
             rti
 
             ; Top of gameover text
-@           cmp #$1e
+@           cmp #$1e-1
             jne @+
             lda GAME_OVER
             cmp #1

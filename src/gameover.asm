@@ -1,6 +1,8 @@
 FIRST_CHAR_XPOS     equ 60
 
 ENTER_GAMEOVER
+            lda GAME_OVER
+            bne EG_1        ; Gameover already entered
             lda #1
             sta GAME_OVER
             lda #0
@@ -9,7 +11,7 @@ ENTER_GAMEOVER
             sta SIZEP2
             sta SIZEP3
             jsr PAINT_GAME_OVER
-            rts
+EG_1        rts
 
 PAINT_GAME_OVER
             jsr CLEAR_SPRITE_DATA
