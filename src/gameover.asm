@@ -1,5 +1,27 @@
 FIRST_CHAR_XPOS     equ 256/2-5*8-1
 
+; Fade
+// CHAR_1_COLOR        equ $41
+// CHAR_2_COLOR        equ $43
+// CHAR_3_COLOR        equ $45
+// CHAR_4_COLOR        equ $47
+// CHAR_5_COLOR        equ $49
+// CHAR_6_COLOR        equ $4b
+// CHAR_7_COLOR        equ $4d
+// CHAR_8_COLOR        equ $4e
+// CHAR_9_COLOR        equ $4f
+
+; Colorful
+CHAR_1_COLOR        equ $1b
+CHAR_2_COLOR        equ $55
+CHAR_3_COLOR        equ $df
+CHAR_4_COLOR        equ $77
+CHAR_5_COLOR        equ $49
+CHAR_6_COLOR        equ $0f
+CHAR_7_COLOR        equ $9f
+CHAR_8_COLOR        equ $38
+CHAR_9_COLOR        equ $ba
+
 ENTER_GAMEOVER
             lda GAME_OVER
             bne EG_1        ; Gameover already entered

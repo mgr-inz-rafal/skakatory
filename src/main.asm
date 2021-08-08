@@ -713,8 +713,6 @@ INIT_PLAYERS
             lda #$a6
             sta PCOLR3
             lda #PS_IDLE
-            ;lda #PS_BURIED
-
             sta P1_STATE
             sta P2_STATE
             lda P1_X
@@ -1008,6 +1006,8 @@ DRG_1       lda #%01100001
             sta DMACTL
             lda #FIRST_CHAR_XPOS
             sta HPOSP0
+            ldy #CHAR_1_COLOR
+            sty COLPM0
             sta WSYNC
             sta WSYNC
             sta WSYNC
@@ -1015,6 +1015,8 @@ DRG_1       lda #%01100001
 
             lda #FIRST_CHAR_XPOS+8
             sta HPOSP1
+            ldy #CHAR_2_COLOR
+            sty COLPM1
 
             sta WSYNC
             sta WSYNC
@@ -1023,6 +1025,8 @@ DRG_1       lda #%01100001
 
             lda #FIRST_CHAR_XPOS+16
             sta HPOSP2
+            ldy #CHAR_3_COLOR
+            sty COLPM2
 
             sta WSYNC
             sta WSYNC
@@ -1031,6 +1035,8 @@ DRG_1       lda #%01100001
 
             lda #FIRST_CHAR_XPOS+24
             sta HPOSP3
+            ldy #CHAR_4_COLOR
+            sty COLPM3
 
             sta WSYNC
             sta WSYNC
@@ -1039,6 +1045,8 @@ DRG_1       lda #%01100001
 
             lda #FIRST_CHAR_XPOS+32
             sta HPOSP0
+            ldy #CHAR_5_COLOR
+            sty COLPM0
 
             sta WSYNC
             sta WSYNC
@@ -1047,6 +1055,8 @@ DRG_1       lda #%01100001
 
             lda #FIRST_CHAR_XPOS+40
             sta HPOSP1
+            ldy #CHAR_6_COLOR
+            sty COLPM1
 
             sta WSYNC
             sta WSYNC
@@ -1059,6 +1069,8 @@ DRG_1       lda #%01100001
 
             lda #FIRST_CHAR_XPOS+56
             sta HPOSP2
+            ldy #CHAR_7_COLOR
+            sty COLPM2
 
             sta WSYNC
             sta WSYNC
@@ -1067,6 +1079,8 @@ DRG_1       lda #%01100001
 
             lda #FIRST_CHAR_XPOS+64
             sta HPOSP3
+            ldy #CHAR_8_COLOR
+            sty COLPM3
 
             sta WSYNC
             sta WSYNC
@@ -1075,6 +1089,8 @@ DRG_1       lda #%01100001
 
             lda #FIRST_CHAR_XPOS+72
             sta HPOSP0
+            ldy #CHAR_9_COLOR
+            sty COLPM0
 
             plr
             rti
