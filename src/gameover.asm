@@ -1,4 +1,4 @@
-FIRST_CHAR_XPOS     equ 60
+FIRST_CHAR_XPOS     equ 256/2-5*8-1
 
 ENTER_GAMEOVER
             lda GAME_OVER
