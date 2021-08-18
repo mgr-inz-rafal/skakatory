@@ -678,17 +678,6 @@ PAINT_PLAYERS
             #end
             rts
 
-; Left player sprites
-PLAYER_DATA_00
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-PLAYER_DATA_01
-            dta $C3,$81,$00,$00,$00,$00,$00,$00,$00,$18,$3C,$3C,$18,$18,$00,$00,$00,$00,$42,$E7
-; Right player sprites
-PLAYER_DATA_02
-            dta $00,$00,$00,$00,$00,$00,$18,$7E,$5A,$9A,$19,$18,$18,$3C,$7C,$7E,$7E,$24,$24,$66
-PLAYER_DATA_03
-            dta $3C,$2C,$3C,$34,$3C,$3C,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$24,$24,$66
-
 GAME_ENGINE_INIT
             ; Enable sprites
             lda #>PMG_BASE
@@ -1159,10 +1148,11 @@ STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
 
+.align      $1000
 SCR_MEM_MENU
 :1160       dta b(0)
-MENU_FADE_TABLE
-:20         dta b(0)
+
+; TODO: Here is a place for the code/data (887 bytes)
 
 .align $400
 NAMES_FONT
