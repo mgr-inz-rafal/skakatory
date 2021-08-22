@@ -1249,6 +1249,11 @@ GAME_OVER_PMG_3     ; Starting offset +6
 ; 43 - b(148) - 14
 ; 44 - b(152) - 14
 ; 45 - b(156) - 14
+;
+; Please note that there is no guarantee which frame will be
+; used as a player picture after the jump is finished.
+; It could be frame #0 or frame #45 (depending on if and when
+; the jump was interrupted).
 
 PLAYER_DATA_OFFSETS
             dta a( 0 * PLAYER_FRAME_SIZE)
