@@ -631,11 +631,34 @@ PAINT_PLAYERS_PRECALC
             lda XTMP1
             rts
 
+ADD_FRAME_OFFSET_1
+            ldy P1_Y
+            cpy #0
+            beq AFO_0
+            tya
+            asl
+            tay
+            adw XTMP PLAYER_DATA_OFFSETS,y 
+            adw XTMP2 PLAYER_DATA_OFFSETS,y 
+AFO_0       rts
+
+ADD_FRAME_OFFSET_2
+            ldy P2_Y
+            cpy #0
+            beq AFO2_0
+            tya
+            asl
+            tay
+            adw XTMP PLAYER_DATA_OFFSETS,y 
+            adw XTMP2 PLAYER_DATA_OFFSETS,y 
+AFO2_0       rts
+
 PAINT_PLAYERS
 ; Paint left player
             #if .byte P1_STATE <> #PS_BURIED
                 mwa #PLAYER_DATA_00 XTMP
                 mwa #PLAYER_DATA_01 XTMP2
+                jsr ADD_FRAME_OFFSET_1
                 ldy P1_Y
                 lda (P1_Y_TABLE),y
                 sec
@@ -658,6 +681,7 @@ PAINT_PLAYERS
             #if .byte P2_STATE <> #PS_BURIED
                 mwa #PLAYER_DATA_02 XTMP
                 mwa #PLAYER_DATA_03 XTMP2
+                jsr ADD_FRAME_OFFSET_2
                 ldy P2_Y
                 lda (P2_Y_TABLE),y
                 sec
