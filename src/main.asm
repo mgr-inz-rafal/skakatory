@@ -756,6 +756,8 @@ INIT_LEVEL_PARAMS
             rts
 
 GAME_STATE_INIT
+            lda #$ff
+            sta CH
             lda #1
             sta P1_VISIBLE
             sta P2_VISIBLE
