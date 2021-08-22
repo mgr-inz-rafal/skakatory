@@ -1202,23 +1202,123 @@ GAME_OVER_PMG_3     ; Starting offset +6
 ; We'll change the shape of the player every 3 frames.
 ; So we need approx. 15 frames for a jump.
 
+; Here's the mapping of the player position vs animation frame
+;  0 - b(156) - 0
+;  1 - b(152) - 0
+;  2 - b(148) - 0
+;  3 - b(144) - 1
+;  4 - b(140) - 1
+;  5 - b(136) - 1
+;  6 - b(133) - 2
+;  7 - b(130) - 2
+;  8 - b(127) - 2
+;  9 - b(124) - 3
+; 10 - b(121) - 3
+; 11 - b(119) - 3
+; 12 - b(117) - 4
+; 13 - b(115) - 4
+; 14 - b(113) - 4
+; 15 - b(112) - 5
+; 16 - b(110) - 5
+; 17 - b(109) - 5
+; 18 - b(108) - 6
+; 19 - b(107) - 6
+; 20 - b(107) - 6
+; 21 - b(106) - 7
+; 22 - b(106) - 7
+; 23 - b(106) - 7
+; 24 - b(106) - 8
+; 25 - b(107) - 8
+; 26 - b(107) - 8
+; 27 - b(108) - 9
+; 28 - b(109) - 9
+; 29 - b(110) - 9
+; 30 - b(112) - 10
+; 31 - b(113) - 10
+; 32 - b(115) - 10
+; 33 - b(117) - 11
+; 34 - b(119) - 11
+; 35 - b(121) - 11
+; 36 - b(124) - 12
+; 37 - b(127) - 12
+; 38 - b(130) - 12
+; 39 - b(133) - 13
+; 40 - b(136) - 13
+; 41 - b(140) - 13
+; 42 - b(144) - 14
+; 43 - b(148) - 14
+; 44 - b(152) - 14
+; 45 - b(156) - 14
+
+PLAYER_DATA_OFFSETS
+            dta a( 0 * PLAYER_FRAME_SIZE)
+            dta a( 0 * PLAYER_FRAME_SIZE)
+            dta a( 0 * PLAYER_FRAME_SIZE)
+            dta a( 1 * PLAYER_FRAME_SIZE)
+            dta a( 1 * PLAYER_FRAME_SIZE)
+            dta a( 1 * PLAYER_FRAME_SIZE)
+            dta a( 2 * PLAYER_FRAME_SIZE)
+            dta a( 2 * PLAYER_FRAME_SIZE)
+            dta a( 2 * PLAYER_FRAME_SIZE)
+            dta a( 3 * PLAYER_FRAME_SIZE)
+            dta a( 3 * PLAYER_FRAME_SIZE)
+            dta a( 3 * PLAYER_FRAME_SIZE)
+            dta a( 4 * PLAYER_FRAME_SIZE)
+            dta a( 4 * PLAYER_FRAME_SIZE)
+            dta a( 4 * PLAYER_FRAME_SIZE)
+            dta a( 5 * PLAYER_FRAME_SIZE)
+            dta a( 5 * PLAYER_FRAME_SIZE)
+            dta a( 5 * PLAYER_FRAME_SIZE)
+            dta a( 6 * PLAYER_FRAME_SIZE)
+            dta a( 6 * PLAYER_FRAME_SIZE)
+            dta a( 6 * PLAYER_FRAME_SIZE)
+            dta a( 7 * PLAYER_FRAME_SIZE)
+            dta a( 7 * PLAYER_FRAME_SIZE)
+            dta a( 7 * PLAYER_FRAME_SIZE)
+            dta a( 8 * PLAYER_FRAME_SIZE)
+            dta a( 8 * PLAYER_FRAME_SIZE)
+            dta a( 8 * PLAYER_FRAME_SIZE)
+            dta a( 9 * PLAYER_FRAME_SIZE)
+            dta a( 9 * PLAYER_FRAME_SIZE)
+            dta a( 9 * PLAYER_FRAME_SIZE)
+            dta a(10 * PLAYER_FRAME_SIZE)
+            dta a(10 * PLAYER_FRAME_SIZE)
+            dta a(10 * PLAYER_FRAME_SIZE)
+            dta a(11 * PLAYER_FRAME_SIZE)
+            dta a(11 * PLAYER_FRAME_SIZE)
+            dta a(11 * PLAYER_FRAME_SIZE)
+            dta a(12 * PLAYER_FRAME_SIZE)
+            dta a(12 * PLAYER_FRAME_SIZE)
+            dta a(12 * PLAYER_FRAME_SIZE)
+            dta a(13 * PLAYER_FRAME_SIZE)
+            dta a(13 * PLAYER_FRAME_SIZE)
+            dta a(13 * PLAYER_FRAME_SIZE)
+            dta a(14 * PLAYER_FRAME_SIZE)
+            dta a(14 * PLAYER_FRAME_SIZE)
+            dta a(14 * PLAYER_FRAME_SIZE)
+            dta a(14 * PLAYER_FRAME_SIZE)
+            
+
 ; Left player sprites
+PLAYER_FRAME_SIZE   equ PLAYER_DATA_FRAME_END - PLAYER_DATA_FRAME_START
 PLAYER_DATA_00
-            dta $FF,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
+PLAYER_DATA_FRAME_START
+            dta $FF,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,1
+PLAYER_DATA_FRAME_END            
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,2
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,3
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,4
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,5
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,6
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,7
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,8
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,9
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,10
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,11
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,12
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,13
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,14
+            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,15
 PLAYER_DATA_01
             dta $C3,$81,$00,$00,$00,$00,$00,$00,$00,$18,$3C,$3C,$18,$18,$00,$00,$00,$00,$42,$E7
             dta $C3,$81,$00,$00,$00,$00,$00,$00,$00,$18,$3C,$3C,$18,$18,$00,$00,$00,$00,$42,$E7
