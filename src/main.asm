@@ -40,8 +40,8 @@ FADE_NEXT_CHAR_5        equ 63
 FADE_SPEED              equ 47
 QUOTE_TARGET_COLOR      equ 10
 LEVEL_TIMER_ADDRESS     equ STATUS_BAR_BUFFER+$0c
-P1_COLOR_1              equ $1f
-P1_COLOR_2              equ $78
+P1_COLOR_1              equ $1a
+P1_COLOR_2              equ $24
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
