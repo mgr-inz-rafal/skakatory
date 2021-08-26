@@ -40,6 +40,10 @@ FADE_NEXT_CHAR_5        equ 63
 FADE_SPEED              equ 47
 QUOTE_TARGET_COLOR      equ 10
 LEVEL_TIMER_ADDRESS     equ STATUS_BAR_BUFFER+$0c
+P1_COLOR_1              equ $1a
+P1_COLOR_2              equ $24
+P2_COLOR_1              equ $98
+P2_COLOR_2              equ $46
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -631,11 +635,22 @@ PAINT_PLAYERS_PRECALC
             lda XTMP1
             rts
 
+ADD_FRAME_OFFSET
+            beq AFO_X
+            tya
+            asl
+            tay
+            adw XTMP PLAYER_DATA_OFFSETS,y 
+            adw XTMP2 PLAYER_DATA_OFFSETS,y 
+AFO_X       rts
+
 PAINT_PLAYERS
 ; Paint left player
             #if .byte P1_STATE <> #PS_BURIED
                 mwa #PLAYER_DATA_00 XTMP
                 mwa #PLAYER_DATA_01 XTMP2
+                ldy P1_Y
+                jsr ADD_FRAME_OFFSET
                 ldy P1_Y
                 lda (P1_Y_TABLE),y
                 sec
@@ -659,6 +674,8 @@ PAINT_PLAYERS
                 mwa #PLAYER_DATA_02 XTMP
                 mwa #PLAYER_DATA_03 XTMP2
                 ldy P2_Y
+                jsr ADD_FRAME_OFFSET
+                ldy P2_Y
                 lda (P2_Y_TABLE),y
                 sec
                 sbc P2_DRAWING_Y_OFFSET
@@ -677,17 +694,6 @@ PAINT_PLAYERS
                 bne @-
             #end
             rts
-
-; Left player sprites
-PLAYER_DATA_00
-            dta $18,$3C,$3C,$3C,$3C,$38,$18,$00,$7F,$59,$59,$99,$98,$18,$3C,$52,$52,$42,$42,$C3
-PLAYER_DATA_01
-            dta $C3,$81,$00,$00,$00,$00,$00,$00,$00,$18,$3C,$3C,$18,$18,$00,$00,$00,$00,$42,$E7
-; Right player sprites
-PLAYER_DATA_02
-            dta $00,$00,$00,$00,$00,$00,$18,$7E,$5A,$9A,$19,$18,$18,$3C,$7C,$7E,$7E,$24,$24,$66
-PLAYER_DATA_03
-            dta $3C,$2C,$3C,$34,$3C,$3C,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$24,$24,$66
 
 GAME_ENGINE_INIT
             ; Enable sprites
@@ -711,13 +717,13 @@ INIT_PLAYERS
             lda #0
             sta P1_Y
             sta P2_Y
-            lda #$1f
+            lda #P1_COLOR_1
             sta PCOLR0
-            lda #$af
+            lda #P1_COLOR_2
             sta PCOLR1
-            lda #$3f
+            lda #P2_COLOR_1
             sta PCOLR2
-            lda #$a6
+            lda #P2_COLOR_2
             sta PCOLR3
             lda #PS_IDLE
             sta P1_STATE
@@ -1161,10 +1167,11 @@ STATUS_BAR_BUFFER
 :40         dta b('A')
             icl 'src\data.asm'
 
+.align      $1000
 SCR_MEM_MENU
 :1160       dta b(0)
-MENU_FADE_TABLE
-:20         dta b(0)
+
+; TODO: Here is a place for the code/data (887 bytes)
 
 .align $400
 NAMES_FONT
