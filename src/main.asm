@@ -42,6 +42,8 @@ QUOTE_TARGET_COLOR      equ 10
 LEVEL_TIMER_ADDRESS     equ STATUS_BAR_BUFFER+$0c
 P1_COLOR_1              equ $1a
 P1_COLOR_2              equ $24
+P2_COLOR_1              equ $98
+P2_COLOR_2              equ $46
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -719,9 +721,9 @@ INIT_PLAYERS
             sta PCOLR0
             lda #P1_COLOR_2
             sta PCOLR1
-            lda #$3f
+            lda #P2_COLOR_1
             sta PCOLR2
-            lda #$a6
+            lda #P2_COLOR_2
             sta PCOLR3
             lda #PS_IDLE
             sta P1_STATE
