@@ -336,6 +336,7 @@ PROGRAM_START_FIRST_PART
             lda >DLI_ROUTINE_GAME
             sta VDSLST+1
 
+            jsr PLAY_INGAME_MUSIC
             jsr GAME_STATE_INIT
 
             ldx <DLIST_GAME
@@ -387,6 +388,43 @@ AI_TICK     AI_PLAYER_TICK 1 0
             AI_PLAYER_TICK 2 1
             RELEASE_AI_KEY 1 0
             RELEASE_AI_KEY 2 1
+            rts
+
+MUSIC_INIT
+            ldx <CMC_MUSIC
+            ldy >CMC_MUSIC
+            lda #$70
+            jsr CMC_PLAYER+3
+            rts
+
+PLAY_MENU_MUSIC
+            lda #$10
+            ldx #19
+            jsr CMC_PLAYER+3
+            rts
+
+PLAY_INGAME_MUSIC
+            lda #$10
+            ldx #0
+            jsr CMC_PLAYER+3
+            rts
+
+PLAY_FADEIN_MUSIC
+            lda #$10
+            ldx #39
+            jsr CMC_PLAYER+3
+            rts
+
+PLAY_FADEOUT_MUSIC
+            lda #$10
+            ldx #42
+            jsr CMC_PLAYER+3
+            rts
+
+PLAY_ENDGAME_MUSIC
+            lda #$10
+            ldx #33
+            jsr CMC_PLAYER+3
             rts
 
 PAINT_TIMER_SHADOW
@@ -968,9 +1006,13 @@ VBI_ROUTINE
                 lda #0
                 sta TIMER_COUNTER
             #end
-@           jmp XITVBV
+@           jsr CMC_PLAYER+6
+            jmp XITVBV
 
 TITLE_SCREEN
+            jsr MUSIC_INIT
+            jsr PLAY_FADEIN_MUSIC
+
             ; Init VBI
             ldy <VBI_ROUTINE
             ldx >VBI_ROUTINE
@@ -1155,7 +1197,7 @@ ENABLE_ANTIC
             sta NMIEN
             rts
 
-            icl "src\gameover.asm"            
+            icl "src\gameover.asm"
 
 PROGRAM_END_FIRST_PART      ; Can't cross $4000
 
@@ -1180,6 +1222,14 @@ QUOTE_FONT
             ins 'data\quote.fnt'
 
 DATA_END
+
+CMC_MUSIC
+            ins 'src\music\SKA7.CMC',+6
+CMC_MUSIC_END
+
+CMC_PLAYER
+            icl 'src\music\cmc_player.asm'
+CMC_PLAYER_END
 
 //------------------------------------------------
 // Loading data into extram
