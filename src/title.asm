@@ -15,6 +15,7 @@
 TIT_1       lda STRIG0
             sta ATRACT
             bne @-
+            jsr PLAY_FADEOUT_MUSIC
             jsr FADE_OUT_TITLE_SCREEN
             jmp PROGRAM_START_FIRST_PART
 
@@ -97,6 +98,7 @@ TITLE_MAIN
             jsr PRINT_QUOTATION
             lda #$ff
             sta CH
+            jsr PLAY_MENU_MUSIC
             rts        
 
 FADE_NAME_ROW
