@@ -12,9 +12,14 @@
             lda #QUOTE_COLOR_COOLDOWN
             sta QUOTE_COLOR_COUNTER
 
-TIT_1       lda STRIG0
+TIT_1       lda #0
             sta ATRACT
-            bne @-
+            #if .byte STRIG0 = #1 .and .byte STRIG1 = #1
+                jmp @-
+            #end
+            #if .byte QUOTE_COLOR <> #QUOTE_TARGET_COLOR
+                jmp @-
+            #end
             jsr PLAY_FADEOUT_MUSIC
             jsr FADE_OUT_TITLE_SCREEN
             jmp PROGRAM_START_FIRST_PART
