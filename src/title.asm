@@ -1,4 +1,6 @@
-            mva #0 IN_GAME
+            lda #0
+            sta IN_GAME
+            sta SHOW_CREDITS_QUOTE
             mva #TITLE_FADEIN_QUOTE TITLE_STATE
             jsr CLEAR_PLAYERS_PMG
             jsr TITLE_MAIN
@@ -54,6 +56,7 @@ ANIMATE_FADEOUT_QUOTE
             #if .byte QUOTE_COLOR != #0
                 dec QUOTE_COLOR
             #else
+                jsr PRINT_QUOTATION
                 mva #TITLE_FADEIN_QUOTE TITLE_STATE
             #end
             lda #QUOTE_COLOR_COOLDOWN
@@ -268,7 +271,16 @@ DECREASE_FADE_TIMER
             lda #0
 DFT_1       rts
 
+PRINT_CREDITS
+            mwa #QUOTATION_CREDITS XTMP
+            jmp PQ_5
+
 PRINT_QUOTATION
+            inc SHOW_CREDITS_QUOTE
+            lda SHOW_CREDITS_QUOTE
+            and #%00000001
+            beq PRINT_CREDITS
+
             lda RANDOM
             and #%00000011
 

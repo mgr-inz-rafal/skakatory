@@ -1106,6 +1106,12 @@ QUOTATION_4
             dta d'     Fenomen tw',b(32),d'rczy i programistyczny',b(63),d'"'
             dta d'                    - ',b(24),b(25),b(11),d' ',b(23),b(21),b(26),d'. ',b(27),b(8),b(28),b(8),b(7),d'    '
 
+QUOTATION_CREDITS
+            dta d'             CODE ',b(123),d' GFX',b(96),d'  mgr in',b(61),d'. Rafa',b(29)
+            dta d'                                        '
+            dta d'                    MSX',b(96),d'     pseudografx'
+            dta d'                                        '
+
 GAME_OVER_PMG_0
             dta b(%00000000)
             dta b(%01100011)

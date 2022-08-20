@@ -79,6 +79,7 @@ MUSICPLAYER             equ DATA_END + $400
 .zpvar          IN_GAME                .byte
 .zpvar          REDUCE_TIMER           .byte
 .zpvar          GAME_OVER              .byte
+.zpvar          SHOW_CREDITS_QUOTE     .byte
 
 .zpvar          QUOTE_COLOR_COUNTER    .byte
 QUOTE_COLOR_COOLDOWN        equ 11
