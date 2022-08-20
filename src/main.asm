@@ -83,6 +83,14 @@ MUSICPLAYER             equ DATA_END + $400
 .zpvar          QUOTE_COLOR_COUNTER    .byte
 QUOTE_COLOR_COOLDOWN        equ 11
 
+.zpvar          QUOTE_SHOWING_COUNTER  .word
+QUOTE_SHOWING_COOLDOWN      equ 873
+
+.zpvar          TITLE_STATE            .byte
+TITLE_FADEIN_QUOTE          equ 1
+TITLE_FADEOUT_QUOTE         equ 2
+TITLE_SHOWING_QUOTE         equ 3
+
 .zpvar          P1_INVUL_COUNTER       .byte
 .zpvar          P2_INVUL_COUNTER       .byte
 INVUL_COOLDOWN              equ 5

@@ -1,17 +1,16 @@
             mva #0 IN_GAME
+            mva #TITLE_FADEIN_QUOTE TITLE_STATE
             jsr CLEAR_PLAYERS_PMG
             jsr TITLE_MAIN
 
 @           jsr SYNCHRO
-            dec QUOTE_COLOR_COUNTER
-            lda QUOTE_COLOR_COUNTER
-            bne TIT_1
-            #if .byte QUOTE_COLOR < #QUOTE_TARGET_COLOR
-                inc QUOTE_COLOR
-            #end
-            lda #QUOTE_COLOR_COOLDOWN
-            sta QUOTE_COLOR_COUNTER
-
+            lda TITLE_STATE
+            cmp #TITLE_FADEIN_QUOTE
+            beq ANIMATE_FADEIN_QUOTE
+TIT_2       cmp #TITLE_SHOWING_QUOTE
+            beq HANDLE_SHOWING_QUOTE
+TIT_3       cmp #TITLE_FADEOUT_QUOTE
+            jeq ANIMATE_FADEOUT_QUOTE
 TIT_1       lda #0
             sta ATRACT
             #if .byte STRIG0 = #1 .and .byte STRIG1 = #1
@@ -23,6 +22,43 @@ TIT_1       lda #0
             jsr PLAY_FADEOUT_MUSIC
             jsr FADE_OUT_TITLE_SCREEN
             jmp PROGRAM_START_FIRST_PART
+
+HANDLE_SHOWING_QUOTE
+            dew QUOTE_SHOWING_COUNTER
+            #if .word QUOTE_SHOWING_COUNTER == #0
+                mva #TITLE_FADEOUT_QUOTE TITLE_STATE
+                lda #QUOTE_COLOR_COOLDOWN
+                sta QUOTE_COLOR_COUNTER
+                jmp TIT_2            
+            #end
+            bne TIT_1
+
+ANIMATE_FADEIN_QUOTE
+            dec QUOTE_COLOR_COUNTER
+            lda QUOTE_COLOR_COUNTER
+            bne TIT_1
+            #if .byte QUOTE_COLOR < #QUOTE_TARGET_COLOR
+                inc QUOTE_COLOR
+            #else
+                mva #TITLE_SHOWING_QUOTE TITLE_STATE
+                mwa #QUOTE_SHOWING_COOLDOWN QUOTE_SHOWING_COUNTER
+            #end
+            lda #QUOTE_COLOR_COOLDOWN
+            sta QUOTE_COLOR_COUNTER
+            jmp TIT_2            
+
+ANIMATE_FADEOUT_QUOTE
+            dec QUOTE_COLOR_COUNTER
+            lda QUOTE_COLOR_COUNTER
+            jne TIT_1
+            #if .byte QUOTE_COLOR != #0
+                dec QUOTE_COLOR
+            #else
+                mva #TITLE_FADEIN_QUOTE TITLE_STATE
+            #end
+            lda #QUOTE_COLOR_COOLDOWN
+            sta QUOTE_COLOR_COUNTER
+            jmp TIT_2            
 
 CLEAR_PLAYERS_PMG
             ldy #0
