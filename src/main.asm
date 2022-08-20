@@ -44,6 +44,7 @@ P1_COLOR_1              equ $1a
 P1_COLOR_2              equ $24
 P2_COLOR_1              equ $98
 P2_COLOR_2              equ $46
+MUSICPLAYER             equ DATA_END + $400
 
 .zpvar          P1_Y_TABLE             .word
 .zpvar          P1_X_TABLE             .word
@@ -389,40 +390,40 @@ AI_TICK     AI_PLAYER_TICK 1 0
             rts
 
 MUSIC_INIT
-            ldx <CMC_MUSIC
-            ldy >CMC_MUSIC
-            lda #$70
-            jsr CMC_PLAYER+3
+            lda #0
+            ldx <MODUL
+            ldy >MODUL
+            jsr RASTERMUSICTRACKER
             rts
 
 PLAY_MENU_MUSIC
-            lda #$10
-            ldx #19
-            jsr CMC_PLAYER+3
+;            lda #$10
+;            ldx #19
+;            jsr CMC_PLAYER+3
             rts
 
 PLAY_INGAME_MUSIC
-            lda #$10
-            ldx #0
-            jsr CMC_PLAYER+3
+;            lda #$10
+;            ldx #0
+;            jsr CMC_PLAYER+3
             rts
 
 PLAY_FADEIN_MUSIC
-            lda #$10
-            ldx #39
-            jsr CMC_PLAYER+3
+;            lda #$10
+;            ldx #39
+;            jsr CMC_PLAYER+3
             rts
 
 PLAY_FADEOUT_MUSIC
-            lda #$10
-            ldx #42
-            jsr CMC_PLAYER+3
+;            lda #$10
+;            ldx #42
+;            jsr CMC_PLAYER+3
             rts
 
 PLAY_ENDGAME_MUSIC
-            lda #$10
-            ldx #33
-            jsr CMC_PLAYER+3
+;            lda #$10
+;            ldx #33
+;            jsr CMC_PLAYER+3
             rts
 
 PAINT_TIMER_SHADOW
@@ -1008,7 +1009,7 @@ VBI_ROUTINE
                 lda #0
                 sta TIMER_COUNTER
             #end
-@           jsr CMC_PLAYER+6
+@           jsr RASTERMUSICTRACKER+3
             jmp XITVBV
 
 TITLE_SCREEN
@@ -1225,13 +1226,14 @@ QUOTE_FONT
 
 DATA_END
 
-CMC_MUSIC
-            ins 'src\music\SKA7.CMC',+6
-CMC_MUSIC_END
+            org MUSICPLAYER
+    		icl "music\rmtplayr.a65"
 
-CMC_PLAYER
-            icl 'src\music\cmc_player.asm'
-CMC_PLAYER_END
+MUSIC_PLAYER_END
+MODUL
+		opt h-
+		ins "music\Flob2b.rmt"
+		opt h+
 
 //------------------------------------------------
 // Loading data into extram
