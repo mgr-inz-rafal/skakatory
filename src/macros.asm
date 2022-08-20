@@ -43,6 +43,7 @@ AS%%1_1     sed
             lda P%%1_SCORE_H
             adc #1
             sta P%%1_SCORE_H
+            cld
             jmp AS%%1_X
 AS%%1_2     .if :1 = 2
                 dec INVUL_DISABLE_COUNTER
