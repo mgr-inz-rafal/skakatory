@@ -86,9 +86,7 @@ QUOTE_COLOR_COOLDOWN        equ 11
 .zpvar          P2_INVUL_COUNTER       .byte
 INVUL_COOLDOWN              equ 5
 
-.zpvar          P1_INVUL_DISABLE_COUNTER .byte
-.zpvar          P2_INVUL_DISABLE_COUNTER .byte
-INVUL_ROTATIONS             equ 4
+.zpvar          INVUL_DISABLE_COUNTER  .byte
 
 .zpvar          SCORE_JUST_INCREASED   .byte
 SCORE_INCREASE_COOLDOWN     equ 4
@@ -586,6 +584,11 @@ CS_1        jsr ADVANCE_SCORES
             jsr PAINT_POINTS
             ldx #SCORE_INCREASE_COOLDOWN
             stx SCORE_JUST_INCREASED
+
+            lda INVUL_DISABLE_COUNTER
+            bne CS_X
+            jsr DISABLE_INVUL
+
             rts
 
 ENABLE_INVUL
@@ -598,8 +601,7 @@ ENABLE_INVUL
             sta P2_INVUL_COUNTER
             ldx CURRENT_GAME_LEVEL
             lda INVUL_ROTATIONS_PER_LEVEL,x
-            sta P1_INVUL_DISABLE_COUNTER
-            sta P2_INVUL_DISABLE_COUNTER
+            sta INVUL_DISABLE_COUNTER
             rts
 
 DISABLE_INVUL

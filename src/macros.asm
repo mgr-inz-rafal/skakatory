@@ -44,10 +44,8 @@ AS%%1_1     sed
             adc #1
             sta P%%1_SCORE_H
             jmp AS%%1_X
-AS%%1_2     dec P%%1_INVUL_DISABLE_COUNTER
-            bne AS%%1_X
-            .if :1 = 2
-                jsr DISABLE_INVUL
+AS%%1_2     .if :1 = 2
+                dec INVUL_DISABLE_COUNTER
             .endif
 AS%%1_X
 .endm
