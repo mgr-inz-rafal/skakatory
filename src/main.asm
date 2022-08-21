@@ -18,7 +18,6 @@ NAMES_BANK              equ 52
 NAMES_PER_SEX           equ 500
 ZERO_DIGIT_OFFSET       equ 66
 AMPERSAND_PIXEL_COUNT   equ 176
-SHADE_COLOR             equ $b0
 TIMER_LENGTH            equ 14
 TIMER_SHADOW_COLOR      equ $0f
 TIMER_COLOR             equ $e4
@@ -669,6 +668,7 @@ ADVANCE_LEVEL
             sta CURRENT_ROTATIONS
             jsr PAINT_TIMER
             jsr INIT_TIMER
+            jsr INIT_SHADE_COLOR
             rts
 
 PAINT_PLAYERS_PRECALC        
@@ -849,6 +849,7 @@ GAME_STATE_INIT
             lda LAST_FRAME_PER_LEVEL,y
             sta LAST_FRAME
             jsr INIT_LEVEL_PARAMS
+            jsr INIT_SHADE_COLOR
             ldy CURRENT_GAME_LEVEL
             lda ROTATIONS_PER_LEVEL,y
             sta CURRENT_ROTATIONS
@@ -1046,7 +1047,7 @@ DLI_ROUTINE_GAME
             sty SIZEP1
             sty SIZEP2
             sty SIZEP3
-            ldx #SHADE_COLOR
+            ldx SHADE_COLOR
             ldy #$ff
             lda P1_VISIBLE
             beq DRG_1
@@ -1224,8 +1225,15 @@ STATUS_BAR_BUFFER
 .align      $1000
 SCR_MEM_MENU
 :1160       dta b(0)
+SHADE_COLOR dta b(0)
 
 ; TODO: Here is a place for the code/data (887 bytes)
+
+INIT_SHADE_COLOR
+            lda RANDOM
+            and #%11110000
+            sta SHADE_COLOR
+            rts
 
 .align $400
 NAMES_FONT
