@@ -23,6 +23,10 @@ TIT_1       lda #0
             #end
             jsr PLAY_FADEOUT_MUSIC
             jsr FADE_OUT_TITLE_SCREEN
+            ldx #255
+            jsr WAIT_FRAMES
+            ldx #255
+            jsr WAIT_FRAMES
             jmp PROGRAM_START_FIRST_PART
 
 HANDLE_SHOWING_QUOTE
@@ -142,7 +146,6 @@ TITLE_MAIN
             jsr PRINT_QUOTATION
             lda #$ff
             sta CH
-            jsr PLAY_MENU_MUSIC
             rts        
 
 FADE_NAME_ROW

@@ -404,34 +404,25 @@ MUSIC_INIT
             jsr RASTERMUSICTRACKER
             rts
 
-PLAY_MENU_MUSIC
-;            lda #$10
-;            ldx #19
-;            jsr CMC_PLAYER+3
-            rts
-
 PLAY_INGAME_MUSIC
-;            lda #$10
-;            ldx #0
-;            jsr CMC_PLAYER+3
+            lda #0
+            ldx <MODUL
+            ldy >MODUL
+            jsr RASTERMUSICTRACKER
             rts
 
 PLAY_FADEIN_MUSIC
-;            lda #$10
-;            ldx #39
-;            jsr CMC_PLAYER+3
+            lda #$11
+            ldx <MODUL
+            ldy >MODUL
+            jsr RASTERMUSICTRACKER
             rts
 
 PLAY_FADEOUT_MUSIC
-;            lda #$10
-;            ldx #42
-;            jsr CMC_PLAYER+3
-            rts
-
-PLAY_ENDGAME_MUSIC
-;            lda #$10
-;            ldx #33
-;            jsr CMC_PLAYER+3
+            lda #$0e
+            ldx <MODUL
+            ldy >MODUL
+            jsr RASTERMUSICTRACKER
             rts
 
 PAINT_TIMER_SHADOW
@@ -1249,7 +1240,7 @@ DATA_END
 MUSIC_PLAYER_END
 MODUL
 		opt h-
-		ins "music\Flob2b.rmt"
+		ins "music\for_rafal.rmt"
 		opt h+
 
 //------------------------------------------------

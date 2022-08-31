@@ -33,7 +33,6 @@ ENTER_GAMEOVER
             sta SIZEP2
             sta SIZEP3
             jsr PAINT_GAME_OVER
-            jsr PLAY_ENDGAME_MUSIC
 EG_1        rts
 
 PAINT_GAME_OVER
